@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "scripts": {
+  "start": "concurrently \"npm run serve-back\" \"npm run serve-front\"",
+  "serve-back": "cd back && npm start",
+  "serve-front": "cd front && npm start"
+}
+}
+
