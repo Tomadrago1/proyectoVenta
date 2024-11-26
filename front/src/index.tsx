@@ -1,6 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
+import App from './App'; // Importamos App.tsx
 
-const App: React.FC = () => <h1>Hello, React with TypeScript!</h1>;
+const rootElement = document.getElementById('root') as HTMLElement;
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <App /> {/* Renderizamos el componente principal */}
+  </React.StrictMode>
+);

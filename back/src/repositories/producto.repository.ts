@@ -1,7 +1,7 @@
 import { Repository } from '../shared/repository';
 import { Producto } from '../models/producto.model';
 import { pool } from '../shared/conn';
-import { RowDataPacket } from 'mysql2';
+import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export class ProductoRepository implements Repository<Producto> {
   public async findAll(): Promise<Producto[] | undefined> {
@@ -23,13 +23,25 @@ export class ProductoRepository implements Repository<Producto> {
   }
 
   public async save(item: Producto): Promise<Producto> {
-    const [result] = (await pool.query(
-      'INSERT INTO productos (nombre, precio) VALUES (?, ?)',
-      [item.nombre, item.precio, item.precio]
-    )) as RowDataPacket[];
-    const affectedRows = (result as any).affectedRows;
-    if (affectedRows === 1) {
-      return item;
+    // Realiza la inserción
+    const [result] = await pool.query<ResultSetHeader>(
+      'INSERT INTO productos (nombre_producto, precio) VALUES (?, ?)',
+      [item.nombre_producto, item.precio]
+    );
+
+    // Obtén el ID generado para el nuevo producto
+    const insertId = (result as any).insertId;
+
+    // Verifica si la inserción fue exitosa
+    if (insertId) {
+      // Recupera el producto recién insertado usando el ID generado
+      const [newProduct] = await pool.query<RowDataPacket[]>(
+        'SELECT * FROM productos WHERE id_producto = ?',
+        [insertId]
+      );
+
+      // Retorna el producto recién creado con su ID
+      return newProduct[0] as Producto;
     } else {
       throw new Error('No se ha podido insertar el producto');
     }
@@ -37,22 +49,36 @@ export class ProductoRepository implements Repository<Producto> {
 
   public async update(item: { id: string }, producto: Producto): Promise<Producto | undefined> {
     const id = Number.parseInt(item.id);
-    const [result] = (await pool.query(
-      'UPDATE productos SET nombre = ?, precio = ? WHERE id = ?',
-      [producto.nombre, producto.precio, id]
-    )) as RowDataPacket[];
-    const affectedRows = (result as any).affectedRows;
+
+    // Realiza la actualización
+    const [result] = await pool.query<ResultSetHeader>(
+      'UPDATE productos SET nombre_producto = ?, precio = ? WHERE id_producto = ?',
+      [producto.nombre_producto, producto.precio, id]
+    );
+
+    // Verifica el número de filas afectadas
+    const affectedRows = result.affectedRows;
+
     if (affectedRows === 1) {
-      return producto;
+      // Recupera el producto actualizado
+      const [updatedProduct] = await pool.query<RowDataPacket[]>(
+        'SELECT * FROM productos WHERE id_producto = ?',
+        [id]
+      );
+
+      // Retorna el primer (y único) producto actualizado
+      return updatedProduct[0] as Producto;  // Asegurarse de que el resultado sea un Producto
     } else {
-      throw new Error('No se ha podido actualizar el producto');
+      throw new Error('No se ha podido actualizar el producto o el producto no existe');
     }
   }
+
+
 
   public async remove(item: { id: string }): Promise<void> {
     const id = Number.parseInt(item.id);
 
-    const [result_venta] = (await pool.query('SELECT * FROM ventas WHERE id_producto = ?', [id])) as RowDataPacket[];
+    const [result_venta] = (await pool.query('SELECT * FROM detalle_venta WHERE id_producto = ?', [id])) as RowDataPacket[];
     if ((result_venta as any).length > 0) {
       throw new Error('No se puede borrar el producto porque tiene ventas asociadas');
     }

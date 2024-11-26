@@ -33,7 +33,7 @@ async function create(req: Request, res: Response) {
   try {
     const producto = new Producto(
       req.body.id,
-      req.body.nombre,
+      req.body.nombre_producto,
       req.body.precio
     );
     const result = await repository.save(producto);
@@ -46,12 +46,13 @@ async function create(req: Request, res: Response) {
 
 async function update(req: Request, res: Response) {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // Obtener el id desde los parámetros de la URL
     const producto = new Producto(
-      req.body.id,
-      req.body.nombre,
-      req.body.precio,
+      parseInt(id), // Convertir el id en número
+      req.body.nombre_producto, // Cambié "nombre" por "nombre_producto" para coincidir con tu clase
+      req.body.precio
     );
+
     const result = await repository.update({ id }, producto);
     res.json(result);
   } catch (error: any) {
@@ -59,6 +60,7 @@ async function update(req: Request, res: Response) {
     res.status(500).json({ message: 'Error al actualizar el producto', errorMessage });
   }
 }
+
 
 async function remove(req: Request, res: Response) {
   try {
