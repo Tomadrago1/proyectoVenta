@@ -62,7 +62,7 @@ function createElectronWindow() {
             },
         });
         // Aquí cargamos el frontend de Electron (puede ser una URL local o un archivo HTML)
-        win.loadURL('http://localhost:3000'); // Asegúrate de que el frontend esté en http://localhost:3000
+        win.loadURL('http://localhost:8080'); // Asegúrate de que el frontend esté en http://localhost:3000
         win.on('closed', () => {
             win = null;
         });

@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/CrudStyle.css';
-
-// Definimos la interfaz para Producto
-interface Producto {
-  id_producto: string;
-  nombre_producto: string;
-  precio: number;
-}
+import { Producto } from '../interface/producto';
 
 const ProductCrud: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
