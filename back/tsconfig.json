@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
-    "outDir": "./dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
+    "target": "ES2020",             // Esto está bien, puedes mantenerlo así
+    "module": "CommonJS",           // Esto está correcto
+    "outDir": "./dist",             // Dirección donde se transpilan los archivos
+    "strict": true,                 // Habilitar todas las verificaciones estrictas
+    "esModuleInterop": true,        // Permite importaciones de estilo ES6
+    "skipLibCheck": true,           // Omite la verificación de tipos en archivos de bibliotecas
+    "moduleResolution": "node"      // Asegura que los módulos se resuelvan de la misma manera que Node.js
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],           // Incluir todos los archivos de src
+  "exclude": ["node_modules"]        // Excluir node_modules
 }
