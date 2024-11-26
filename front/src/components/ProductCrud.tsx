@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import '../styles/CrudStyle.css';
 
 // Definimos la interfaz para Producto
 interface Producto {
@@ -37,7 +38,6 @@ const ProductCrud: React.FC = () => {
       console.error('Error creating product:', error);
     }
   };
-
 
   const editProduct = (producto: Producto) => {
     setEditProducto(producto);
@@ -82,9 +82,9 @@ const ProductCrud: React.FC = () => {
   }, []);
 
   return (
-    <div>
+    <div className="container">
       <h1>Product CRUD</h1>
-      <div>
+      <div className="form-container">
         <h2>{editProducto ? 'Edit Product' : 'Add Product'}</h2>
         <form
           onSubmit={(e) => {
@@ -97,28 +97,40 @@ const ProductCrud: React.FC = () => {
           }}
         >
           <input
+            className="input-field"
             type="text"
             placeholder="Nombre"
             value={newProducto.nombre_producto}
             onChange={(e) => setNewProducto({ ...newProducto, nombre_producto: e.target.value })}
           />
           <input
-            type="number"
+            className="input-field"
+            type="text"
             placeholder="Precio"
-            value={newProducto.precio}
-            onChange={(e) => setNewProducto({ ...newProducto, precio: +e.target.value })}
+            value={newProducto.precio === 0 ? '' : newProducto.precio} // Muestra vacío si el precio es 0
+            onChange={(e) => {
+              const value = e.target.value;
+              // Si está vacío, se setea el valor a 0
+              if (value === '') {
+                setNewProducto({ ...newProducto, precio: 0 });
+              } else if (!isNaN(Number(value))) {
+                setNewProducto({ ...newProducto, precio: Number(value) });
+              }
+            }}
           />
-          <button type="submit">{editProducto ? 'Modificar Producto' : 'Crear producto'}</button>
+          <button type="submit" className="btn-submit">{editProducto ? 'Modificar Producto' : 'Crear producto'}</button>
         </form>
       </div>
-      <div>
+      <div className="list-container">
         <h2>Product List</h2>
-        <ul>
+        <ul className="product-list">
           {productos.map((producto) => (
-            <li key={producto.id_producto}>
+            <li key={producto.id_producto} className="product-item">
               {producto.nombre_producto} - ${producto.precio}
-              <button onClick={() => editProduct(producto)}>Editar</button>
-              <button onClick={() => deleteProducto(producto.id_producto)}>Eliminar</button>
+              <div className="product-actions">
+                <button className="btn-edit" onClick={() => editProduct(producto)}>Editar</button>
+                <button className="btn-delete" onClick={() => deleteProducto(producto.id_producto)}>Eliminar</button>
+              </div>
             </li>
           ))}
         </ul>
