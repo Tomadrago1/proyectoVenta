@@ -12,7 +12,9 @@ USE negocio;
 CREATE TABLE usuarios (
   id_usuario INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(100) NOT NULL,
-  contraseña VARCHAR(255) NOT NULL
+  apellido VARCHAR(100) NOT NULL,
+  username VARCHAR(100) NOT NULL,
+  contrasena VARCHAR(255) NOT NULL
 );
 -- Tabla Productos
 CREATE TABLE productos (

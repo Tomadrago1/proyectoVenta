@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
 const Login: React.FC = () => {
@@ -9,46 +9,39 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();  
-    try {
-      const response = await axios.post('/api/cliente/login', { username, password });
-      console.log(response);
+async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
 
-      if (response.status === 200) {
-        const { cliente, token } = response.data;
+  try {;
+    const response = await axios.post('/api/usuario/login', { username, password });
 
-        if (cliente.estado === 1) {
-          console.log('Login successful:', cliente);
-          setError('');
-
-          localStorage.setItem('token', token);
-          localStorage.setItem('user', JSON.stringify(cliente));
-
-          if (cliente.tipo_usuario === 'admin') {
-            navigate('/vistaAdmin', { state: { cliente } });
-          } else {
-            navigate('/', { state: { cliente } });
-          }
-        } else {
-          setError('La cuenta ha sido deshabilitada.');
-        }
-      } else {
-        setError('Usuario o contraseña incorrectos.');
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      setError('Error al iniciar sesión, por favor intente nuevamente.');
+    if (response.status === 200) {
+      const { usuario, token } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(usuario));
+      navigate('/productos', { state: { usuario } });
+    } else {
+      setError('Usuario o contraseña incorrectos.');
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error en login:', error.response ? error.response.data : error.message);
+      setError('Error al conectar al servidor, intente nuevamente.');
+    } else {
+      console.error('Error en login:', error);
+      setError('Error desconocido, intente nuevamente.');
     }
   }
+}
+
 
   return (
     <div className='container-session'>
       <div className='form-session'>
-        <h2>Login</h2>
+        <h2>Inicio de Sesión</h2>
         <form onSubmit={handleLogin}>
           <div>
-            <label>Username:</label>
+            <label>Nombre de Usuario:</label>
             <input
               type="text"
               name="username"
@@ -58,18 +51,18 @@ const Login: React.FC = () => {
             />
           </div>
           <div>
-            <label>Password:</label>
-            <input
-              type="password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <label>Contraseña:</label>
+              <input
+                type="password"
+                name="password"
+                value={password}  // Esto asegura que el estado `password` esté en sincronización con el input
+                onChange={(e) => setPassword(e.target.value)}  // Actualiza el estado al cambiar el valor
+                required
+              />
           </div>
           {error && <p className="error-message">{error}</p>}
           <div className='container-button'>
-            <button type="submit">Login</button>
+            <button type="submit">Ingresar</button>
           </div>
         </form>
       </div>

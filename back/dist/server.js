@@ -14,6 +14,7 @@ app.use((0, cors_1.default)({
     origin: 'http://localhost:8080'
 }));
 const producto_routes_1 = require("./routes/producto.routes");
+const usuario_routes_1 = require("./routes/usuario.routes");
 app.use((0, express_session_1.default)({
     secret: 'juamaqbrujan', // Cambia esta clave por una más segura en producción
     resave: false,
@@ -21,6 +22,7 @@ app.use((0, express_session_1.default)({
     cookie: { secure: false }, // Cambiar a true si usas HTTPS
 }));
 app.use('/api/producto', producto_routes_1.routerProducto);
+app.use('/api/usuario', usuario_routes_1.routerUsuario);
 app.use(express_1.default.static(path_1.default.join(__dirname, 'dist')));
 app.get('/', (req, res) => {
     res.send('¡Hola Mundo! El servidor Express está corriendo en el puerto 3000.');

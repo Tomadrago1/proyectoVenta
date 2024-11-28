@@ -35,6 +35,14 @@ module.exports = {
       directory: path.join(__dirname, 'public'), // Carpeta de archivos estáticos
     },
     port: 8080,
+    proxy: [
+            {
+                context: ['/api'],
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                pathRewrite: { '^/api': '/api' },
+            },
+        ],
     hot: true,
     historyApiFallback: true, // Para manejar rutas en React
   },

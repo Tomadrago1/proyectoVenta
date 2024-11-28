@@ -14,6 +14,7 @@ app.use(cors({
 }));
 
 import { routerProducto } from './routes/producto.routes';
+import { routerUsuario } from './routes/usuario.routes';
 
 app.use(
   session({
@@ -25,6 +26,7 @@ app.use(
 );
 
 app.use('/api/producto', routerProducto);
+app.use('/api/usuario', routerUsuario);
 
 app.use(express.static(path.join(__dirname, 'dist')));
 
