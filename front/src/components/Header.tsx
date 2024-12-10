@@ -11,6 +11,7 @@ const Header = () => {
             <nav className="nav d-none d-lg-flex justify-content-center align-items-center">
                 <ul>
                     <li><Link to="/productos">Productos</Link></li>
+                    <li><Link to="/venta">Venta</Link></li>
                     <li><Link to="/ventas">Ventas</Link></li>
                 </ul>
             </nav>

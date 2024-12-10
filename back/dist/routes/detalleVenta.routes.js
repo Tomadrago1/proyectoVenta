@@ -6,6 +6,7 @@ const express_1 = require("express");
 exports.routerDetalleVenta = (0, express_1.Router)();
 exports.routerDetalleVenta.get('/', detalleVenta_controller_1.findAll);
 exports.routerDetalleVenta.get('/:id_venta/:id_producto', detalleVenta_controller_1.findOne);
+exports.routerDetalleVenta.get('/:id_venta/', detalleVenta_controller_1.findByVenta);
 exports.routerDetalleVenta.post('/', detalleVenta_controller_1.create);
 exports.routerDetalleVenta.put('/:id_venta/:id_producto', detalleVenta_controller_1.update);
 exports.routerDetalleVenta.delete('/:id_venta/:id_producto', detalleVenta_controller_1.remove);

@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import Header from './components/Header';
 import Login from './components/Login';
 import Venta from './components/Venta';
+import Ventas from './components/Ventas';
 
 const App: React.FC = () => {
     return (
@@ -27,11 +28,20 @@ const App: React.FC = () => {
                 }
             />
             <Route
-                path="/ventas"
+                path="/venta"
                 element={
                     <div>
                         <Header />
                         <Venta />
+                    </div>
+                }
+            />
+            <Route
+                path="/ventas"
+                element={
+                    <div>
+                        <Header />
+                        <Ventas />
                     </div>
                 }
             />

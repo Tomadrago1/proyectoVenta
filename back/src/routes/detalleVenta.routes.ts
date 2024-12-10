@@ -1,6 +1,7 @@
 import {
   findAll,
   findOne,
+  findByVenta,
   create,
   update,
   remove,
@@ -12,6 +13,8 @@ export const routerDetalleVenta = Router();
 routerDetalleVenta.get('/', findAll);
 
 routerDetalleVenta.get('/:id_venta/:id_producto', findOne);
+
+routerDetalleVenta.get('/:id_venta/', findByVenta);
 
 routerDetalleVenta.post('/', create);
 

@@ -3,4 +3,6 @@ export interface Venta {
   id_usuario: number;
   fecha_venta: string;
   total: number;
+  nombre_usuario?: string;
+  apellido_usuario?: string;
 }

@@ -48,5 +48,10 @@ class DetalleVentaRepository {
             throw new Error('No se ha podido borrar el detalle de la venta');
         }
     }
+    async findByVenta(idVenta) {
+        const id = Number.parseInt(idVenta);
+        const [detalles] = await conn_1.pool.query('SELECT * FROM detalle_venta WHERE id_venta = ?', [id]);
+        return detalles;
+    }
 }
 exports.DetalleVentaRepository = DetalleVentaRepository;

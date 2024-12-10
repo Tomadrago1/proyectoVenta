@@ -5,6 +5,7 @@ exports.findOne = findOne;
 exports.create = create;
 exports.update = update;
 exports.remove = remove;
+exports.findByVenta = findByVenta;
 const detalleVenta_repository_1 = require("../repositories/detalleVenta.repository");
 const detalleVenta_model_1 = require("../models/detalleVenta.model");
 const repository = new detalleVenta_repository_1.DetalleVentaRepository();
@@ -66,5 +67,16 @@ async function remove(req, res) {
     catch (error) {
         const errorMessage = error.message || 'Error desconocido';
         res.status(500).json({ message: 'Error al eliminar el detalle de venta', errorMessage });
+    }
+}
+async function findByVenta(req, res) {
+    try {
+        const { id_venta } = req.params;
+        const detalles = await repository.findByVenta(id_venta);
+        res.json(detalles);
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Error desconocido';
+        res.status(500).json({ message: 'Error al obtener los detalles de venta', errorMessage });
     }
 }

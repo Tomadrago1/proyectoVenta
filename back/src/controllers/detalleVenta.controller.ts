@@ -74,4 +74,15 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { findAll, findOne, create, update, remove };
+async function findByVenta(req: Request, res: Response) {
+  try {
+    const { id_venta } = req.params;
+    const detalles = await repository.findByVenta(id_venta);
+    res.json(detalles);
+  } catch (error: any) {
+    const errorMessage = error.message || 'Error desconocido';
+    res.status(500).json({ message: 'Error al obtener los detalles de venta', errorMessage });
+  }
+}
+
+export { findAll, findOne, create, update, remove, findByVenta };

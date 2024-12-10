@@ -83,4 +83,13 @@ export class VentaRepository implements Repository<Venta> {
       throw new Error('No se ha podido borrar la venta');
     }
   }
+  public async filterByDateRange(startDate: Date, endDate: Date): Promise<Venta[]> {
+    const [ventas] = await pool.query(
+      'SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ?',
+      [startDate, endDate]
+    );
+    return ventas as Venta[];
+  }
 }
+
+

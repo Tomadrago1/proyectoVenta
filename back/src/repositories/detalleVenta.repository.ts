@@ -78,4 +78,10 @@ export class DetalleVentaRepository implements Repository<DetalleVenta> {
       throw new Error('No se ha podido borrar el detalle de la venta');
     }
   }
+
+  public async findByVenta(idVenta: string): Promise<DetalleVenta[] | undefined> {
+    const id = Number.parseInt(idVenta);
+    const [detalles] = await pool.query('SELECT * FROM detalle_venta WHERE id_venta = ?', [id]);
+    return detalles as DetalleVenta[];
+  }
 }

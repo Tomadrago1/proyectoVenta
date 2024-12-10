@@ -21,7 +21,8 @@ CREATE TABLE usuarios (
 CREATE TABLE productos (
   id_producto INT AUTO_INCREMENT PRIMARY KEY,
   nombre_producto VARCHAR(100) NOT NULL,
-  precio DECIMAL(10, 2) NOT NULL
+  precio DECIMAL(10, 2) NOT NULL,
+  codigo_barras VARCHAR(20)
 );
 -- Tabla Ventas
 CREATE TABLE ventas (
@@ -41,3 +42,5 @@ CREATE TABLE detalle_venta (
   FOREIGN KEY (id_venta) REFERENCES ventas(id_venta),
   FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
 );
+
+INSERT INTO usuarios (id_usuario, nombre, apellido, username, contrasena) VALUES (1,'a','a','a','$2b$10$EQX/UvNEf34aP.cPci9i6uYHDMbFV.AmocH5vl/kwIjft1phT24sS')

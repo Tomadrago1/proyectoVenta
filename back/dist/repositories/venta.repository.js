@@ -53,5 +53,9 @@ class VentaRepository {
             throw new Error('No se ha podido borrar la venta');
         }
     }
+    async filterByDateRange(startDate, endDate) {
+        const [ventas] = await conn_1.pool.query('SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ?', [startDate, endDate]);
+        return ventas;
+    }
 }
 exports.VentaRepository = VentaRepository;
