@@ -6,6 +6,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'negocio' @'localhost' WITH
 GRANT OPTION;
 -- Aplicar los cambios
 FLUSH PRIVILEGES;
+DROP DATABASE IF EXISTS negocio;
 CREATE DATABASE IF NOT EXISTS negocio;
 USE negocio;
 -- Tabla Usuarios

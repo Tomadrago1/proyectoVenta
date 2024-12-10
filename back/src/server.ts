@@ -15,18 +15,23 @@ app.use(cors({
 
 import { routerProducto } from './routes/producto.routes';
 import { routerUsuario } from './routes/usuario.routes';
+import { routerVenta } from './routes/venta.routes';
+import { routerDetalleVenta } from './routes/detalleVenta.routes';
+
 
 app.use(
   session({
-    secret: 'juamaqbrujan', // Cambia esta clave por una más segura en producción
+    secret: 'juamaqbrujan',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // Cambiar a true si usas HTTPS
+    cookie: { secure: false },
   })
 );
 
 app.use('/api/producto', routerProducto);
 app.use('/api/usuario', routerUsuario);
+app.use('/api/venta', routerVenta);
+app.use('/api/detalle-venta', routerDetalleVenta);
 
 app.use(express.static(path.join(__dirname, 'dist')));
 

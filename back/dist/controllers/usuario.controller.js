@@ -12,6 +12,7 @@ exports.login = login;
 const usuario_repository_1 = require("../repositories/usuario.repository");
 const usuario_model_1 = require("../models/usuario.model");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const repository = new usuario_repository_1.UsuarioRepository();
 async function findAll(req, res) {
     try {
@@ -41,9 +42,7 @@ async function create(req, res) {
     try {
         const { contrasena, ...rest } = req.body;
         const hashedPassword = await bcrypt_1.default.hash(contrasena, 10);
-        const usuario = new usuario_model_1.Usuario(rest.id_usuario, rest.nombre, rest.apellido, rest.username, 
-        /* hashedPassword */
-        contrasena);
+        const usuario = new usuario_model_1.Usuario(rest.id_usuario, rest.nombre, rest.apellido, rest.username, hashedPassword);
         const result = await repository.save(usuario);
         res.json(result);
     }
@@ -80,14 +79,11 @@ async function login(req, res) {
     try {
         const { username, password } = req.body;
         const usuario = await repository.findByUsername(username);
-        console.log("Aca esta el usuario", usuario);
-        console.log("Aca esta la contraseña", password);
         if (usuario) {
-            console.log("Aca esta la contraseña del usuario", usuario.contrasena);
-        }
-        if (usuario) {
-            if (usuario.contrasena === password) {
-                res.json({ usuario });
+            const isMatch = await bcrypt_1.default.compare(password, usuario.contrasena);
+            if (isMatch) {
+                const token = jsonwebtoken_1.default.sign({ id_usuario: usuario.id_usuario, username: usuario.username }, 'secreto_del_token', { expiresIn: '1h' });
+                res.json({ usuario, token });
             }
             else {
                 res.status(401).json({ message: 'Contraseña incorrecta' });
