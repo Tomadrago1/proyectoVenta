@@ -17,6 +17,7 @@ import { routerProducto } from './routes/producto.routes';
 import { routerUsuario } from './routes/usuario.routes';
 import { routerVenta } from './routes/venta.routes';
 import { routerDetalleVenta } from './routes/detalleVenta.routes';
+import { routerCategoria } from './routes/categoria.routes';
 
 
 app.use(
@@ -32,6 +33,7 @@ app.use('/api/producto', routerProducto);
 app.use('/api/usuario', routerUsuario);
 app.use('/api/venta', routerVenta);
 app.use('/api/detalle-venta', routerDetalleVenta);
+app.use('/api/categoria', routerCategoria);
 
 app.use(express.static(path.join(__dirname, 'dist')));
 

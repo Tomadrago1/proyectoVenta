@@ -6,57 +6,84 @@ import { Venta } from '../interface/venta';
 import '../styles/VentaStyle.css';
 
 const Venta: React.FC = () => {
-  const [productos, setProductos] = useState<Producto[]>([]);
   const [detalles, setDetalles] = useState<DetalleVenta[]>([]);
   const [total, setTotal] = useState<number>(0);
+  const [codigoBarras, setCodigoBarras] = useState<string>("");
   const [venta, setVenta] = useState<Venta>({
-    id_venta: 0,  // Este id será null al guardarlo
-    id_usuario: 1,  // ID del usuario hardcodeado
+    id_venta: 0,
+    id_usuario: 1,
     fecha_venta: new Date().toISOString(),
     total: 0,
   });
 
-  useEffect(() => {
-    // Obtener los productos del servidor
-    axios.get("/api/producto")
-      .then((response) => {
-        setProductos(response.data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener productos", error);
-      });
-  }, []);
+  // Estado para los nombres de los productos
+  const [nombresProductos, setNombresProductos] = useState<Record<number, string>>({});
 
   useEffect(() => {
     // Calcular el total cuando los detalles cambian
-    const totalCalculado = detalles.reduce((acc, detalle) => acc + detalle.precio_unitario * detalle.cantidad, 0);
+    const totalCalculado = detalles.reduce(
+      (acc, detalle) => acc + detalle.precio_unitario * detalle.cantidad,
+      0
+    );
     setTotal(totalCalculado);
   }, [detalles]);
 
-  const agregarProducto = (idProducto: number, cantidad: number) => {
-    const producto = productos.find((p) => Number(p.id_producto) === idProducto);
-    if (!producto) return;
+  const buscarProductoPorCodigo = async (codigo: string) => {
+    try {
+      const response = await axios.get(`/api/producto/barcode/${codigo}`);
+      const producto: Producto = response.data;
 
-    // Verificar si el producto ya está en la venta
-    const productoExistente = detalles.find(d => d.id_producto === idProducto);
-    if (productoExistente) {
-      alert("Este producto ya ha sido añadido a la venta.");
-      return;
+      if (!producto) {
+        alert("Producto no encontrado");
+        return;
+      }
+
+      // Verificar si el producto ya está en la lista de detalles
+      const productoExistente = detalles.find(
+        (d) => d.id_producto === Number(producto.id_producto)
+      );
+      if (productoExistente) {
+        alert("Este producto ya ha sido añadido a la venta.");
+        return;
+      }
+
+      const nuevoDetalle: DetalleVenta = {
+        id_producto: Number(producto.id_producto),
+        id_venta: venta.id_venta, // Será asignado en el backend
+        cantidad: 1, // Por defecto, 1 unidad
+        precio_unitario: producto.precio_venta,
+      };
+
+      setDetalles([...detalles, nuevoDetalle]);
+
+      // Actualizar el nombre del producto en el estado
+      setNombresProductos((prevState) => ({
+        ...prevState,
+        [producto.id_producto]: producto.nombre_producto,
+      }));
+    } catch (error) {
+      console.error("Error al buscar el producto por código de barras", error);
+      alert("Error al buscar el producto");
     }
+  };
 
-    const nuevoDetalle: DetalleVenta = {
-      id_producto: Number(producto.id_producto),
-      id_venta: venta.id_venta,  // Este campo no se usa aquí, el id_venta lo asigna el backend
-      cantidad,
-      precio_unitario: producto.precio,
-    };
-
-    setDetalles([...detalles, nuevoDetalle]);
+  const handleCodigoBarras = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const codigo = e.target.value.trim();
+    if (codigo) {
+      buscarProductoPorCodigo(codigo);
+      setCodigoBarras(""); // Limpia el campo después de procesar
+    }
   };
 
   const eliminarProducto = (idProducto: number) => {
-    const nuevoDetalles = detalles.filter((detalle) => detalle.id_producto !== idProducto);
-    setDetalles(nuevoDetalles);
+    const nuevosDetalles = detalles.filter((detalle) => detalle.id_producto !== idProducto);
+    setDetalles(nuevosDetalles);
+
+    // Eliminar el nombre del producto del estado también
+    setNombresProductos((prevState) => {
+      const { [idProducto]: _, ...rest } = prevState;
+      return rest;
+    });
   };
 
   const guardarVenta = () => {
@@ -66,28 +93,21 @@ const Venta: React.FC = () => {
     }
 
     const nuevaVenta: Venta = {
-      id_venta: null,  // Este id será null para que el backend lo asigne automáticamente
-      id_usuario: 1,  // ID del usuario hardcodeado
+      id_venta: 0, // Será asignado en el backend
+      id_usuario: 1,
       fecha_venta: new Date().toISOString(),
-      total: total,  // Asegúrate de que el total esté correctamente calculado
+      total: total,
     };
 
-    console.log("Datos de la venta que se van a guardar:", nuevaVenta);
-
-    // Realizamos solo el POST para guardar la venta
-    axios.post("/api/venta", nuevaVenta)
+    axios
+      .post("/api/venta", nuevaVenta)
       .then((response) => {
-        const ventaCreada = response.data; // La venta con el id generado por el backend
-        console.log("Venta guardada con éxito:", ventaCreada);
-
-        // Asignamos el id de la venta guardada al estado de la venta
+        const ventaCreada = response.data;
         setVenta(ventaCreada);
-        alert("Venta guardada exitosamente.");
 
-        // Ahora guardamos los detalles de la venta
         detalles.forEach((detalle) => {
-          // Aseguramos que el id_venta es el de la venta recién creada
-          axios.post("/api/detalle-venta", { ...detalle, id_venta: ventaCreada.id_venta })
+          axios
+            .post("/api/detalle-venta", { ...detalle, id_venta: ventaCreada.id_venta })
             .then(() => {
               console.log("Detalle de venta guardado correctamente.");
             })
@@ -96,6 +116,8 @@ const Venta: React.FC = () => {
               alert("Error al guardar los detalles de la venta.");
             });
         });
+
+        alert("Venta guardada exitosamente.");
       })
       .catch((error) => {
         console.error("Error al guardar la venta", error);
@@ -107,21 +129,14 @@ const Venta: React.FC = () => {
     <div className="container">
       <h1>Registro de Venta</h1>
       <div>
-        <label>Producto:</label>
-        <select
-          onChange={(e) => {
-            const idProducto = parseInt(e.target.value);
-            const cantidad = 1; // Ejemplo: cantidad de 1 por defecto
-            agregarProducto(idProducto, cantidad);
-          }}
-        >
-          <option value="">Seleccione un producto</option>
-          {productos.map((producto) => (
-            <option key={producto.id_producto} value={producto.id_producto}>
-              {producto.nombre_producto}
-            </option>
-          ))}
-        </select>
+        <label>Código de Barras:</label>
+        <input
+          type="text"
+          value={codigoBarras}
+          onChange={(e) => setCodigoBarras(e.target.value)}
+          onBlur={(e) => handleCodigoBarras(e)}
+          placeholder="Escanee el código de barras"
+        />
       </div>
 
       <h3>Detalles de la venta</h3>
@@ -135,34 +150,35 @@ const Venta: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {detalles.map((detalle, index) => {
-            const producto = productos.find(p => Number(p.id_producto) === detalle.id_producto);
-            return (
-              <tr key={index}>
-                <td>{producto?.nombre_producto}</td>
-                <td>
-                  <input
-                    type="number"
-                    value={detalle.cantidad}
-                    min="1"
-                    onChange={(e) => {
-                      const nuevaCantidad = parseInt(e.target.value);
-                      const nuevosDetalles = detalles.map(d => 
-                        d.id_producto === detalle.id_producto 
-                          ? { ...d, cantidad: nuevaCantidad }
-                          : d
-                      );
-                      setDetalles(nuevosDetalles);
-                    }}
-                  />
-                </td>
-                <td>{detalle.precio_unitario}</td>
-                <td>
-                  <button onClick={() => eliminarProducto(detalle.id_producto)}>Eliminar</button>
-                </td>
-              </tr>
-            );
-          })}
+          {detalles.map((detalle, index) => (
+            <tr key={index}>
+              <td>
+                {nombresProductos[detalle.id_producto] || "Cargando..."}
+              </td>
+              <td>
+                <input
+                  type="number"
+                  value={detalle.cantidad}
+                  min="1"
+                  onChange={(e) => {
+                    const nuevaCantidad = parseInt(e.target.value);
+                    const nuevosDetalles = detalles.map((d) =>
+                      d.id_producto === detalle.id_producto
+                        ? { ...d, cantidad: nuevaCantidad }
+                        : d
+                    );
+                    setDetalles(nuevosDetalles);
+                  }}
+                />
+              </td>
+              <td>{detalle.precio_unitario}</td>
+              <td>
+                <button onClick={() => eliminarProducto(detalle.id_producto)}>
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 

@@ -18,29 +18,22 @@ export class ProductoRepository implements Repository<Producto> {
     if (productos.length === 0) {
       return undefined;
     }
-    const producto = productos[0] as Producto;
-    return producto;
+    return productos[0] as Producto;
   }
 
   public async save(item: Producto): Promise<Producto> {
-    // Realiza la inserción
     const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO productos (nombre_producto, precio) VALUES (?, ?)',
-      [item.nombre_producto, item.precio]
+      'INSERT INTO productos (id_categoria, nombre_producto, precio_compra, precio_venta, stock, codigo_barras) VALUES (?, ?, ?, ?, ?, ?)',
+      [item.id_categoria, item.nombre_producto, item.precio_compra, item.precio_venta, item.stock, item.codigo_barras]
     );
 
-    // Obtén el ID generado para el nuevo producto
-    const insertId = (result as any).insertId;
+    const insertId = result.insertId;
 
-    // Verifica si la inserción fue exitosa
     if (insertId) {
-      // Recupera el producto recién insertado usando el ID generado
       const [newProduct] = await pool.query<RowDataPacket[]>(
         'SELECT * FROM productos WHERE id_producto = ?',
         [insertId]
       );
-
-      // Retorna el producto recién creado con su ID
       return newProduct[0] as Producto;
     } else {
       throw new Error('No se ha podido insertar el producto');
@@ -50,43 +43,51 @@ export class ProductoRepository implements Repository<Producto> {
   public async update(item: { id: string }, producto: Producto): Promise<Producto | undefined> {
     const id = Number.parseInt(item.id);
 
-    // Realiza la actualización
     const [result] = await pool.query<ResultSetHeader>(
-      'UPDATE productos SET nombre_producto = ?, precio = ? WHERE id_producto = ?',
-      [producto.nombre_producto, producto.precio, id]
+      'UPDATE productos SET id_categoria= ?, nombre_producto = ?, precio_compra = ?, precio_venta = ?, stock = ?, codigo_barras = ? WHERE id_producto = ?',
+      [producto.id_categoria, producto.nombre_producto, producto.precio_compra, producto.precio_venta, producto.stock, producto.codigo_barras, id]
     );
 
-    // Verifica el número de filas afectadas
-    const affectedRows = result.affectedRows;
-
-    if (affectedRows === 1) {
-      // Recupera el producto actualizado
+    if (result.affectedRows === 1) {
       const [updatedProduct] = await pool.query<RowDataPacket[]>(
         'SELECT * FROM productos WHERE id_producto = ?',
         [id]
       );
-
-      // Retorna el primer (y único) producto actualizado
-      return updatedProduct[0] as Producto;  // Asegurarse de que el resultado sea un Producto
+      return updatedProduct[0] as Producto;
     } else {
       throw new Error('No se ha podido actualizar el producto o el producto no existe');
     }
   }
 
-
-
   public async remove(item: { id: string }): Promise<void> {
     const id = Number.parseInt(item.id);
 
-    const [result_venta] = (await pool.query('SELECT * FROM detalle_venta WHERE id_producto = ?', [id])) as RowDataPacket[];
-    if ((result_venta as any).length > 0) {
+    const [resultVenta] = (await pool.query<RowDataPacket[]>(
+      'SELECT * FROM detalle_venta WHERE id_producto = ?',
+      [id]
+    )) as RowDataPacket[];
+    if (resultVenta.length > 0) {
       throw new Error('No se puede borrar el producto porque tiene ventas asociadas');
     }
 
-    const [result] = (await pool.query('DELETE FROM productos WHERE id_producto = ?', [id])) as RowDataPacket[];
-    const affectedRows = (result as any).affectedRows;
-    if (affectedRows === 0) {
+    const [result] = (await pool.query<ResultSetHeader>(
+      'DELETE FROM productos WHERE id_producto = ?',
+      [id]
+    )) as ResultSetHeader[];
+
+    if (result.affectedRows === 0) {
       throw new Error('No se ha podido borrar el producto');
     }
+  }
+
+  public async findByBarcode(item: { barcode: string }): Promise<Producto | undefined> {
+    const [productos] = (await pool.query<RowDataPacket[]>(
+      'SELECT * FROM productos WHERE codigo_barras = ?',
+      [item.barcode]
+    )) as RowDataPacket[];
+    if (productos.length === 0) {
+      return undefined;
+    }
+    return productos[0] as Producto;
   }
 }

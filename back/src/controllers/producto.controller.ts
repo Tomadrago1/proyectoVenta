@@ -33,8 +33,12 @@ async function create(req: Request, res: Response) {
   try {
     const producto = new Producto(
       req.body.id,
+      req.body.id_categoria,
       req.body.nombre_producto,
-      req.body.precio
+      req.body.precio_compra,
+      req.body.precio_venta,
+      req.body.stock,
+      req.body.codigo_barras,
     );
     const result = await repository.save(producto);
     res.json(result);
@@ -46,11 +50,15 @@ async function create(req: Request, res: Response) {
 
 async function update(req: Request, res: Response) {
   try {
-    const { id } = req.params; // Obtener el id desde los parámetros de la URL
+    const { id } = req.params;
     const producto = new Producto(
-      parseInt(id), // Convertir el id en número
-      req.body.nombre_producto, // Cambié "nombre" por "nombre_producto" para coincidir con tu clase
-      req.body.precio
+      parseInt(id),
+      req.body.id_categoria,
+      req.body.nombre_producto,
+      req.body.precio_compra,
+      req.body.precio_venta,
+      req.body.stock,
+      req.body.codigo_barras,
     );
 
     const result = await repository.update({ id }, producto);
@@ -73,4 +81,19 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { findAll, findOne, create, update, remove };
+async function findByBarcode(req: Request, res: Response) {
+  try {
+    const { barcode } = req.params;
+    const producto = await repository.findByBarcode({ barcode });
+    if (producto) {
+      res.json(producto);
+    } else {
+      res.status(404).json({ message: 'Producto no encontrado' });
+    }
+  } catch (error: any) {
+    const errorMessage = error.message || 'Error desconocido';
+    res.status(500).json({ message: 'Error al obtener el producto', errorMessage });
+  }
+}
+
+export { findAll, findOne, create, update, remove, findByBarcode };
