@@ -105,25 +105,48 @@ const Venta: React.FC = () => {
         const ventaCreada = response.data;
         setVenta(ventaCreada);
 
-        detalles.forEach((detalle) => {
-          axios
-            .post("/api/detalle-venta", { ...detalle, id_venta: ventaCreada.id_venta })
-            .then(() => {
-              console.log("Detalle de venta guardado correctamente.");
-            })
-            .catch((error) => {
-              console.error("Error al guardar el detalle de la venta", error);
-              alert("Error al guardar los detalles de la venta.");
-            });
+detalles.forEach((detalle) => {
+
+  axios
+    .get(`/api/producto/${detalle.id_producto}`)
+    .then((response) => {
+      const producto = response.data;
+      const nuevoStock = producto.stock - detalle.cantidad;
+
+      axios
+        .put(`/api/producto/stock/${detalle.id_producto}/${nuevoStock}`)
+        .then(() => {
+          console.log("Stock del producto actualizado correctamente.");
+        })
+        .catch((error) => {
+          console.error("Error al actualizar el stock del producto", error);
+          alert("Error al actualizar el stock del producto.");
         });
+    })
+    .catch((error) => {
+      console.error("Error al obtener el producto", error);
+      alert("Error al obtener el producto.");
+    });
+  axios
+    .post("/api/detalle-venta", { ...detalle, id_venta: ventaCreada.id_venta })
+    .then(() => {
+      console.log("Detalle de venta guardado correctamente.");
+    })
+    .catch((error) => {
+      console.error("Error al guardar el detalle de la venta", error);
+      alert("Error al guardar los detalles de la venta.");
+    });
+});
 
         alert("Venta guardada exitosamente.");
+        setDetalles([]);
       })
       .catch((error) => {
         console.error("Error al guardar la venta", error);
         alert("Error al guardar la venta.");
       });
   };
+
 
   return (
     <div className="container">

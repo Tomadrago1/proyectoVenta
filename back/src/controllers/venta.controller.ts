@@ -78,7 +78,6 @@ async function filterByDateRange(req: Request, res: Response): Promise<void> {
       res.status(400).json({ message: 'Debe proporcionar startDate y endDate' });
       return;
     }
-
     const ventas = await repository.filterByDateRange(new Date(startDate as string), new Date(endDate as string));
     res.status(200).json(ventas);
   } catch (error: any) {

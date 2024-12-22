@@ -5,7 +5,7 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export class ProductoRepository implements Repository<Producto> {
   public async findAll(): Promise<Producto[] | undefined> {
-    const [productos] = await pool.query('SELECT * FROM productos');
+    const [productos] = await pool.query('SELECT * FROM productos order by id_categoria');
     return productos as Producto[];
   }
 
@@ -89,5 +89,33 @@ export class ProductoRepository implements Repository<Producto> {
       return undefined;
     }
     return productos[0] as Producto;
+  }
+
+  public async findByName(item: { name: string }): Promise<Producto[]> {
+    const [productos] = await pool.query<RowDataPacket[]>(
+      'SELECT * FROM productos WHERE nombre_producto LIKE ?',
+      [`%${item.name}%`] // Utilizar % para permitir coincidencias parciales
+    ) as RowDataPacket[];
+
+    return productos as Producto[]; // Retorna todos los productos encontrados
+  }
+
+  public async updateStock(item: { id: string, stock: string }): Promise<Producto | undefined> {
+    const id = Number.parseInt(item.id);
+    const stock = Number.parseInt(item.stock);
+    const [result] = await pool.query<ResultSetHeader>(
+      'UPDATE productos SET stock = ? WHERE id_producto = ?',
+      [stock, id]
+    );
+
+    if (result.affectedRows === 1) {
+      const [updatedProduct] = await pool.query<RowDataPacket[]>(
+        'SELECT * FROM productos WHERE id_producto = ?',
+        [id]
+      );
+      return updatedProduct[0] as Producto;
+    } else {
+      throw new Error('No se ha podido actualizar el stock del producto o el producto no existe');
+    }
   }
 }

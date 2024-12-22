@@ -96,4 +96,27 @@ async function findByBarcode(req: Request, res: Response) {
   }
 }
 
-export { findAll, findOne, create, update, remove, findByBarcode };
+async function findByName(req: Request, res: Response) {
+  try {
+    const { name } = req.params;
+    const productos = await repository.findByName({ name });
+    res.json(productos);
+  } catch (error: any) {
+    const errorMessage = error.message || 'Error desconocido';
+    res.status(500).json({ message: 'Error al obtener los productos', errorMessage });
+  }
+}
+
+async function updateStock(req: Request, res: Response) {
+  try {
+    const { id, stock } = req.params;
+    const result = await repository.updateStock({ id, stock });
+    res.json(result);
+  } catch (error: any) {
+    const errorMessage = error.message || 'Error desconocido';
+    res.status(500).json({ message: 'Error al actualizar el stock', errorMessage });
+  }
+
+}
+
+export { findAll, findOne, create, update, remove, findByBarcode, findByName, updateStock };

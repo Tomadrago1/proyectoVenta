@@ -54,6 +54,7 @@ class VentaRepository {
         }
     }
     async filterByDateRange(startDate, endDate) {
+        endDate.setUTCHours(23, 59, 59, 999);
         const [ventas] = await conn_1.pool.query('SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ?', [startDate, endDate]);
         return ventas;
     }

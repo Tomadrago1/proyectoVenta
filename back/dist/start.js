@@ -44,7 +44,6 @@ const backendPort = 3001;
 backendApp.get('/api', (req, res) => {
     res.json({ message: '¡Backend en funcionamiento!' });
 });
-// Iniciar el servidor Express (backend)
 const server = http.createServer(backendApp);
 server.listen(backendPort, () => {
     console.log(`Servidor Express corriendo en http://localhost:${backendPort}`);
@@ -61,8 +60,15 @@ function createElectronWindow() {
                 contextIsolation: true,
             },
         });
-        // Aquí cargamos el frontend de Electron (puede ser una URL local o un archivo HTML)
-        win.loadURL('http://localhost:8080'); // Asegúrate de que el frontend esté en http://localhost:3000
+        win.loadURL('http://localhost:8080');
+        electron_1.globalShortcut.register('F5', () => {
+            if (win) {
+                win.webContents.reload();
+            }
+        });
+        electron_1.app.on('before-quit', () => {
+            electron_1.globalShortcut.unregisterAll();
+        });
         win.on('closed', () => {
             win = null;
         });

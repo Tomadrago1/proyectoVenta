@@ -1,11 +1,12 @@
 import React from 'react';
-import ProductCrud from './components/ProductCrud';
+import ProductCrud from './components/Producto';
 import { Route, Routes } from "react-router-dom";
 
 import Header from './components/Header';
 import Login from './components/Login';
 import Venta from './components/Venta';
 import Ventas from './components/Ventas';
+import Producto from './components/Producto'
 
 const App: React.FC = () => {
     return (
@@ -23,7 +24,7 @@ const App: React.FC = () => {
                 element={
                     <div>
                         <Header />
-                        <ProductCrud />
+                        <Producto />
                     </div>
                 }
             />

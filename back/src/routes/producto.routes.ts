@@ -5,10 +5,14 @@ import {
   update,
   remove,
   findByBarcode,
+  findByName,
+  updateStock,
 } from '../controllers/producto.controller';
 import { Router } from 'express';
 
 export const routerProducto = Router();
+
+routerProducto.put('/stock/:id/:stock', updateStock);
 
 routerProducto.get('/', findAll);
 
@@ -21,3 +25,5 @@ routerProducto.put('/:id', update);
 routerProducto.delete('/:id', remove);
 
 routerProducto.get('/barcode/:barcode', findByBarcode);
+
+routerProducto.get('/search/:name', findByName);

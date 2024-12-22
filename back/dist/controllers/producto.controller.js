@@ -5,7 +5,9 @@ exports.findOne = findOne;
 exports.create = create;
 exports.update = update;
 exports.remove = remove;
+exports.findByBarcode = findByBarcode;
 exports.findByName = findByName;
+exports.updateStock = updateStock;
 const producto_repository_1 = require("../repositories/producto.repository");
 const producto_model_1 = require("../models/producto.model");
 const repository = new producto_repository_1.ProductoRepository();
@@ -37,7 +39,7 @@ async function findOne(req, res) {
 }
 async function create(req, res) {
     try {
-        const producto = new producto_model_1.Producto(req.body.id, req.body.nombre_producto, req.body.precio_compra, req.body.precio_venta, req.body.stock, req.body.codigo_barras);
+        const producto = new producto_model_1.Producto(req.body.id, req.body.id_categoria, req.body.nombre_producto, req.body.precio_compra, req.body.precio_venta, req.body.stock, req.body.codigo_barras);
         const result = await repository.save(producto);
         res.json(result);
     }
@@ -49,7 +51,7 @@ async function create(req, res) {
 async function update(req, res) {
     try {
         const { id } = req.params;
-        const producto = new producto_model_1.Producto(parseInt(id), req.body.nombre_producto, req.body.precio_compra, req.body.precio_venta, req.body.stock, req.body.codigo_barras);
+        const producto = new producto_model_1.Producto(parseInt(id), req.body.id_categoria, req.body.nombre_producto, req.body.precio_compra, req.body.precio_venta, req.body.stock, req.body.codigo_barras);
         const result = await repository.update({ id }, producto);
         res.json(result);
     }
@@ -69,22 +71,41 @@ async function remove(req, res) {
         res.status(500).json({ message: 'Error al eliminar el producto', errorMessage });
     }
 }
-async function findByName(req, res) {
+async function findByBarcode(req, res) {
     try {
-        const { name } = req.query; // Obtén el nombre del query string
-        if (!name) {
-            return res.status(400).json({ message: 'Se debe proporcionar un nombre para la búsqueda' });
-        }
-        const productos = await repository.findByName(name);
-        if (productos) {
-            return res.json(productos); // Devuelve los productos encontrados
+        const { barcode } = req.params;
+        const producto = await repository.findByBarcode({ barcode });
+        if (producto) {
+            res.json(producto);
         }
         else {
-            return res.status(404).json({ message: 'No se encontraron productos con ese nombre' });
+            res.status(404).json({ message: 'Producto no encontrado' });
         }
     }
     catch (error) {
         const errorMessage = error.message || 'Error desconocido';
-        return res.status(500).json({ message: 'Error al buscar el producto por nombre', errorMessage });
+        res.status(500).json({ message: 'Error al obtener el producto', errorMessage });
+    }
+}
+async function findByName(req, res) {
+    try {
+        const { name } = req.params;
+        const productos = await repository.findByName({ name });
+        res.json(productos);
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Error desconocido';
+        res.status(500).json({ message: 'Error al obtener los productos', errorMessage });
+    }
+}
+async function updateStock(req, res) {
+    try {
+        const { id, stock } = req.params;
+        const result = await repository.updateStock({ id, stock });
+        res.json(result);
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Error desconocido';
+        res.status(500).json({ message: 'Error al actualizar el stock', errorMessage });
     }
 }

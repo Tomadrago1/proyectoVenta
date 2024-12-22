@@ -84,6 +84,7 @@ export class VentaRepository implements Repository<Venta> {
     }
   }
   public async filterByDateRange(startDate: Date, endDate: Date): Promise<Venta[]> {
+    endDate.setUTCHours(23, 59, 59, 999);
     const [ventas] = await pool.query(
       'SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ?',
       [startDate, endDate]
