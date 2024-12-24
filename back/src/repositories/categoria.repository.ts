@@ -70,4 +70,12 @@ export class CategoriaRepository implements Repository<Categoria> {
       throw new Error('No se ha podido eliminar la categoria o la categoria no existe');
     }
   }
+
+  public async findByName(item: { name: string }): Promise<Categoria[]> {
+    const [categorias] = await pool.query<RowDataPacket[]>(
+      'SELECT * FROM categoria WHERE nombre LIKE ?',
+      [`%${item.name}%`]
+    ) as RowDataPacket[];
+    return categorias as Categoria[];
+  }
 }

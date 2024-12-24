@@ -3,7 +3,8 @@ import {
   findOne,
   create,
   update,
-  remove
+  remove,
+  findByName,
 } from '../controllers/categoria.controller';
 import { Router } from 'express';
 
@@ -18,3 +19,5 @@ routerCategoria.post('/', create);
 routerCategoria.put('/:id', update);
 
 routerCategoria.delete('/:id', remove);
+
+routerCategoria.get('/search/:name', findByName);

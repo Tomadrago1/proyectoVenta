@@ -9,3 +9,4 @@ exports.routerCategoria.get('/:id', categoria_controller_1.findOne);
 exports.routerCategoria.post('/', categoria_controller_1.create);
 exports.routerCategoria.put('/:id', categoria_controller_1.update);
 exports.routerCategoria.delete('/:id', categoria_controller_1.remove);
+exports.routerCategoria.get('/search/:name', categoria_controller_1.findByName);

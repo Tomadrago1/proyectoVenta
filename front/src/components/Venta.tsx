@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Producto } from '../interface/producto';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { Venta } from '../interface/venta';
@@ -8,7 +8,10 @@ import '../styles/VentaStyle.css';
 const Venta: React.FC = () => {
   const [detalles, setDetalles] = useState<DetalleVenta[]>([]);
   const [total, setTotal] = useState<number>(0);
-  const [codigoBarras, setCodigoBarras] = useState<string>("");
+  const [codigoBarras, setCodigoBarras] = useState<string>('');
+  const [nombresProductos, setNombresProductos] = useState<
+    Record<number, string>
+  >({});
   const [venta, setVenta] = useState<Venta>({
     id_venta: 0,
     id_usuario: 1,
@@ -16,11 +19,7 @@ const Venta: React.FC = () => {
     total: 0,
   });
 
-  // Estado para los nombres de los productos
-  const [nombresProductos, setNombresProductos] = useState<Record<number, string>>({});
-
   useEffect(() => {
-    // Calcular el total cuando los detalles cambian
     const totalCalculado = detalles.reduce(
       (acc, detalle) => acc + detalle.precio_unitario * detalle.cantidad,
       0
@@ -34,23 +33,22 @@ const Venta: React.FC = () => {
       const producto: Producto = response.data;
 
       if (!producto) {
-        alert("Producto no encontrado");
+        alert('Producto no encontrado');
         return;
       }
 
-      // Verificar si el producto ya está en la lista de detalles
       const productoExistente = detalles.find(
         (d) => d.id_producto === Number(producto.id_producto)
       );
       if (productoExistente) {
-        alert("Este producto ya ha sido añadido a la venta.");
+        alert('Este producto ya ha sido añadido a la venta.');
         return;
       }
 
       const nuevoDetalle: DetalleVenta = {
         id_producto: Number(producto.id_producto),
-        id_venta: venta.id_venta, // Será asignado en el backend
-        cantidad: 1, // Por defecto, 1 unidad
+        id_venta: venta.id_venta,
+        cantidad: 1,
         precio_unitario: producto.precio_venta,
       };
 
@@ -62,8 +60,8 @@ const Venta: React.FC = () => {
         [producto.id_producto]: producto.nombre_producto,
       }));
     } catch (error) {
-      console.error("Error al buscar el producto por código de barras", error);
-      alert("Error al buscar el producto");
+      console.error('Error al buscar el producto por código de barras', error);
+      alert('Error al buscar el producto');
     }
   };
 
@@ -71,15 +69,16 @@ const Venta: React.FC = () => {
     const codigo = e.target.value.trim();
     if (codigo) {
       buscarProductoPorCodigo(codigo);
-      setCodigoBarras(""); // Limpia el campo después de procesar
+      setCodigoBarras('');
     }
   };
 
   const eliminarProducto = (idProducto: number) => {
-    const nuevosDetalles = detalles.filter((detalle) => detalle.id_producto !== idProducto);
+    const nuevosDetalles = detalles.filter(
+      (detalle) => detalle.id_producto !== idProducto
+    );
     setDetalles(nuevosDetalles);
 
-    // Eliminar el nombre del producto del estado también
     setNombresProductos((prevState) => {
       const { [idProducto]: _, ...rest } = prevState;
       return rest;
@@ -88,65 +87,69 @@ const Venta: React.FC = () => {
 
   const guardarVenta = () => {
     if (total <= 0) {
-      alert("El total de la venta no puede ser 0.");
+      alert('El total de la venta no puede ser 0.');
       return;
     }
 
     const nuevaVenta: Venta = {
-      id_venta: 0, // Será asignado en el backend
+      id_venta: 0,
       id_usuario: 1,
       fecha_venta: new Date().toISOString(),
       total: total,
     };
 
     axios
-      .post("/api/venta", nuevaVenta)
+      .post('/api/venta', nuevaVenta)
       .then((response) => {
         const ventaCreada = response.data;
         setVenta(ventaCreada);
 
-detalles.forEach((detalle) => {
+        detalles.forEach((detalle) => {
+          axios
+            .get(`/api/producto/${detalle.id_producto}`)
+            .then((response) => {
+              const producto = response.data;
+              const nuevoStock = producto.stock - detalle.cantidad;
 
-  axios
-    .get(`/api/producto/${detalle.id_producto}`)
-    .then((response) => {
-      const producto = response.data;
-      const nuevoStock = producto.stock - detalle.cantidad;
-
-      axios
-        .put(`/api/producto/stock/${detalle.id_producto}/${nuevoStock}`)
-        .then(() => {
-          console.log("Stock del producto actualizado correctamente.");
-        })
-        .catch((error) => {
-          console.error("Error al actualizar el stock del producto", error);
-          alert("Error al actualizar el stock del producto.");
+              axios
+                .put(`/api/producto/stock/${detalle.id_producto}/${nuevoStock}`)
+                .then(() => {
+                  console.log('Stock del producto actualizado correctamente.');
+                })
+                .catch((error) => {
+                  console.error(
+                    'Error al actualizar el stock del producto',
+                    error
+                  );
+                  alert('Error al actualizar el stock del producto.');
+                });
+            })
+            .catch((error) => {
+              console.error('Error al obtener el producto', error);
+              alert('Error al obtener el producto.');
+            });
+          axios
+            .post('/api/detalle-venta', {
+              ...detalle,
+              id_venta: ventaCreada.id_venta,
+            })
+            .then(() => {
+              console.log('Detalle de venta guardado correctamente.');
+            })
+            .catch((error) => {
+              console.error('Error al guardar el detalle de la venta', error);
+              alert('Error al guardar los detalles de la venta.');
+            });
         });
-    })
-    .catch((error) => {
-      console.error("Error al obtener el producto", error);
-      alert("Error al obtener el producto.");
-    });
-  axios
-    .post("/api/detalle-venta", { ...detalle, id_venta: ventaCreada.id_venta })
-    .then(() => {
-      console.log("Detalle de venta guardado correctamente.");
-    })
-    .catch((error) => {
-      console.error("Error al guardar el detalle de la venta", error);
-      alert("Error al guardar los detalles de la venta.");
-    });
-});
 
-        alert("Venta guardada exitosamente.");
+        alert('Venta guardada exitosamente.');
         setDetalles([]);
       })
       .catch((error) => {
-        console.error("Error al guardar la venta", error);
-        alert("Error al guardar la venta.");
+        console.error('Error al guardar la venta', error);
+        alert('Error al guardar la venta.');
       });
   };
-
 
   return (
     <div className="container">
@@ -161,7 +164,6 @@ detalles.forEach((detalle) => {
           placeholder="Escanee el código de barras"
         />
       </div>
-
       <h3>Detalles de la venta</h3>
       <table>
         <thead>
@@ -175,9 +177,7 @@ detalles.forEach((detalle) => {
         <tbody>
           {detalles.map((detalle, index) => (
             <tr key={index}>
-              <td>
-                {nombresProductos[detalle.id_producto] || "Cargando..."}
-              </td>
+              <td>{nombresProductos[detalle.id_producto] || 'Cargando...'}</td>
               <td>
                 <input
                   type="number"

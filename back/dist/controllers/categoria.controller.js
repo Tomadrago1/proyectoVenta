@@ -5,6 +5,7 @@ exports.findOne = findOne;
 exports.create = create;
 exports.update = update;
 exports.remove = remove;
+exports.findByName = findByName;
 const categoria_repository_1 = require("../repositories/categoria.repository");
 const categoria_model_1 = require("../models/categoria.model");
 const repository = new categoria_repository_1.CategoriaRepository();
@@ -68,5 +69,16 @@ async function remove(req, res) {
     catch (error) {
         const errorMessage = error.message || 'Error desconocido';
         res.status(500).json({ message: 'Error al eliminar la categoria', errorMessage });
+    }
+}
+async function findByName(req, res) {
+    try {
+        const { name } = req.params;
+        const categorias = await repository.findByName({ name });
+        res.json(categorias);
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Error desconocido';
+        res.status(500).json({ message: 'Error al obtener los productos', errorMessage });
     }
 }

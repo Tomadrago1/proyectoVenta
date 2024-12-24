@@ -9,35 +9,40 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
+  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-  try {;
-    const response = await axios.post('/api/usuario/login', { username, password });
+    try {
+      const response = await axios.post('/api/usuario/login', {
+        username,
+        password,
+      });
 
-    if (response.status === 200) {
-      const { usuario, token } = response.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(usuario));
-      navigate('/productos', { state: { usuario } });
-    } else {
-      setError('Usuario o contraseña incorrectos.');
-    }
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error('Error en login:', error.response ? error.response.data : error.message);
-      setError('Error al conectar al servidor, intente nuevamente.');
-    } else {
-      console.error('Error en login:', error);
-      setError('Error desconocido, intente nuevamente.');
+      if (response.status === 200) {
+        const { usuario, token } = response.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(usuario));
+        navigate('/venta', { state: { usuario } });
+      } else {
+        setError('Usuario o contraseña incorrectos.');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          'Error en login:',
+          error.response ? error.response.data : error.message
+        );
+        setError('Error al conectar al servidor, intente nuevamente.');
+      } else {
+        console.error('Error en login:', error);
+        setError('Error desconocido, intente nuevamente.');
+      }
     }
   }
-}
-
 
   return (
-    <div className='container-session'>
-      <div className='form-session'>
+    <div className="container-session">
+      <div className="form-session">
         <h2>Inicio de Sesión</h2>
         <form onSubmit={handleLogin}>
           <div>
@@ -52,16 +57,16 @@ async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
           </div>
           <div>
             <label>Contraseña:</label>
-              <input
-                type="password"
-                name="password"
-                value={password}  // Esto asegura que el estado `password` esté en sincronización con el input
-                onChange={(e) => setPassword(e.target.value)}  // Actualiza el estado al cambiar el valor
-                required
-              />
+            <input
+              type="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
           {error && <p className="error-message">{error}</p>}
-          <div className='container-button'>
+          <div className="container-button">
             <button type="submit">Ingresar</button>
           </div>
         </form>

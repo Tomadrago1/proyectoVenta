@@ -44,5 +44,9 @@ class CategoriaRepository {
             throw new Error('No se ha podido eliminar la categoria o la categoria no existe');
         }
     }
+    async findByName(item) {
+        const [categorias] = await conn_1.pool.query('SELECT * FROM categoria WHERE nombre LIKE ?', [`%${item.name}%`]);
+        return categorias;
+    }
 }
 exports.CategoriaRepository = CategoriaRepository;

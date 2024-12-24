@@ -72,5 +72,16 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { findAll, findOne, create, update, remove };
+async function findByName(req: Request, res: Response) {
+  try {
+    const { name } = req.params;
+    const categorias = await repository.findByName({ name });
+    res.json(categorias);
+  } catch (error: any) {
+    const errorMessage = error.message || 'Error desconocido';
+    res.status(500).json({ message: 'Error al obtener los productos', errorMessage });
+  }
+}
+
+export { findAll, findOne, create, update, remove, findByName };
 

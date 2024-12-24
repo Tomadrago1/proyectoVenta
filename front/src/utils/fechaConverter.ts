@@ -5,7 +5,7 @@ export const formatFechaHora = (fecha: string) => {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false, // Muestra en formato 24 horas
+    hour12: false,
   };
   return new Date(fecha).toLocaleString('es-ES', opciones);
 };
