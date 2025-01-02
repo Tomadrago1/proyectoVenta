@@ -33,9 +33,9 @@ async function create(req: Request, res: Response) {
       req.body.id_usuario,
       null,
       req.body.total,
-      new Date(req.body.fecha_venta)
+      new Date(req.body.fecha_venta),
+      req.body.monto_extra
     );
-
     const result = await repository.save(venta);
     res.json(result);
   } catch (error: any) {
@@ -50,7 +50,8 @@ async function update(req: Request, res: Response) {
       req.body.id_usuario,
       parseInt(id),
       req.body.total,
-      new Date(req.body.fecha_venta)
+      new Date(req.body.fecha_venta),
+      req.body.monto_extra
     );
 
     const result = await repository.update({ id }, venta);

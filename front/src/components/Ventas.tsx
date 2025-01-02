@@ -190,6 +190,16 @@ const Ventas: React.FC = () => {
               ))}
             </tbody>
           </table>
+          <h2>
+            Monto extra:{' '}
+            {ventas.find((venta) => venta.id_venta === selectedVenta)
+              ?.monto_extra || '0.00'}
+          </h2>
+          <h2>
+            Total:{' '}
+            {ventas.find((venta) => venta.id_venta === selectedVenta)?.total ||
+              '0.00'}
+          </h2>
         </div>
       )}
     </div>

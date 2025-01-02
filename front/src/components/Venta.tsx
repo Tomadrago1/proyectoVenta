@@ -8,6 +8,7 @@ import '../styles/VentaStyle.css';
 const Venta: React.FC = () => {
   const [detalles, setDetalles] = useState<DetalleVenta[]>([]);
   const [total, setTotal] = useState<number>(0);
+  const [monto_extra, setMontoExtra] = useState<number>(0);
   const [codigoBarras, setCodigoBarras] = useState<string>('');
   const [nombresProductos, setNombresProductos] = useState<
     Record<number, string>
@@ -17,6 +18,7 @@ const Venta: React.FC = () => {
     id_usuario: 1,
     fecha_venta: new Date().toISOString(),
     total: 0,
+    monto_extra: 0,
   });
 
   useEffect(() => {
@@ -53,8 +55,6 @@ const Venta: React.FC = () => {
       };
 
       setDetalles([...detalles, nuevoDetalle]);
-
-      // Actualizar el nombre del producto en el estado
       setNombresProductos((prevState) => ({
         ...prevState,
         [producto.id_producto]: producto.nombre_producto,
@@ -95,7 +95,8 @@ const Venta: React.FC = () => {
       id_venta: 0,
       id_usuario: 1,
       fecha_venta: new Date().toISOString(),
-      total: total,
+      total: total + monto_extra,
+      monto_extra: monto_extra,
     };
 
     axios
@@ -103,6 +104,7 @@ const Venta: React.FC = () => {
       .then((response) => {
         const ventaCreada = response.data;
         setVenta(ventaCreada);
+        console.log('Venta guardada correctamente.', ventaCreada);
 
         detalles.forEach((detalle) => {
           axios
@@ -144,11 +146,19 @@ const Venta: React.FC = () => {
 
         alert('Venta guardada exitosamente.');
         setDetalles([]);
+        setMontoExtra(0);
       })
       .catch((error) => {
         console.error('Error al guardar la venta', error);
         alert('Error al guardar la venta.');
       });
+  };
+
+  const addExtraAmount = () => {
+    const nuevoMontoExtra = parseFloat(prompt('Ingrese el monto extra') || '0');
+    if (nuevoMontoExtra > 0) {
+      setMontoExtra((prevMontoExtra) => prevMontoExtra + nuevoMontoExtra);
+    }
   };
 
   return (
@@ -204,9 +214,12 @@ const Venta: React.FC = () => {
           ))}
         </tbody>
       </table>
-
-      <h2>Total: {total.toFixed(2)}</h2>
-      <button onClick={guardarVenta}>Guardar Venta</button>
+      <h2>Monto extra: {monto_extra.toFixed(2) || '0.00'}</h2>
+      <h2>Total: {(total + monto_extra).toFixed(2)}</h2>
+      <div>
+        <button onClick={guardarVenta}>Guardar Venta</button>
+        <button onClick={addExtraAmount}>Agregar monto extra</button>
+      </div>
     </div>
   );
 };

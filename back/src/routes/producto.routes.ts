@@ -7,10 +7,13 @@ import {
   findByBarcode,
   findByName,
   updateStock,
+  getProductoGenerico,
 } from '../controllers/producto.controller';
 import { Router } from 'express';
 
 export const routerProducto = Router();
+
+routerProducto.get('/generico', getProductoGenerico);
 
 routerProducto.put('/stock/:id/:stock', updateStock);
 

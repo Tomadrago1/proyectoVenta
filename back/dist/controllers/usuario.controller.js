@@ -86,11 +86,11 @@ async function login(req, res) {
                 res.json({ usuario, token });
             }
             else {
-                res.status(401).json({ message: 'Contraseña incorrecta' });
+                res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
             }
         }
         else {
-            res.status(404).json({ message: 'Usuario no encontrado' });
+            res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
         }
     }
     catch (error) {

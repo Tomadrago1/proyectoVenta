@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import '../styles/CrudStyle.css';
 import { Producto } from '../interface/producto';
@@ -21,6 +21,7 @@ const Producto: React.FC = () => {
   const [editId, setEditId] = useState<string>('');
   const [porcentaje, setPorcentaje] = useState<number>(0);
   const [error, setError] = useState<string>('');
+  const formRef = useRef<HTMLDivElement | null>(null);
   const [cantidad, setCantidad] = useState<number>(0);
 
   const fetchProductos = async () => {
@@ -64,7 +65,7 @@ const Producto: React.FC = () => {
         );
         setNewProducto(response.data);
         setPorcentaje(50);
-        setSelectedAction('modificar');
+        handleActionClick('modificar');
         setEditId(id);
         setError('');
       } catch (error) {
@@ -81,7 +82,7 @@ const Producto: React.FC = () => {
           `http://localhost:3000/api/producto/${id}`
         );
         setNewProducto(response.data);
-        setSelectedAction('update-stock');
+        handleActionClick('update-stock');
         setEditId(id);
         setError('');
       } catch (error) {
@@ -98,7 +99,7 @@ const Producto: React.FC = () => {
           `http://localhost:3000/api/producto/${id}`
         );
         setNewProducto(response.data);
-        setSelectedAction('eliminar');
+        handleActionClick('eliminar');
         setEditId(id);
         setError('');
       } catch (error) {
@@ -213,6 +214,11 @@ const Producto: React.FC = () => {
     return categoria ? categoria.nombre : 'Categoría no encontrada';
   };
 
+  const handleActionClick = (action: string) => {
+    setSelectedAction(action);
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   useEffect(() => {
     fetchProductos();
     fetchCategorias();
@@ -225,15 +231,23 @@ const Producto: React.FC = () => {
         <button
           onClick={() => {
             resetForm();
-            setSelectedAction('crear');
+            handleActionClick('crear');
           }}
         >
           Crear Producto
         </button>
-        <button onClick={() => setSelectedAction('modificar')}>
+        <button
+          onClick={() => {
+            handleActionClick('modificar');
+          }}
+        >
           Modificar Producto
         </button>
-        <button onClick={() => setSelectedAction('eliminar')}>
+        <button
+          onClick={() => {
+            handleActionClick('eliminar');
+          }}
+        >
           Eliminar Producto
         </button>
       </div>
@@ -274,9 +288,7 @@ const Producto: React.FC = () => {
                     Editar
                   </button>
                   <button
-                    onClick={() => {
-                      handleUpdateStockLoad(producto.id_producto);
-                    }}
+                    onClick={() => handleUpdateStockLoad(producto.id_producto)}
                   >
                     Cargar Stock
                   </button>
@@ -293,7 +305,7 @@ const Producto: React.FC = () => {
       </div>
 
       {selectedAction && (
-        <div className="product-form">
+        <div ref={formRef} className="product-form">
           <h3>
             {selectedAction === 'crear'
               ? 'Crear Producto'
@@ -330,6 +342,7 @@ const Producto: React.FC = () => {
               />
             </div>
           )}
+
           <div className="form-group">
             <label>Nombre del Producto</label>
             <input
@@ -343,6 +356,7 @@ const Producto: React.FC = () => {
               }
             />
           </div>
+
           {selectedAction !== 'eliminar' &&
             selectedAction !== 'update-stock' && (
               <>
@@ -382,6 +396,7 @@ const Producto: React.FC = () => {
                     }
                   />
                 </div>
+
                 <div className="form-group">
                   <label>Porcentaje de Ganancia (%)</label>
                   <input
@@ -390,6 +405,7 @@ const Producto: React.FC = () => {
                     onChange={(e) => setPorcentaje(parseFloat(e.target.value))}
                   />
                 </div>
+
                 <div className="form-group">
                   <label>Código de Barras</label>
                   <input
@@ -405,6 +421,7 @@ const Producto: React.FC = () => {
                 </div>
               </>
             )}
+
           {selectedAction !== 'eliminar' && (
             <div className="form-group">
               <label>Stock</label>
@@ -426,6 +443,7 @@ const Producto: React.FC = () => {
               />
             </div>
           )}
+
           <div className="form-buttons">
             {selectedAction === 'crear' && (
               <button onClick={createProducto}>Crear</button>

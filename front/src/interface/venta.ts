@@ -5,4 +5,5 @@ export interface Venta {
   total: number;
   nombre_usuario?: string;
   apellido_usuario?: string;
+  monto_extra: number;
 }

@@ -118,4 +118,14 @@ export class ProductoRepository implements Repository<Producto> {
       throw new Error('No se ha podido actualizar el stock del producto o el producto no existe');
     }
   }
+
+  public async getProductoGenerico(): Promise<Producto | undefined> {
+    const [productos] = await pool.query<RowDataPacket[]>(
+      'SELECT * FROM productos WHERE nombre_producto = "Generico"',
+    ) as RowDataPacket[];
+    if (productos.length === 0) {
+      return undefined;
+    }
+    return productos[0] as Producto;
+  }
 }

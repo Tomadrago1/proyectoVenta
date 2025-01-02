@@ -116,7 +116,16 @@ async function updateStock(req: Request, res: Response) {
     const errorMessage = error.message || 'Error desconocido';
     res.status(500).json({ message: 'Error al actualizar el stock', errorMessage });
   }
-
 }
 
-export { findAll, findOne, create, update, remove, findByBarcode, findByName, updateStock };
+async function getProductoGenerico(req: Request, res: Response) {
+  try {
+    const producto = await repository.getProductoGenerico();
+    res.json(producto);
+  } catch (error: any) {
+    const errorMessage = error.message || 'Error desconocido';
+    res.status(500).json({ message: 'Error al obtener el producto genérico', errorMessage });
+  }
+}
+
+export { findAll, findOne, create, update, remove, findByBarcode, findByName, updateStock, getProductoGenerico };

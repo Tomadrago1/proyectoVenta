@@ -17,22 +17,27 @@ const Login: React.FC = () => {
         username,
         password,
       });
-
       if (response.status === 200) {
         const { usuario, token } = response.data;
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(usuario));
         navigate('/venta', { state: { usuario } });
-      } else {
-        setError('Usuario o contraseña incorrectos.');
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        if (error.response) {
+          if (error.response.status === 401) {
+            setError('Usuario o contraseña incorrectos.');
+          } else {
+            setError('Error en el servidor, intente nuevamente.');
+          }
+        } else {
+          setError('Error al conectar al servidor, intente nuevamente.');
+        }
         console.error(
           'Error en login:',
           error.response ? error.response.data : error.message
         );
-        setError('Error al conectar al servidor, intente nuevamente.');
       } else {
         console.error('Error en login:', error);
         setError('Error desconocido, intente nuevamente.');

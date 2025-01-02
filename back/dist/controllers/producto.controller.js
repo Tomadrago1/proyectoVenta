@@ -8,6 +8,7 @@ exports.remove = remove;
 exports.findByBarcode = findByBarcode;
 exports.findByName = findByName;
 exports.updateStock = updateStock;
+exports.getProductoGenerico = getProductoGenerico;
 const producto_repository_1 = require("../repositories/producto.repository");
 const producto_model_1 = require("../models/producto.model");
 const repository = new producto_repository_1.ProductoRepository();
@@ -107,5 +108,15 @@ async function updateStock(req, res) {
     catch (error) {
         const errorMessage = error.message || 'Error desconocido';
         res.status(500).json({ message: 'Error al actualizar el stock', errorMessage });
+    }
+}
+async function getProductoGenerico(req, res) {
+    try {
+        const producto = await repository.getProductoGenerico();
+        res.json(producto);
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Error desconocido';
+        res.status(500).json({ message: 'Error al obtener el producto genérico', errorMessage });
     }
 }

@@ -4,6 +4,7 @@ exports.routerProducto = void 0;
 const producto_controller_1 = require("../controllers/producto.controller");
 const express_1 = require("express");
 exports.routerProducto = (0, express_1.Router)();
+exports.routerProducto.get('/generico', producto_controller_1.getProductoGenerico);
 exports.routerProducto.put('/stock/:id/:stock', producto_controller_1.updateStock);
 exports.routerProducto.get('/', producto_controller_1.findAll);
 exports.routerProducto.get('/:id', producto_controller_1.findOne);
