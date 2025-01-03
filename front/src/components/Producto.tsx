@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import '../styles/CrudStyle.css';
+import '../styles/ProductoStyle.css';
 import { Producto } from '../interface/producto';
 import { Categoria } from '../interface/categoria';
 
@@ -271,7 +271,7 @@ const Producto: React.FC = () => {
               <th>Precio Venta</th>
               <th>Stock</th>
               <th>Código de Barras</th>
-              <th>Acciones</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>

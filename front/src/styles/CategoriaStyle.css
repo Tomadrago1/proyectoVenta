@@ -1,0 +1,170 @@
+/* Estilos Generales */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+h1,
+h3 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  /* Centrar el título */
+}
+
+/* Estilos para los botones de acción */
+.action-buttons {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.action-buttons button {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-right: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.action-buttons button:hover {
+  background-color: #444;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+/* Estilos para la tabla de categorías */
+.category-table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.category-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.category-table th,
+.category-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.category-table th {
+  background-color: #000;
+  color: #fff;
+}
+
+.category-table td button {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-right: 10px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-table td button:hover {
+  background-color: #444;
+  box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.6);
+  /* Sombreado blanco suave */
+}
+
+.category-table td button:last-child {
+  margin-right: 0;
+}
+
+.category-form {
+  margin-top: 30px;
+}
+
+.category-form h3 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  text-align: center;
+}
+
+.category-form .form-group {
+  margin-bottom: 15px;
+}
+
+.category-form label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.category-form input,
+.category-form select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+.category-form input[type="number"] {
+  width: auto;
+  display: inline-block;
+  max-width: 120px;
+}
+
+.category-form .form-buttons button {
+  background-color: #000;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.category-form .form-buttons button:hover {
+  background-color: #444;
+}
+
+.category-form .form-buttons button:last-child {
+  background-color: #ccc;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.category-form .form-buttons button:last-child {
+  background-color: #ccc;
+  box-shadow: none;
+  transition: none;
+}

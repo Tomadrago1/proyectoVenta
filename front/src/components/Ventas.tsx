@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import jsPDF from 'jspdf';
 import { Venta } from '../interface/venta';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { formatFechaHora } from '../utils/fechaConverter';
+import '../styles/VentasStyle.css';
+import { generateReport } from '../services/generateReport';
 
 const Ventas: React.FC = () => {
   const [ventas, setVentas] = useState<Venta[]>([]);
@@ -92,6 +95,7 @@ const Ventas: React.FC = () => {
       return;
     }
     try {
+      console.log(startDate, endDate);
       const response = await axios.get(`/api/venta/filtro/fechas`, {
         params: { startDate, endDate },
       });
@@ -106,30 +110,40 @@ const Ventas: React.FC = () => {
     fetchDetalleVenta(idVenta);
   };
 
-  return (
-    <div>
-      <h1>Historial de Ventas</h1>
-      <form onSubmit={handleFilter} style={{ marginBottom: '20px' }}>
-        <label>
-          Desde:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </label>
-        <label>
-          Hasta:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </label>
-        <button type="submit">Filtrar</button>
-      </form>
+  const handleGenerarReporte = () => {
+    generateReport(ventas);
+  };
 
-      <table border={1} style={{ width: '100%', marginBottom: '20px' }}>
+  return (
+    <div className="ventas-container">
+      <div className="ventas-header-container">
+        <h1 className="ventas-header">Historial de Ventas</h1>
+        <form className="ventas-form" onSubmit={handleFilter}>
+          <label>
+            Desde:
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </label>
+          <label>
+            Hasta:
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </label>
+          <button type="submit">Filtrar</button>
+        </form>
+
+        <button onClick={handleGenerarReporte}>
+          Generar reporte de ventas
+        </button>
+      </div>
+
+      <table className="ventas-tabla">
         <thead>
           <tr>
             <th>ID Venta</th>
@@ -165,9 +179,33 @@ const Ventas: React.FC = () => {
       </table>
 
       {detalleVenta && selectedVenta && (
-        <div>
-          <h2>Detalle de la Venta #{selectedVenta}</h2>
-          <table border={1} style={{ width: '100%' }}>
+        <div className="ventas-detalle">
+          <h2>Detalle de la Venta {selectedVenta}</h2>
+          <div className="ventas-detalle-info">
+            <p>
+              <strong>Vendedor:</strong>{' '}
+              {`${
+                usuarios[
+                  ventas.find((venta) => venta.id_venta === selectedVenta)
+                    ?.id_usuario || 0
+                ]?.nombre || ''
+              } ${
+                usuarios[
+                  ventas.find((venta) => venta.id_venta === selectedVenta)
+                    ?.id_usuario ?? 0
+                ]?.apellido || ''
+              }`}
+            </p>
+            <p>
+              <strong>Fecha:</strong>{' '}
+              {formatFechaHora(
+                ventas.find((venta) => venta.id_venta === selectedVenta)
+                  ?.fecha_venta || ''
+              )}
+            </p>
+          </div>
+
+          <table className="ventas-detalle-tabla">
             <thead>
               <tr>
                 <th>Producto</th>
@@ -179,8 +217,7 @@ const Ventas: React.FC = () => {
             <tbody>
               {detalleVenta.map((detalle) => (
                 <tr key={detalle.id_producto}>
-                  <td>{productos[detalle.id_producto]}</td>{' '}
-                  {/* Aquí mostramos el nombre del producto */}
+                  <td>{productos[detalle.id_producto]}</td>
                   <td>{detalle.cantidad}</td>
                   <td>${Number(detalle.precio_unitario).toFixed(2)}</td>
                   <td>
@@ -191,14 +228,18 @@ const Ventas: React.FC = () => {
             </tbody>
           </table>
           <h2>
-            Monto extra:{' '}
-            {ventas.find((venta) => venta.id_venta === selectedVenta)
-              ?.monto_extra || '0.00'}
+            <span>
+              Monto extra:{' '}
+              {ventas.find((venta) => venta.id_venta === selectedVenta)
+                ?.monto_extra || '0.00'}
+            </span>
           </h2>
           <h2>
-            Total:{' '}
-            {ventas.find((venta) => venta.id_venta === selectedVenta)?.total ||
-              '0.00'}
+            <span>
+              Total:{' '}
+              {ventas.find((venta) => venta.id_venta === selectedVenta)
+                ?.total || '0.00'}
+            </span>
           </h2>
         </div>
       )}

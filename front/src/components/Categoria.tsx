@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Categoria } from '../interface/categoria';
 import axios from 'axios';
-import '../styles/CrudStyle.css';
+import '../styles/CategoriaStyle.css';
 
 const Categorias: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -151,7 +151,7 @@ const Categorias: React.FC = () => {
             setSelectedAction('crear');
           }}
         >
-          Crear Categoria
+          Crear Categoría
         </button>
         <button onClick={() => setSelectedAction('modificar')}>
           Modificar Categoría
@@ -164,7 +164,7 @@ const Categorias: React.FC = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Buscar Categoria por Nombre"
+          placeholder="Buscar Categoría por Nombre"
           value={searchTerm}
           onChange={handleSearchChange}
         />
@@ -175,7 +175,7 @@ const Categorias: React.FC = () => {
           <thead>
             <tr>
               <th>Nombre</th>
-              <th>Acciones</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>

@@ -20,6 +20,8 @@ const Venta: React.FC = () => {
     total: 0,
     monto_extra: 0,
   });
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [nuevoMontoExtra, setNuevoMontoExtra] = useState<number>(0);
 
   useEffect(() => {
     const totalCalculado = detalles.reduce(
@@ -61,7 +63,6 @@ const Venta: React.FC = () => {
       }));
     } catch (error) {
       console.error('Error al buscar el producto por código de barras', error);
-      alert('Error al buscar el producto');
     }
   };
 
@@ -130,6 +131,7 @@ const Venta: React.FC = () => {
               console.error('Error al obtener el producto', error);
               alert('Error al obtener el producto.');
             });
+
           axios
             .post('/api/detalle-venta', {
               ...detalle,
@@ -155,16 +157,21 @@ const Venta: React.FC = () => {
   };
 
   const addExtraAmount = () => {
-    const nuevoMontoExtra = parseFloat(prompt('Ingrese el monto extra') || '0');
+    setShowModal(true);
+  };
+
+  const handleMontoExtraSubmit = () => {
     if (nuevoMontoExtra > 0) {
       setMontoExtra((prevMontoExtra) => prevMontoExtra + nuevoMontoExtra);
+      setNuevoMontoExtra(0);
+      setShowModal(false);
     }
   };
 
   return (
-    <div className="container">
-      <h1>Registro de Venta</h1>
-      <div>
+    <div className="venta-container">
+      <h1 className="venta-header">Registro de Venta</h1>
+      <div className="venta-codigo">
         <label>Código de Barras:</label>
         <input
           type="text"
@@ -174,14 +181,14 @@ const Venta: React.FC = () => {
           placeholder="Escanee el código de barras"
         />
       </div>
-      <h3>Detalles de la venta</h3>
-      <table>
+      <h3 className="venta-detalles-header">Detalles de la venta</h3>
+      <table className="venta-tabla">
         <thead>
           <tr>
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Precio Unitario</th>
-            <th>Eliminar</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -214,12 +221,32 @@ const Venta: React.FC = () => {
           ))}
         </tbody>
       </table>
-      <h2>Monto extra: {monto_extra.toFixed(2) || '0.00'}</h2>
-      <h2>Total: {(total + monto_extra).toFixed(2)}</h2>
-      <div>
+      <div className="venta-totales">
+        <h2>Monto extra: {monto_extra.toFixed(2) || '0.00'}</h2>
+        <h2>Total: {(total + monto_extra).toFixed(2)}</h2>
+      </div>
+      <div className="venta-botones">
         <button onClick={guardarVenta}>Guardar Venta</button>
         <button onClick={addExtraAmount}>Agregar monto extra</button>
       </div>
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Ingrese el monto extra</h3>
+            <input
+              type="number"
+              value={nuevoMontoExtra}
+              onChange={(e) => setNuevoMontoExtra(parseFloat(e.target.value))}
+              min="0"
+              placeholder="Monto extra"
+            />
+            <div className="modal-buttons">
+              <button onClick={handleMontoExtraSubmit}>Aceptar</button>
+              <button onClick={() => setShowModal(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

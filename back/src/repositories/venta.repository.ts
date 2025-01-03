@@ -5,7 +5,7 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export class VentaRepository implements Repository<Venta> {
   public async findAll(): Promise<Venta[] | undefined> {
-    const [ventas] = await pool.query('SELECT * FROM ventas');
+    const [ventas] = await pool.query('SELECT * FROM ventas order by fecha_venta desc');
     return ventas as Venta[];
   }
 
@@ -78,10 +78,16 @@ export class VentaRepository implements Repository<Venta> {
   }
   public async filterByDateRange(startDate: Date, endDate: Date): Promise<Venta[]> {
     endDate.setUTCHours(23, 59, 59, 999);
+    const startDateISO = startDate.toISOString();
+    const endDateISO = endDate.toISOString();
+
+    console.log(startDateISO, endDateISO);
+
     const [ventas] = await pool.query(
-      'SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ?',
-      [startDate, endDate]
+      'SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ? ORDER BY fecha_venta DESC',
+      [startDateISO, endDateISO]
     );
+
     return ventas as Venta[];
   }
 }

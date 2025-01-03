@@ -1,0 +1,181 @@
+/* General */
+.ventas-container {
+  font-family: Arial, sans-serif;
+  color: #000;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Encabezado */
+.ventas-header-container {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+}
+
+.ventas-header {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.ventas-header-container button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.ventas-header-container button:hover {
+  background-color: #444;
+}
+
+/* Formulario */
+.ventas-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.ventas-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.ventas-form input[type="date"] {
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.ventas-form button {
+  padding: 8px 16px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.ventas-form button:hover {
+  background-color: #444;
+}
+
+/* Botón de generar reporte */
+button[type="button"] {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="button"]:hover {
+  background-color: #218838;
+}
+
+/* Tabla */
+.ventas-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.ventas-tabla th,
+.ventas-tabla td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+.ventas-tabla th {
+  background-color: #000;
+  color: #fff;
+  font-weight: 600;
+}
+
+.ventas-tabla td button {
+  padding: 6px 12px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.ventas-tabla td button:hover {
+  background-color: #444;
+  transform: translateY(-2px);
+}
+
+/* Detalle de Venta */
+.ventas-detalle {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+}
+
+.ventas-detalle h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  text-align: center;
+  color: #000;
+}
+
+.ventas-detalle-tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ventas-detalle-tabla th,
+.ventas-detalle-tabla td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.ventas-detalle-tabla th {
+  background-color: #000;
+  color: #fff;
+}
+
+.ventas-detalle-info {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f1f1f1;
+}
+
+.ventas-detalle-info p {
+  margin: 5px 0;
+  font-size: 16px;
+}

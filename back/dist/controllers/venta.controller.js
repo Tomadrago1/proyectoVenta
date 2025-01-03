@@ -35,7 +35,7 @@ async function findOne(req, res) {
 }
 async function create(req, res) {
     try {
-        const venta = new venta_model_1.Venta(req.body.id_usuario, null, req.body.total, new Date(req.body.fecha_venta));
+        const venta = new venta_model_1.Venta(req.body.id_usuario, null, req.body.total, new Date(req.body.fecha_venta), req.body.monto_extra);
         const result = await repository.save(venta);
         res.json(result);
     }
@@ -46,7 +46,7 @@ async function create(req, res) {
 async function update(req, res) {
     try {
         const { id } = req.params;
-        const venta = new venta_model_1.Venta(req.body.id_usuario, parseInt(id), req.body.total, new Date(req.body.fecha_venta));
+        const venta = new venta_model_1.Venta(req.body.id_usuario, parseInt(id), req.body.total, new Date(req.body.fecha_venta), req.body.monto_extra);
         const result = await repository.update({ id }, venta);
         res.json(result);
     }
