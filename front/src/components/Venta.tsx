@@ -33,6 +33,55 @@ const Venta: React.FC = () => {
 
   const buscarProductoPorCodigo = async (codigo: string) => {
     try {
+      const codigoRecortado = codigo.substring(1, 6);
+      let importeStr = codigo.substring(6, 12);
+      importeStr = importeStr.replace(/^0+/, '');
+      console.log('Código recortado:', codigoRecortado);
+      console.log('Importe:', importeStr);
+      try {
+        const responseRecortado = await axios.get(
+          `/api/producto/barcode/${codigoRecortado}`
+        );
+        const productoRecortado: Producto = responseRecortado.data;
+
+        if (productoRecortado) {
+          const productoExistente = detalles.find(
+            (d) => d.id_producto === Number(productoRecortado.id_producto)
+          );
+          if (productoExistente) {
+            alert('Este producto ya ha sido añadido a la venta.');
+            return;
+          }
+          const importe = parseFloat(importeStr);
+
+          if (isNaN(importe) || importe <= 0) {
+            alert('El importe en el código de barras no es válido.');
+            return;
+          }
+
+          const cantidad = importe / productoRecortado.precio_venta;
+
+          const nuevoDetalleRecortado: DetalleVenta = {
+            id_producto: Number(productoRecortado.id_producto),
+            id_venta: venta.id_venta,
+            cantidad: parseFloat(cantidad.toString()),
+            precio_unitario: productoRecortado.precio_venta,
+          };
+
+          setDetalles([...detalles, nuevoDetalleRecortado]);
+          setNombresProductos((prevState) => ({
+            ...prevState,
+            [productoRecortado.id_producto]: productoRecortado.nombre_producto,
+          }));
+
+          return;
+        }
+      } catch {
+        console.log(
+          'No se encontró el producto con el código recortado, intentando con el código completo...'
+        );
+      }
+
       const response = await axios.get(`/api/producto/barcode/${codigo}`);
       const producto: Producto = response.data;
 
@@ -45,7 +94,12 @@ const Venta: React.FC = () => {
         (d) => d.id_producto === Number(producto.id_producto)
       );
       if (productoExistente) {
-        alert('Este producto ya ha sido añadido a la venta.');
+        const nuevosDetalles = detalles.map((d) =>
+          d.id_producto === Number(producto.id_producto)
+            ? { ...d, cantidad: d.cantidad + 1 }
+            : d
+        );
+        setDetalles(nuevosDetalles);
         return;
       }
 
@@ -188,6 +242,7 @@ const Venta: React.FC = () => {
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Precio Unitario</th>
+            <th>Subtotal</th>
             <th></th>
           </tr>
         </thead>
@@ -197,21 +252,26 @@ const Venta: React.FC = () => {
               <td>{nombresProductos[detalle.id_producto] || 'Cargando...'}</td>
               <td>
                 <input
-                  type="number"
+                  type="text"
                   value={detalle.cantidad}
-                  min="1"
                   onChange={(e) => {
-                    const nuevaCantidad = parseInt(e.target.value);
-                    const nuevosDetalles = detalles.map((d) =>
-                      d.id_producto === detalle.id_producto
-                        ? { ...d, cantidad: nuevaCantidad }
-                        : d
+                    const nuevaCantidad = parseFloat(
+                      e.target.value.replace(',', '.')
                     );
-                    setDetalles(nuevosDetalles);
+                    if (!isNaN(nuevaCantidad)) {
+                      const nuevosDetalles = detalles.map((d) =>
+                        d.id_producto === detalle.id_producto
+                          ? { ...d, cantidad: nuevaCantidad }
+                          : d
+                      );
+                      setDetalles(nuevosDetalles);
+                    }
                   }}
                 />
               </td>
+
               <td>{detalle.precio_unitario}</td>
+              <td>{(detalle.cantidad * detalle.precio_unitario).toFixed(2)}</td>
               <td>
                 <button onClick={() => eliminarProducto(detalle.id_producto)}>
                   Eliminar

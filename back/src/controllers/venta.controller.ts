@@ -29,6 +29,7 @@ async function findOne(req: Request, res: Response) {
 
 async function create(req: Request, res: Response) {
   try {
+    console.log("ESTE ES EL BODY DE LA REQ", req.body);
     const venta = new Venta(
       req.body.id_usuario,
       null,
@@ -36,6 +37,7 @@ async function create(req: Request, res: Response) {
       new Date(req.body.fecha_venta),
       req.body.monto_extra
     );
+    console.log("ESTA ES LA VENTA A GUARDAR", venta);
     const result = await repository.save(venta);
     res.json(result);
   } catch (error: any) {

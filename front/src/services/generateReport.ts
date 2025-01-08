@@ -141,5 +141,6 @@ export const generateReport = async (ventas: Venta[]) => {
     currentY += rowHeight + 10;
   }
 
-  doc.save('reporte_ventas.pdf');
+  const formattedDate = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-') + '_' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }).replace(/:/g, '-');
+  doc.save(`reporte_ventas_${formattedDate}.pdf`);
 };

@@ -31,12 +31,13 @@ CREATE TABLE ventas (
   id_usuario INT NOT NULL,
   fecha_venta DATETIME DEFAULT CURRENT_TIMESTAMP,
   total DECIMAL(10, 2) NOT NULL,
+  monto_extra DECIMAL(10, 2),
   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 CREATE TABLE detalle_venta (
   id_venta INT NOT NULL,
   id_producto INT NOT NULL,
-  cantidad INT NOT NULL,
+  cantidad DECIMAL(10, 2) NOT NULL,
   precio_unitario DECIMAL(10, 2) NOT NULL,
   PRIMARY KEY (id_venta, id_producto),
   FOREIGN KEY (id_venta) REFERENCES ventas(id_venta),

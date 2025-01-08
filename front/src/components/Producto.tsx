@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import '../styles/ProductoStyle.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faTrash,
+  faSquarePlus,
+  faFloppyDisk,
+  faPen,
+} from '@fortawesome/free-solid-svg-icons';
 import { Producto } from '../interface/producto';
 import { Categoria } from '../interface/categoria';
 
@@ -23,6 +30,8 @@ const Producto: React.FC = () => {
   const [error, setError] = useState<string>('');
   const formRef = useRef<HTMLDivElement | null>(null);
   const [cantidad, setCantidad] = useState<number>(0);
+  const [mostrarFormularioAutomatico, setMostrarFormularioAutomatico] =
+    useState<boolean>(false);
 
   const fetchProductos = async () => {
     try {
@@ -110,8 +119,10 @@ const Producto: React.FC = () => {
   };
 
   const createProducto = async () => {
-    const precioVentaCalculado =
-      newProducto.precio_compra * (1 + porcentaje / 100);
+    const precioVentaCalculado = mostrarFormularioAutomatico
+      ? newProducto.precio_compra * (1 + porcentaje / 100)
+      : newProducto.precio_venta;
+
     try {
       const response = await axios.post('http://localhost:3000/api/producto', {
         ...newProducto,
@@ -125,8 +136,10 @@ const Producto: React.FC = () => {
   };
 
   const updateProducto = async () => {
-    const precioVentaCalculado =
-      newProducto.precio_compra * (1 + porcentaje / 100);
+    const precioVentaCalculado = mostrarFormularioAutomatico
+      ? newProducto.precio_compra * (1 + porcentaje / 100)
+      : newProducto.precio_venta;
+
     try {
       const response = await axios.put(
         `http://localhost:3000/api/producto/${newProducto.id_producto}`,
@@ -229,25 +242,31 @@ const Producto: React.FC = () => {
       <h1>Productos</h1>
       <div className="action-buttons">
         <button
+          className="create-button"
           onClick={() => {
             resetForm();
             handleActionClick('crear');
           }}
         >
+          <FontAwesomeIcon icon={faSquarePlus} />
           Crear Producto
         </button>
         <button
+          className="update-button"
           onClick={() => {
             handleActionClick('modificar');
           }}
         >
+          <FontAwesomeIcon icon={faPen} />
           Modificar Producto
         </button>
         <button
+          className="delete-button"
           onClick={() => {
             handleActionClick('eliminar');
           }}
         >
+          <FontAwesomeIcon icon={faTrash} />
           Eliminar Producto
         </button>
       </div>
@@ -262,7 +281,7 @@ const Producto: React.FC = () => {
       </div>
 
       <div className="product-table">
-        <table>
+        <table className="table">
           <thead>
             <tr>
               <th>Nombre</th>
@@ -293,8 +312,10 @@ const Producto: React.FC = () => {
                     Cargar Stock
                   </button>
                   <button
+                    className="delete-button"
                     onClick={() => handleDeleteLoad(producto.id_producto)}
                   >
+                    <FontAwesomeIcon icon={faTrash} />
                     Eliminar
                   </button>
                 </td>
@@ -396,16 +417,52 @@ const Producto: React.FC = () => {
                     }
                   />
                 </div>
+                {(selectedAction === 'crear' ||
+                  selectedAction === 'modificar') && (
+                  <>
+                    <button
+                      className="toggle-button"
+                      onClick={() =>
+                        setMostrarFormularioAutomatico(
+                          !mostrarFormularioAutomatico
+                        )
+                      }
+                    >
+                      {mostrarFormularioAutomatico
+                        ? 'Usar Precio Manual'
+                        : 'Usar Precio Automático'}
+                    </button>
 
-                <div className="form-group">
-                  <label>Porcentaje de Ganancia (%)</label>
-                  <input
-                    type="number"
-                    value={porcentaje}
-                    onChange={(e) => setPorcentaje(parseFloat(e.target.value))}
-                  />
-                </div>
+                    {mostrarFormularioAutomatico && (
+                      <div className="form-group">
+                        <label>Porcentaje de Ganancia (%)</label>
+                        <input
+                          type="number"
+                          value={porcentaje}
+                          onChange={(e) =>
+                            setPorcentaje(parseFloat(e.target.value))
+                          }
+                        />
+                      </div>
+                    )}
 
+                    {!mostrarFormularioAutomatico && (
+                      <div className="form-group">
+                        <label>Precio Venta</label>
+                        <input
+                          type="number"
+                          value={newProducto.precio_venta}
+                          onChange={(e) =>
+                            setNewProducto({
+                              ...newProducto,
+                              precio_venta: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
                 <div className="form-group">
                   <label>Código de Barras</label>
                   <input
@@ -446,20 +503,35 @@ const Producto: React.FC = () => {
 
           <div className="form-buttons">
             {selectedAction === 'crear' && (
-              <button onClick={createProducto}>Crear</button>
+              <button className="submit-button" onClick={createProducto}>
+                <FontAwesomeIcon icon={faFloppyDisk} />
+                Crear
+              </button>
             )}
             {selectedAction === 'modificar' && (
-              <button onClick={updateProducto}>Actualizar</button>
+              <button className="submit-button" onClick={updateProducto}>
+                <FontAwesomeIcon icon={faFloppyDisk} />
+                Actualizar
+              </button>
             )}
             {selectedAction === 'eliminar' && (
-              <button onClick={deleteProducto}>Eliminar</button>
+              <button className="delete-button" onClick={deleteProducto}>
+                <FontAwesomeIcon icon={faTrash} />
+                Eliminar
+              </button>
             )}
             {selectedAction === 'update-stock' && (
-              <button onClick={() => updateStock(cantidad)}>
+              <button
+                className="submit-button"
+                onClick={() => updateStock(cantidad)}
+              >
+                <FontAwesomeIcon icon={faFloppyDisk} />
                 Actualizar Stock
               </button>
             )}
-            <button onClick={resetForm}>Cancelar</button>
+            <button className="cancel-button" onClick={resetForm}>
+              Cancelar
+            </button>
           </div>
         </div>
       )}

@@ -19,7 +19,6 @@ const Ventas: React.FC = () => {
   >({});
   const [productos, setProductos] = useState<Record<number, string>>({});
 
-  // Función para obtener las ventas con los usuarios
   const fetchVentas = async () => {
     try {
       const response = await axios.get('/api/venta');
@@ -90,15 +89,24 @@ const Ventas: React.FC = () => {
 
   const handleFilter = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!startDate || !endDate) {
-      alert('Por favor, selecciona un rango de fechas');
-      return;
-    }
+
     try {
-      console.log(startDate, endDate);
+      if (!startDate && !endDate) {
+        const response = await axios.get(`/api/venta`);
+        setSelectedVenta(null);
+        setVentas(response.data);
+        return;
+      }
+
+      if (!startDate || !endDate) {
+        alert('Por favor, selecciona un rango de fechas completo');
+        return;
+      }
+
       const response = await axios.get(`/api/venta/filtro/fechas`, {
         params: { startDate, endDate },
       });
+      setSelectedVenta(null);
       setVentas(response.data);
     } catch (error) {
       console.error('Error al filtrar las ventas:', error);
@@ -110,6 +118,18 @@ const Ventas: React.FC = () => {
     fetchDetalleVenta(idVenta);
   };
 
+  const handleFilterToday = async () => {
+    setStartDate(new Date().toISOString().split('T')[0]);
+    setEndDate(new Date().toISOString().split('T')[0]);
+  };
+
+  const handleFilterThisMonth = async () => {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    setStartDate(firstDay.toISOString().split('T')[0]);
+    setEndDate(today.toISOString().split('T')[0]);
+  };
+
   const handleGenerarReporte = () => {
     generateReport(ventas);
   };
@@ -118,6 +138,7 @@ const Ventas: React.FC = () => {
     <div className="ventas-container">
       <div className="ventas-header-container">
         <h1 className="ventas-header">Historial de Ventas</h1>
+
         <form className="ventas-form" onSubmit={handleFilter}>
           <label>
             Desde:
@@ -135,9 +156,18 @@ const Ventas: React.FC = () => {
               onChange={(e) => setEndDate(e.target.value)}
             />
           </label>
-          <button type="submit">Filtrar</button>
+          <button type="submit" className="btn-filtro">
+            Filtrar
+          </button>
         </form>
-
+        <div className="ventas-btn-group">
+          <button onClick={handleFilterToday} className="btn-filtro-hoy">
+            Filtrar Ventas Hoy
+          </button>
+          <button onClick={handleFilterThisMonth} className="btn-filtro-mes">
+            Filtrar Ventas Este Mes
+          </button>
+        </div>
         <button onClick={handleGenerarReporte}>
           Generar reporte de ventas
         </button>

@@ -51,7 +51,10 @@ class VentaRepository {
     }
     async filterByDateRange(startDate, endDate) {
         endDate.setUTCHours(23, 59, 59, 999);
-        const [ventas] = await conn_1.pool.query('SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ? order by fecha_venta desc', [startDate, endDate]);
+        const startDateISO = startDate.toISOString();
+        const endDateISO = endDate.toISOString();
+        console.log(startDateISO, endDateISO);
+        const [ventas] = await conn_1.pool.query('SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ? ORDER BY fecha_venta DESC', [startDateISO, endDateISO]);
         return ventas;
     }
 }
