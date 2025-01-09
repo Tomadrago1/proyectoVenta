@@ -120,11 +120,13 @@ const Venta: React.FC = () => {
     }
   };
 
-  const handleCodigoBarras = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const codigo = e.target.value.trim();
-    if (codigo) {
-      buscarProductoPorCodigo(codigo);
-      setCodigoBarras('');
+  const handleCodigoBarras = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const codigo = (e.target as HTMLInputElement).value.trim();
+      if (codigo) {
+        buscarProductoPorCodigo(codigo);
+        setCodigoBarras('');
+      }
     }
   };
 
@@ -150,7 +152,7 @@ const Venta: React.FC = () => {
       id_venta: 0,
       id_usuario: 1,
       fecha_venta: new Date().toISOString(),
-      total: total + monto_extra,
+      total: total,
       monto_extra: monto_extra,
     };
 
@@ -217,6 +219,7 @@ const Venta: React.FC = () => {
   const handleMontoExtraSubmit = () => {
     if (nuevoMontoExtra > 0) {
       setMontoExtra((prevMontoExtra) => prevMontoExtra + nuevoMontoExtra);
+      setTotal((prevTotal) => prevTotal + nuevoMontoExtra);
       setNuevoMontoExtra(0);
       setShowModal(false);
     }
@@ -231,7 +234,8 @@ const Venta: React.FC = () => {
           type="text"
           value={codigoBarras}
           onChange={(e) => setCodigoBarras(e.target.value)}
-          onBlur={(e) => handleCodigoBarras(e)}
+          onKeyDown={(e) => handleCodigoBarras(e)}
+          autoFocus
           placeholder="Escanee el código de barras"
         />
       </div>
@@ -283,7 +287,7 @@ const Venta: React.FC = () => {
       </table>
       <div className="venta-totales">
         <h2>Monto extra: {monto_extra.toFixed(2) || '0.00'}</h2>
-        <h2>Total: {(total + monto_extra).toFixed(2)}</h2>
+        <h2>Total: {total.toFixed(2)}</h2>
       </div>
       <div className="venta-botones">
         <button onClick={guardarVenta}>Guardar Venta</button>
