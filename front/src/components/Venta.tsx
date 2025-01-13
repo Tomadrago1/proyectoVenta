@@ -45,13 +45,6 @@ const Venta: React.FC = () => {
         const productoRecortado: Producto = responseRecortado.data;
 
         if (productoRecortado) {
-          const productoExistente = detalles.find(
-            (d) => d.id_producto === Number(productoRecortado.id_producto)
-          );
-          if (productoExistente) {
-            alert('Este producto ya ha sido añadido a la venta.');
-            return;
-          }
           const importe = parseFloat(importeStr);
 
           if (isNaN(importe) || importe <= 0) {
@@ -62,9 +55,10 @@ const Venta: React.FC = () => {
           const cantidad = importe / productoRecortado.precio_venta;
 
           const nuevoDetalleRecortado: DetalleVenta = {
+            id_temp: Date.now(),
             id_producto: Number(productoRecortado.id_producto),
             id_venta: venta.id_venta,
-            cantidad: parseFloat(cantidad.toString()),
+            cantidad: parseFloat(cantidad.toFixed(3)),
             precio_unitario: productoRecortado.precio_venta,
           };
 
@@ -104,6 +98,7 @@ const Venta: React.FC = () => {
       }
 
       const nuevoDetalle: DetalleVenta = {
+        id_temp: Date.now(),
         id_producto: Number(producto.id_producto),
         id_venta: venta.id_venta,
         cantidad: 1,
@@ -130,14 +125,14 @@ const Venta: React.FC = () => {
     }
   };
 
-  const eliminarProducto = (idProducto: number) => {
+  const eliminarProducto = (idTemp: number) => {
     const nuevosDetalles = detalles.filter(
-      (detalle) => detalle.id_producto !== idProducto
+      (detalle) => detalle.id_temp !== idTemp
     );
     setDetalles(nuevosDetalles);
 
     setNombresProductos((prevState) => {
-      const { [idProducto]: _, ...rest } = prevState;
+      const { [idTemp]: _, ...rest } = prevState;
       return rest;
     });
   };
@@ -148,63 +143,60 @@ const Venta: React.FC = () => {
       return;
     }
 
+    const montoExtraCalculado = detalles
+      .filter((detalle) => detalle.id_producto === 0)
+      .reduce(
+        (acc, detalle) => acc + detalle.precio_unitario * detalle.cantidad,
+        0
+      );
+
     const nuevaVenta: Venta = {
       id_venta: 0,
       id_usuario: 1,
       fecha_venta: new Date().toISOString(),
-      total: total,
-      monto_extra: monto_extra,
+      total: parseFloat(total.toFixed(0)),
+      monto_extra: montoExtraCalculado,
     };
 
+    // Agrupar detalles para evitar duplicados
+    const detallesAgrupados: DetalleVenta[] = [];
+    const mapDetalles = new Map<number, DetalleVenta>();
+
+    detalles.forEach((detalle) => {
+      if (mapDetalles.has(detalle.id_producto)) {
+        const detalleExistente = mapDetalles.get(detalle.id_producto)!;
+        detalleExistente.cantidad += detalle.cantidad;
+      } else {
+        mapDetalles.set(detalle.id_producto, { ...detalle });
+      }
+    });
+
+    mapDetalles.forEach((detalle) => detallesAgrupados.push(detalle));
+
+    // Guardar la venta y sus detalles
     axios
       .post('/api/venta', nuevaVenta)
       .then((response) => {
         const ventaCreada = response.data;
         setVenta(ventaCreada);
-        console.log('Venta guardada correctamente.', ventaCreada);
 
-        detalles.forEach((detalle) => {
-          axios
-            .get(`/api/producto/${detalle.id_producto}`)
-            .then((response) => {
-              const producto = response.data;
-              const nuevoStock = producto.stock - detalle.cantidad;
-
-              axios
-                .put(`/api/producto/stock/${detalle.id_producto}/${nuevoStock}`)
-                .then(() => {
-                  console.log('Stock del producto actualizado correctamente.');
-                })
-                .catch((error) => {
-                  console.error(
-                    'Error al actualizar el stock del producto',
-                    error
-                  );
-                  alert('Error al actualizar el stock del producto.');
-                });
-            })
-            .catch((error) => {
-              console.error('Error al obtener el producto', error);
-              alert('Error al obtener el producto.');
-            });
-
+        detallesAgrupados.forEach((detalle) => {
           axios
             .post('/api/detalle-venta', {
               ...detalle,
               id_venta: ventaCreada.id_venta,
             })
             .then(() => {
-              console.log('Detalle de venta guardado correctamente.');
+              console.log('Detalle guardado:', detalle);
             })
             .catch((error) => {
-              console.error('Error al guardar el detalle de la venta', error);
-              alert('Error al guardar los detalles de la venta.');
+              console.error('Error al guardar detalle', error);
             });
         });
 
         alert('Venta guardada exitosamente.');
         setDetalles([]);
-        setMontoExtra(0);
+        setMontoExtra(0); // Reiniciar monto_extra
       })
       .catch((error) => {
         console.error('Error al guardar la venta', error);
@@ -218,10 +210,29 @@ const Venta: React.FC = () => {
 
   const handleMontoExtraSubmit = () => {
     if (nuevoMontoExtra > 0) {
-      setMontoExtra((prevMontoExtra) => prevMontoExtra + nuevoMontoExtra);
-      setTotal((prevTotal) => prevTotal + nuevoMontoExtra);
+      const nuevoDetalle: DetalleVenta = {
+        id_temp: Date.now(),
+        id_producto: 0,
+        id_venta: venta.id_venta,
+        cantidad: 1,
+        precio_unitario: nuevoMontoExtra,
+      };
+
+      setDetalles((prevDetalles) => [...prevDetalles, nuevoDetalle]);
+
+      setTotal(
+        (prevTotal) => prevTotal + nuevoMontoExtra * nuevoDetalle.cantidad
+      );
+
       setNuevoMontoExtra(0);
       setShowModal(false);
+    }
+  };
+
+  const cancelarVenta = () => {
+    if (window.confirm('¿Está seguro de que desea cancelar la venta?')) {
+      setDetalles([]);
+      setMontoExtra(0);
     }
   };
 
@@ -251,33 +262,38 @@ const Venta: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {detalles.map((detalle, index) => (
-            <tr key={index}>
-              <td>{nombresProductos[detalle.id_producto] || 'Cargando...'}</td>
+          {detalles.map((detalle) => (
+            <tr key={detalle.id_temp}>
+              <td>
+                {nombresProductos[detalle.id_producto] || 'Producto generico'}
+              </td>
               <td>
                 <input
-                  type="text"
-                  value={detalle.cantidad}
+                  type="number"
+                  value={
+                    Number.isInteger(detalle.cantidad)
+                      ? detalle.cantidad
+                      : detalle.cantidad.toFixed(3)
+                  }
                   onChange={(e) => {
-                    const nuevaCantidad = parseFloat(
-                      e.target.value.replace(',', '.')
-                    );
+                    const nuevaCantidad = parseFloat(e.target.value);
                     if (!isNaN(nuevaCantidad)) {
                       const nuevosDetalles = detalles.map((d) =>
-                        d.id_producto === detalle.id_producto
+                        d.id_temp === detalle.id_temp
                           ? { ...d, cantidad: nuevaCantidad }
                           : d
                       );
                       setDetalles(nuevosDetalles);
                     }
                   }}
+                  step={1}
+                  min={0}
                 />
               </td>
-
               <td>{detalle.precio_unitario}</td>
-              <td>{(detalle.cantidad * detalle.precio_unitario).toFixed(2)}</td>
+              <td>{(detalle.cantidad * detalle.precio_unitario).toFixed(0)}</td>
               <td>
-                <button onClick={() => eliminarProducto(detalle.id_producto)}>
+                <button onClick={() => eliminarProducto(detalle.id_temp)}>
                   Eliminar
                 </button>
               </td>
@@ -286,23 +302,23 @@ const Venta: React.FC = () => {
         </tbody>
       </table>
       <div className="venta-totales">
-        <h2>Monto extra: {monto_extra.toFixed(2) || '0.00'}</h2>
-        <h2>Total: {total.toFixed(2)}</h2>
+        <h2>Total: {total.toFixed(0)}</h2>
       </div>
       <div className="venta-botones">
         <button onClick={guardarVenta}>Guardar Venta</button>
-        <button onClick={addExtraAmount}>Agregar monto extra</button>
+        <button onClick={addExtraAmount}>Agregar producto generico</button>
+        <button onClick={cancelarVenta}>Cancelar venta</button>
       </div>
       {showModal && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Ingrese el monto extra</h3>
+            <h3>Precio del producto</h3>
             <input
               type="number"
               value={nuevoMontoExtra}
               onChange={(e) => setNuevoMontoExtra(parseFloat(e.target.value))}
               min="0"
-              placeholder="Monto extra"
+              placeholder="Monto extra (precio unitario)"
             />
             <div className="modal-buttons">
               <button onClick={handleMontoExtraSubmit}>Aceptar</button>

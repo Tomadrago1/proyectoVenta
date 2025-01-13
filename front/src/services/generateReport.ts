@@ -116,7 +116,7 @@ export const generateReport = async (ventas: Venta[]) => {
         y
       );
       doc.text(
-        `$${detalle.cantidad * detalle.precio_unitario}`,
+        `$${(detalle.cantidad * detalle.precio_unitario).toFixed(0)}`,
         startX + cellWidth * 3,
         y
       );

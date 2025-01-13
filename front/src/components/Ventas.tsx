@@ -251,7 +251,7 @@ const Ventas: React.FC = () => {
                   <td>{detalle.cantidad}</td>
                   <td>${Number(detalle.precio_unitario).toFixed(2)}</td>
                   <td>
-                    ${(detalle.cantidad * detalle.precio_unitario).toFixed(2)}
+                    ${(detalle.cantidad * detalle.precio_unitario).toFixed(0)}
                   </td>
                 </tr>
               ))}

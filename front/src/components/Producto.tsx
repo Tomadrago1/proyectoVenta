@@ -481,7 +481,11 @@ const Producto: React.FC = () => {
 
           {selectedAction !== 'eliminar' && (
             <div className="form-group">
-              <label>Stock</label>
+              <label>
+                {selectedAction === 'update-stock'
+                  ? 'Cantidad a Agregar'
+                  : 'Stock'}
+              </label>
               <input
                 type="number"
                 value={
