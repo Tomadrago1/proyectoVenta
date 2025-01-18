@@ -3,22 +3,24 @@ import path from 'path';
 import cors from 'cors';
 import session from 'express-session';
 
+
+// Primer servidor (en el puerto 3000)
 const app = express();
 const port = 3000;
 
-
-app.use(express.json());
+app.use(express.json()); // Middleware para manejar JSON
 
 app.use(cors({
-  origin: 'http://localhost:8080'
+  origin: 'http://localhost:8080',
 }));
 
+// Rutas (estos imports pueden estar en sus respectivos archivos)
 import { routerProducto } from './routes/producto.routes';
 import { routerUsuario } from './routes/usuario.routes';
 import { routerVenta } from './routes/venta.routes';
 import { routerDetalleVenta } from './routes/detalleVenta.routes';
 import { routerCategoria } from './routes/categoria.routes';
-
+import { routerImpresora } from './routes/impresora.routes';
 
 app.use(
   session({
@@ -34,24 +36,21 @@ app.use('/api/usuario', routerUsuario);
 app.use('/api/venta', routerVenta);
 app.use('/api/detalle-venta', routerDetalleVenta);
 app.use('/api/categoria', routerCategoria);
+app.use('/api/impresora', routerImpresora);
 
 app.use(express.static(path.join(__dirname, 'dist')));
-
 
 app.get('/', (req: Request, res: Response) => {
   res.send('¡Hola Mundo! El servidor Express está corriendo en el puerto 3000.');
 });
 
-
 app.get('/api', (req: Request, res: Response) => {
   res.json({ message: "API funcionando correctamente." });
 });
 
-
 app.get('/home', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
-
 
 app.listen(port, () => {
   console.log(`Servidor Express corriendo en http://localhost:${port}`);

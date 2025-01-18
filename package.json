@@ -3,10 +3,16 @@
     "@radix-ui/react-dropdown-menu": "^2.1.4",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.4",
+    "browserify-zlib": "^0.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "concurrently": "^9.1.0",
-    "jspdf": "^2.5.2"
+    "events": "^3.3.0",
+    "jspdf": "^2.5.2",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5"
   },
   "scripts": {
     "start": "concurrently \"npm run serve-front\" \"npm run serve-back\"",
@@ -16,7 +22,6 @@
   "devDependencies": {
     "@shadcn/ui": "^0.0.4",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17"
+    "postcss": "^8.4.49"
   }
 }

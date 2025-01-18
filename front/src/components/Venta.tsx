@@ -4,6 +4,8 @@ import { Producto } from '../interface/producto';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { Venta } from '../interface/venta';
 import '../styles/VentaStyle.css';
+import { guardarVenta } from '../services/ventaService';
+import { buscarProductoPorCodigo } from '../services/searchByBarcode';
 
 const Venta: React.FC = () => {
   const [detalles, setDetalles] = useState<DetalleVenta[]>([]);
@@ -31,95 +33,17 @@ const Venta: React.FC = () => {
     setTotal(totalCalculado);
   }, [detalles]);
 
-  const buscarProductoPorCodigo = async (codigo: string) => {
-    try {
-      const codigoRecortado = codigo.substring(1, 6);
-      let importeStr = codigo.substring(6, 12);
-      importeStr = importeStr.replace(/^0+/, '');
-      console.log('Código recortado:', codigoRecortado);
-      console.log('Importe:', importeStr);
-      try {
-        const responseRecortado = await axios.get(
-          `/api/producto/barcode/${codigoRecortado}`
-        );
-        const productoRecortado: Producto = responseRecortado.data;
-
-        if (productoRecortado) {
-          const importe = parseFloat(importeStr);
-
-          if (isNaN(importe) || importe <= 0) {
-            alert('El importe en el código de barras no es válido.');
-            return;
-          }
-
-          const cantidad = importe / productoRecortado.precio_venta;
-
-          const nuevoDetalleRecortado: DetalleVenta = {
-            id_temp: Date.now(),
-            id_producto: Number(productoRecortado.id_producto),
-            id_venta: venta.id_venta,
-            cantidad: parseFloat(cantidad.toFixed(3)),
-            precio_unitario: productoRecortado.precio_venta,
-          };
-
-          setDetalles([...detalles, nuevoDetalleRecortado]);
-          setNombresProductos((prevState) => ({
-            ...prevState,
-            [productoRecortado.id_producto]: productoRecortado.nombre_producto,
-          }));
-
-          return;
-        }
-      } catch {
-        console.log(
-          'No se encontró el producto con el código recortado, intentando con el código completo...'
-        );
-      }
-
-      const response = await axios.get(`/api/producto/barcode/${codigo}`);
-      const producto: Producto = response.data;
-
-      if (!producto) {
-        alert('Producto no encontrado');
-        return;
-      }
-
-      const productoExistente = detalles.find(
-        (d) => d.id_producto === Number(producto.id_producto)
-      );
-      if (productoExistente) {
-        const nuevosDetalles = detalles.map((d) =>
-          d.id_producto === Number(producto.id_producto)
-            ? { ...d, cantidad: d.cantidad + 1 }
-            : d
-        );
-        setDetalles(nuevosDetalles);
-        return;
-      }
-
-      const nuevoDetalle: DetalleVenta = {
-        id_temp: Date.now(),
-        id_producto: Number(producto.id_producto),
-        id_venta: venta.id_venta,
-        cantidad: 1,
-        precio_unitario: producto.precio_venta,
-      };
-
-      setDetalles([...detalles, nuevoDetalle]);
-      setNombresProductos((prevState) => ({
-        ...prevState,
-        [producto.id_producto]: producto.nombre_producto,
-      }));
-    } catch (error) {
-      console.error('Error al buscar el producto por código de barras', error);
-    }
-  };
-
   const handleCodigoBarras = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       const codigo = (e.target as HTMLInputElement).value.trim();
       if (codigo) {
-        buscarProductoPorCodigo(codigo);
+        buscarProductoPorCodigo(
+          codigo,
+          venta,
+          detalles,
+          setDetalles,
+          setNombresProductos
+        );
         setCodigoBarras('');
       }
     }
@@ -137,71 +61,8 @@ const Venta: React.FC = () => {
     });
   };
 
-  const guardarVenta = () => {
-    if (total <= 0) {
-      alert('El total de la venta no puede ser 0.');
-      return;
-    }
-
-    const montoExtraCalculado = detalles
-      .filter((detalle) => detalle.id_producto === 0)
-      .reduce(
-        (acc, detalle) => acc + detalle.precio_unitario * detalle.cantidad,
-        0
-      );
-
-    const nuevaVenta: Venta = {
-      id_venta: 0,
-      id_usuario: 1,
-      fecha_venta: new Date().toISOString(),
-      total: parseFloat(total.toFixed(0)),
-      monto_extra: montoExtraCalculado,
-    };
-
-    // Agrupar detalles para evitar duplicados
-    const detallesAgrupados: DetalleVenta[] = [];
-    const mapDetalles = new Map<number, DetalleVenta>();
-
-    detalles.forEach((detalle) => {
-      if (mapDetalles.has(detalle.id_producto)) {
-        const detalleExistente = mapDetalles.get(detalle.id_producto)!;
-        detalleExistente.cantidad += detalle.cantidad;
-      } else {
-        mapDetalles.set(detalle.id_producto, { ...detalle });
-      }
-    });
-
-    mapDetalles.forEach((detalle) => detallesAgrupados.push(detalle));
-
-    // Guardar la venta y sus detalles
-    axios
-      .post('/api/venta', nuevaVenta)
-      .then((response) => {
-        const ventaCreada = response.data;
-        setVenta(ventaCreada);
-
-        detallesAgrupados.forEach((detalle) => {
-          axios
-            .post('/api/detalle-venta', {
-              ...detalle,
-              id_venta: ventaCreada.id_venta,
-            })
-            .then(() => {
-              console.log('Detalle guardado:', detalle);
-            })
-            .catch((error) => {
-              console.error('Error al guardar detalle', error);
-            });
-        });
-
-        alert('Venta guardada exitosamente.');
-        setDetalles([]);
-        setMontoExtra(0); // Reiniciar monto_extra
-      })
-      .catch((error) => {
-        console.error('Error al guardar la venta', error);
-        alert('Error al guardar la venta.');
-      });
+  const handleGuardarVenta = () => {
+    guardarVenta(detalles, total, setVenta, setDetalles, setMontoExtra);
   };
 
   const addExtraAmount = () => {
@@ -305,7 +166,7 @@ const Venta: React.FC = () => {
         <h2>Total: {total.toFixed(0)}</h2>
       </div>
       <div className="venta-botones">
-        <button onClick={guardarVenta}>Guardar Venta</button>
+        <button onClick={handleGuardarVenta}>Guardar Venta</button>
         <button onClick={addExtraAmount}>Agregar producto generico</button>
         <button onClick={cancelarVenta}>Cancelar venta</button>
       </div>
