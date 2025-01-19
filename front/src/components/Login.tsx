@@ -49,8 +49,8 @@ const Login: React.FC = () => {
     <div className="container-session">
       <div className="form-session">
         <h2>Inicio de Sesión</h2>
-        <form onSubmit={handleLogin}>
-          <div>
+        <form onSubmit={handleLogin} className='form-acomodar'>
+          <div className='container-inputs'>
             <label>Nombre de Usuario:</label>
             <input
               type="text"
@@ -60,7 +60,7 @@ const Login: React.FC = () => {
               required
             />
           </div>
-          <div>
+          <div className='container-inputs'>
             <label>Contraseña:</label>
             <input
               type="password"

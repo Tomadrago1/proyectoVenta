@@ -1,6 +1,13 @@
-/* General */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
 .venta-container {
-  font-family: Arial, sans-serif;
   color: #000;
   background-color: #fff;
   padding: 20px;
@@ -126,6 +133,7 @@
 }
 
 .venta-botones button {
+  font-family: 'Poppins', sans-serif;
   padding: 10px 20px;
   background-color: #000;
   color: #fff;
