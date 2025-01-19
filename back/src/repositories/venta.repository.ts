@@ -81,8 +81,6 @@ export class VentaRepository implements Repository<Venta> {
     const startDateISO = startDate.toISOString();
     const endDateISO = endDate.toISOString();
 
-    console.log(startDateISO, endDateISO);
-
     const [ventas] = await pool.query(
       'SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ? ORDER BY fecha_venta DESC',
       [startDateISO, endDateISO]

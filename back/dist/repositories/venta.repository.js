@@ -53,7 +53,6 @@ class VentaRepository {
         endDate.setUTCHours(23, 59, 59, 999);
         const startDateISO = startDate.toISOString();
         const endDateISO = endDate.toISOString();
-        console.log(startDateISO, endDateISO);
         const [ventas] = await conn_1.pool.query('SELECT * FROM ventas WHERE fecha_venta BETWEEN ? AND ? ORDER BY fecha_venta DESC', [startDateISO, endDateISO]);
         return ventas;
     }

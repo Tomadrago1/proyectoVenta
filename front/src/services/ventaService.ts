@@ -62,8 +62,8 @@ export const guardarVenta = async (
 
     alert('Venta guardada exitosamente.');
     const detallesParaTicket = detalles.filter((detalle) => detalle.id_producto === 0);
-    const contenidoTicket = await generarContenidoTicket(ventaCreada, detallesAgrupados.concat(detallesParaTicket));
-    await imprimirTicketBackend(contenidoTicket);
+    const contenidoTicket = await generarContenidoTicket(detallesAgrupados.concat(detallesParaTicket));
+    await imprimirTicketBackend(contenidoTicket, total, new Date().toLocaleString('es-ES', { hour12: false }));
 
     setDetalles([]);
     setMontoExtra(0);
@@ -74,23 +74,30 @@ export const guardarVenta = async (
   }
 };
 
-
-const generarContenidoTicket = async (venta: Venta, detalles: DetalleVenta[]) => {
-  let contenido = `CARNES PAMPA\nGracias por su compra\n`;
-  contenido += "--------------------------------";
+const generarContenidoTicket = async (detalles: DetalleVenta[]) => {
+  let contenido = "";
 
   for (const detalle of detalles) {
     const producto = await obtenerProductoPorId(detalle.id_producto);
-    contenido += `\n${producto.nombre_producto}\n ${detalle.cantidad} x $${detalle.precio_unitario} = $${(detalle.precio_unitario * detalle.cantidad).toFixed(0)}\n`;
+
+    const cantidad = Number(detalle.cantidad) || 0;
+    const precioUnitario = Number(detalle.precio_unitario) || 0;
+
+    const subtotal = cantidad * precioUnitario;
+
+    contenido += `\x1b\x45\x01${producto.nombre_producto}\x1b\x45\x00\n`;
+
+    const lineaDetalle = `${cantidad} x $${precioUnitario.toFixed(0)}`;
+    const subtotalString = `$${subtotal.toFixed(0)}`;
+    const espacioParaSubtotal = 32 - lineaDetalle.length - subtotalString.length;
+    const lineaConSubtotal = lineaDetalle + " ".repeat(Math.max(0, espacioParaSubtotal)) + subtotalString;
+
+    contenido += `${lineaConSubtotal}\n`;
   }
-
-  contenido += "--------------------------------\n";
-  contenido += `Total: $${parseFloat(venta.total.toString()).toFixed(0)}\n`;
-  contenido += `Fecha: ${new Date().toLocaleString()}\n`;
-  contenido += "--------------------------------\n";
-
+  contenido = contenido.replace(/\n$/, '');
   return contenido;
 };
+
 
 
 const obtenerProductoPorId = async (id_producto: number): Promise<Producto> => {
@@ -111,9 +118,9 @@ const obtenerProductoPorId = async (id_producto: number): Promise<Producto> => {
   }
 };
 
-const imprimirTicketBackend = async (contenidoTicket: string) => {
+const imprimirTicketBackend = async (contenidoTicket: string, total: number, fecha: string) => {
   try {
-    await axios.post('/api/impresora/imprimir', { contenido: contenidoTicket });
+    await axios.post('/api/impresora/imprimir', { contenido: contenidoTicket, fecha, total });
     console.log("Ticket enviado para impresión.");
   } catch (error) {
     console.error("Error al enviar el ticket para impresión:", error);
