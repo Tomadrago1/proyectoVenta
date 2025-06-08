@@ -144,7 +144,7 @@ const Categorias: React.FC = () => {
   }, []);
 
   return (
-    <div className="container">
+    <div className="container_categoria">
       <h1>Categorías</h1>
       <div className="action-buttons">
         <button

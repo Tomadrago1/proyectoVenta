@@ -238,7 +238,7 @@ const Producto: React.FC = () => {
   }, []);
 
   return (
-    <div className="container">
+    <div className="container_producto">
       <h1>Productos</h1>
       <div className="action-buttons">
         <button

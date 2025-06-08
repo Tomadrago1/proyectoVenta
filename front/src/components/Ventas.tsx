@@ -19,6 +19,10 @@ const Ventas: React.FC = () => {
   >({});
   const [productos, setProductos] = useState<Record<number, string>>({});
 
+  // Estados para la paginación
+  const [pagina, setPagina] = useState<number>(1);
+  const [ventasPorPagina] = useState<number>(10);
+
   const fetchVentas = async () => {
     try {
       const response = await axios.get('/api/venta');
@@ -94,6 +98,7 @@ const Ventas: React.FC = () => {
       if (!startDate && !endDate) {
         const response = await axios.get(`/api/venta`);
         setSelectedVenta(null);
+        setPagina(1);
         setVentas(response.data);
         return;
       }
@@ -107,6 +112,7 @@ const Ventas: React.FC = () => {
         params: { startDate, endDate },
       });
       setSelectedVenta(null);
+      setPagina(1);
       setVentas(response.data);
     } catch (error) {
       console.error('Error al filtrar las ventas:', error);
@@ -118,20 +124,38 @@ const Ventas: React.FC = () => {
     fetchDetalleVenta(idVenta);
   };
 
-  const handleFilterToday = async () => {
-    setStartDate(new Date().toISOString().split('T')[0]);
-    setEndDate(new Date().toISOString().split('T')[0]);
+  const handleFilterToday = () => {
+    const today = new Date().toISOString().split('T')[0];
+    setStartDate(today);
+    setEndDate(today);
   };
 
-  const handleFilterThisMonth = async () => {
+  const handleFilterThisMonth = () => {
     const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-    setStartDate(firstDay.toISOString().split('T')[0]);
-    setEndDate(today.toISOString().split('T')[0]);
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+      .toISOString()
+      .split('T')[0];
+    const lastDay = today.toISOString().split('T')[0];
+    setStartDate(firstDay);
+    setEndDate(lastDay);
   };
 
   const handleGenerarReporte = () => {
     generateReport(ventas);
+  };
+
+  const indiceInicial = (pagina - 1) * ventasPorPagina;
+  const ventasPaginadas = ventas.slice(
+    indiceInicial,
+    indiceInicial + ventasPorPagina
+  );
+
+  const totalPaginas = Math.ceil(ventas.length / ventasPorPagina);
+
+  const cambiarPagina = (numero: number) => {
+    if (numero >= 1 && numero <= Math.ceil(ventas.length / ventasPorPagina)) {
+      setPagina(numero);
+    }
   };
 
   return (
@@ -184,7 +208,7 @@ const Ventas: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {ventas.map((venta) => (
+          {ventasPaginadas.map((venta) => (
             <tr key={venta.id_venta}>
               <td>{venta.id_venta}</td>
               <td>
@@ -193,7 +217,7 @@ const Ventas: React.FC = () => {
                 }`}
               </td>
               <td>{formatFechaHora(venta.fecha_venta)}</td>
-              <td>${Number(venta.total).toFixed(2)}</td>
+              <td>${Number(venta.total).toFixed(0)}</td>
               <td>
                 <button
                   onClick={() =>
@@ -207,6 +231,24 @@ const Ventas: React.FC = () => {
           ))}
         </tbody>
       </table>
+
+      <div className="pagination">
+        <button
+          onClick={() => cambiarPagina(pagina - 1)}
+          disabled={pagina === 1}
+        >
+          Anterior
+        </button>
+        <span>
+          Página {pagina} / {totalPaginas}
+        </span>
+        <button
+          onClick={() => cambiarPagina(pagina + 1)}
+          disabled={pagina === totalPaginas}
+        >
+          Siguiente
+        </button>
+      </div>
 
       {detalleVenta && selectedVenta && (
         <div className="ventas-detalle">
@@ -249,7 +291,7 @@ const Ventas: React.FC = () => {
                 <tr key={detalle.id_producto}>
                   <td>{productos[detalle.id_producto]}</td>
                   <td>{detalle.cantidad}</td>
-                  <td>${Number(detalle.precio_unitario).toFixed(2)}</td>
+                  <td>${Number(detalle.precio_unitario).toFixed(0)}</td>
                   <td>
                     ${(detalle.cantidad * detalle.precio_unitario).toFixed(0)}
                   </td>
@@ -259,16 +301,14 @@ const Ventas: React.FC = () => {
           </table>
           <h2>
             <span>
-              Monto extra:{' '}
-              {ventas.find((venta) => venta.id_venta === selectedVenta)
-                ?.monto_extra || '0.00'}
+              Monto extra: ${' '}
+              {ventas.find((v) => v.id_venta === selectedVenta)?.monto_extra}
             </span>
           </h2>
           <h2>
             <span>
-              Total:{' '}
-              {ventas.find((venta) => venta.id_venta === selectedVenta)
-                ?.total || '0.00'}
+              Monto Total: $
+              {ventas.find((v) => v.id_venta === selectedVenta)?.total}
             </span>
           </h2>
         </div>
