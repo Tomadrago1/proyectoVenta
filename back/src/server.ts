@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import cors from 'cors';
 import session from 'express-session';
+import { MikroORM } from '@mikro-orm/mysql';
+import mikroConfig from './mikro-orm.config';
 
 
 // Primer servidor (en el puerto 3000)
@@ -52,6 +54,13 @@ app.get('/home', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Servidor Express corriendo en http://localhost:${port}`);
+async function start() {
+  await MikroORM.init(mikroConfig);
+  app.listen(port, () => {
+    console.log(`Servidor Express corriendo en http://localhost:${port}`);
+  });
+}
+
+start().catch((err) => {
+  console.error('Error iniciando la aplicaci\u00f3n', err);
 });

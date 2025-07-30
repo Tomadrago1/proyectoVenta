@@ -5,7 +5,8 @@
   "scripts": {
     "start": "npm run build && electron .  ",
     "build": "tsc",
-    "server": "ts-node src/server.ts"
+    "server": "ts-node src/server.ts",
+    "mikro-orm": "mikro-orm"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +24,9 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.4",
     "node-thermal-printer": "^4.4.3",
-    "usb": "^2.14.0"
+    "usb": "^2.14.0",
+    "@mikro-orm/core": "^6.2.1",
+    "@mikro-orm/mysql": "^6.2.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -31,6 +34,7 @@
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.0",
     "@types/jsonwebtoken": "^9.0.7",
+    "@mikro-orm/cli": "^6.2.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.7.2"
   }

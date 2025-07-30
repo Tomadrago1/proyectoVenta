@@ -7,6 +7,8 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const cors_1 = __importDefault(require("cors"));
 const express_session_1 = __importDefault(require("express-session"));
+const mysql_1 = require("@mikro-orm/mysql");
+const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 // Primer servidor (en el puerto 3000)
 const app = (0, express_1.default)();
 const port = 3000;
@@ -43,6 +45,12 @@ app.get('/api', (req, res) => {
 app.get('/home', (req, res) => {
     res.sendFile(path_1.default.join(__dirname, 'dist', 'index.html'));
 });
-app.listen(port, () => {
-    console.log(`Servidor Express corriendo en http://localhost:${port}`);
+async function start() {
+    await mysql_1.MikroORM.init(mikro_orm_config_1.default);
+    app.listen(port, () => {
+        console.log(`Servidor Express corriendo en http://localhost:${port}`);
+    });
+}
+start().catch((err) => {
+    console.error('Error iniciando la aplicaci\u00f3n', err);
 });
