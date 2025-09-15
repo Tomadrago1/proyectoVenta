@@ -11,6 +11,18 @@ import {
 import { Producto } from '../interface/producto';
 import { Categoria } from '../interface/categoria';
 
+type OFFProduct = {
+  product_name?: string;
+  product_name_es?: string;
+  brands?: string;
+  product_quantity?: string;
+  product_quantity_unit?: string;
+};
+type OFFResponse = {
+  status: number;
+  product?: OFFProduct;
+};
+
 const Producto: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -237,6 +249,62 @@ const Producto: React.FC = () => {
     fetchCategorias();
   }, []);
 
+  const fetchNombreProducto = async (codigo: string) => {
+    if (!codigo) return;
+    try {
+      const url = `https://world.openfoodfacts.net/api/v2/product/${codigo}`;
+      const { data } = await axios.get<OFFResponse>(url, {
+        params: {
+          fields:
+            'status,product_name,product_name_es,brands,product_quantity,product_quantity_unit',
+        },
+      });
+
+      if (data.status === 1 && data.product) {
+        const p = data.product;
+
+        // Helper para capitalizar cada palabra
+        const toTitleCase = (str: string) =>
+          str
+            .split(' ')
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join(' ');
+
+        const name = p.product_name_es || p.product_name || '';
+        const brand = p.brands || '';
+
+        // Si hay cantidad y unidad, las uno (ej: "250 g")
+        let quantity = '';
+        if (p.product_quantity) {
+          quantity = String(p.product_quantity);
+          if (p.product_quantity_unit) {
+            quantity += ' ' + p.product_quantity_unit;
+          }
+        }
+
+        // Armar nombre final
+        const parts = [];
+        if (name) parts.push(toTitleCase(name));
+        if (brand) parts.push(toTitleCase(brand));
+        if (quantity) parts.push(quantity);
+
+        const autoName = parts.join(' ').trim();
+
+        if (autoName) {
+          setNewProducto((prev) => ({
+            ...prev,
+            nombre_producto: autoName,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error consultando OpenFoodFacts:', error);
+    }
+  };
+
   return (
     <div className="container_producto">
       <h1>Productos</h1>
@@ -364,23 +432,40 @@ const Producto: React.FC = () => {
             </div>
           )}
 
-          <div className="form-group">
-            <label>Nombre del Producto</label>
-            <input
-              type="text"
-              value={newProducto.nombre_producto}
-              onChange={(e) =>
-                setNewProducto({
-                  ...newProducto,
-                  nombre_producto: e.target.value,
-                })
-              }
-            />
-          </div>
-
           {selectedAction !== 'eliminar' &&
             selectedAction !== 'update-stock' && (
               <>
+                {/* Código de barras primero */}
+                <div className="form-group">
+                  <label>Código de Barras</label>
+                  <input
+                    type="text"
+                    value={newProducto.codigo_barras}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setNewProducto((prev) => ({
+                        ...prev,
+                        codigo_barras: value,
+                      }));
+                      fetchNombreProducto(value); // llamada directa sin debounce
+                    }}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Nombre del Producto</label>
+                  <input
+                    type="text"
+                    value={newProducto.nombre_producto}
+                    onChange={(e) =>
+                      setNewProducto({
+                        ...newProducto,
+                        nombre_producto: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
                 <div className="form-group">
                   <label>Categoría</label>
                   <select
@@ -417,6 +502,7 @@ const Producto: React.FC = () => {
                     }
                   />
                 </div>
+
                 {(selectedAction === 'crear' ||
                   selectedAction === 'modificar') && (
                   <>
@@ -463,19 +549,6 @@ const Producto: React.FC = () => {
                     )}
                   </>
                 )}
-                <div className="form-group">
-                  <label>Código de Barras</label>
-                  <input
-                    type="text"
-                    value={newProducto.codigo_barras}
-                    onChange={(e) =>
-                      setNewProducto({
-                        ...newProducto,
-                        codigo_barras: e.target.value,
-                      })
-                    }
-                  />
-                </div>
               </>
             )}
 

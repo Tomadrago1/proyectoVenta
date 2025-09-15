@@ -1,5 +1,8 @@
 import escpos from 'escpos';
-escpos.USB = require('escpos-usb');
+const USB = require('../vendor/escpos-usb/index.js');
+
+escpos.USB = USB;
+
 
 import { Request, Response } from 'express';
 
@@ -47,7 +50,7 @@ async function imprimir(req: Request, res: Response): Promise<void> {
         .text(contenido)
         .text('--------------------------------')
         .text('\x1b\x61\x01' + lineaConTotal + '\x1b\x61\x00')
-        .text('\n'+'\x1b\x61\x01' +
+        .text('\n' + '\x1b\x61\x01' +
           'Gracias por su compra'.padStart(16 + 'Gracias por su compra'.length / 2) +
           '\x1b\x61\x00')
         .cut()

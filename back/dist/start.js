@@ -36,7 +36,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const electron_1 = require("electron");
 const http = __importStar(require("http"));
 const express_1 = __importDefault(require("express"));
 const backendApp = (0, express_1.default)();
@@ -47,35 +46,4 @@ backendApp.get('/api', (req, res) => {
 const server = http.createServer(backendApp);
 server.listen(backendPort, () => {
     console.log(`Servidor Express corriendo en http://localhost:${backendPort}`);
-    createElectronWindow();
 });
-function createElectronWindow() {
-    let win;
-    electron_1.app.whenReady().then(() => {
-        win = new electron_1.BrowserWindow({
-            width: 800,
-            height: 600,
-            webPreferences: {
-                nodeIntegration: false,
-                contextIsolation: true,
-            },
-        });
-        win.loadURL('http://localhost:8080');
-        electron_1.globalShortcut.register('F5', () => {
-            if (win) {
-                win.webContents.reload();
-            }
-        });
-        electron_1.app.on('before-quit', () => {
-            electron_1.globalShortcut.unregisterAll();
-        });
-        win.on('closed', () => {
-            win = null;
-        });
-    });
-    electron_1.app.on('window-all-closed', () => {
-        if (process.platform !== 'darwin') {
-            electron_1.app.quit();
-        }
-    });
-}

@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.imprimir = imprimir;
 const escpos_1 = __importDefault(require("escpos"));
-escpos_1.default.USB = require('escpos-usb');
+const USB = require('../vendor/escpos-usb/index.js');
+escpos_1.default.USB = USB;
 async function imprimir(req, res) {
     const { contenido, fecha, total } = req.body;
     try {
