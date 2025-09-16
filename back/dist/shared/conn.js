@@ -6,10 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.pool = void 0;
 const promise_1 = __importDefault(require("mysql2/promise"));
 exports.pool = promise_1.default.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'negocio',
-    password: process.env.DB_PASSWORD || 'negocio',
-    database: process.env.DB_NAME || 'negocio',
+    host: 'b1c1nnrckvmjvoqmnv3s-mysql.services.clever-cloud.com',
+    port: 3306,
+    user: 'ucshzilrupyqbyok',
+    password: 'BmVhhA204lLIrPnCZFUg',
+    database: 'b1c1nnrckvmjvoqmnv3s',
     waitForConnections: true,
     connectionLimit: 10,
     maxIdle: 10,

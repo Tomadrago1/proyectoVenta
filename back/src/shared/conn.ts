@@ -1,10 +1,11 @@
-import mysql from 'mysql2/promise'
+import mysql from 'mysql2/promise';
 
 export const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'negocio',
-  password: process.env.DB_PASSWORD || 'negocio',
-  database: process.env.DB_NAME || 'negocio',
+  host: 'b1c1nnrckvmjvoqmnv3s-mysql.services.clever-cloud.com',
+  port: 3306,
+  user: 'ucshzilrupyqbyok',
+  password: 'BmVhhA204lLIrPnCZFUg',
+  database: 'b1c1nnrckvmjvoqmnv3s',
   waitForConnections: true,
   connectionLimit: 10,
   maxIdle: 10,
@@ -12,4 +13,4 @@ export const pool = mysql.createPool({
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0
-})
+});

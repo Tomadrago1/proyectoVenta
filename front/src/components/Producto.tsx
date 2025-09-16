@@ -263,7 +263,6 @@ const Producto: React.FC = () => {
       if (data.status === 1 && data.product) {
         const p = data.product;
 
-        // Helper para capitalizar cada palabra
         const toTitleCase = (str: string) =>
           str
             .split(' ')
@@ -275,17 +274,14 @@ const Producto: React.FC = () => {
 
         const name = p.product_name_es || p.product_name || '';
         const brand = p.brands || '';
-
-        // Si hay cantidad y unidad, las uno (ej: "250 g")
         let quantity = '';
         if (p.product_quantity) {
           quantity = String(p.product_quantity);
           if (p.product_quantity_unit) {
-            quantity += ' ' + p.product_quantity_unit;
+            quantity += p.product_quantity_unit;
           }
         }
 
-        // Armar nombre final
         const parts = [];
         if (name) parts.push(toTitleCase(name));
         if (brand) parts.push(toTitleCase(brand));

@@ -25,6 +25,31 @@ const Venta: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [nuevoMontoExtra, setNuevoMontoExtra] = useState<number>(0);
 
+  // === 1) Cargar la venta desde localStorage cuando el componente se monta ===
+  useEffect(() => {
+    const guardada = localStorage.getItem('ventaActual');
+    if (guardada) {
+      try {
+        const parsed = JSON.parse(guardada);
+        setDetalles(parsed.detalles || []);
+        setTotal(parsed.total || 0);
+        setVenta(
+          parsed.venta || {
+            id_venta: 0,
+            id_usuario: 1,
+            fecha_venta: new Date().toISOString(),
+            total: 0,
+            monto_extra: 0,
+          }
+        );
+        setNombresProductos(parsed.nombresProductos || {});
+      } catch (err) {
+        console.error('Error leyendo venta guardada:', err);
+      }
+    }
+  }, []);
+
+  // === 2) Calcular el total automáticamente cada vez que cambian los detalles ===
   useEffect(() => {
     const totalCalculado = detalles.reduce(
       (acc, detalle) => acc + detalle.precio_unitario * detalle.cantidad,
@@ -32,6 +57,18 @@ const Venta: React.FC = () => {
     );
     setTotal(totalCalculado);
   }, [detalles]);
+
+  // === 3) Guardar en localStorage cada vez que cambian los datos importantes ===
+  useEffect(() => {
+    const data = {
+      detalles,
+      total,
+      venta,
+      nombresProductos,
+      fechaGuardado: Date.now(),
+    };
+    localStorage.setItem('ventaActual', JSON.stringify(data));
+  }, [detalles, total, venta, nombresProductos]);
 
   const handleCodigoBarras = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -61,8 +98,12 @@ const Venta: React.FC = () => {
     });
   };
 
+  // === 4) Guardar venta en la base y limpiar localStorage ===
   const handleGuardarVenta = () => {
     guardarVenta(detalles, total, setVenta, setDetalles, setMontoExtra);
+
+    // Borra los datos guardados en el navegador
+    localStorage.removeItem('ventaActual');
   };
 
   const addExtraAmount = () => {
@@ -80,7 +121,6 @@ const Venta: React.FC = () => {
       };
 
       setDetalles((prevDetalles) => [...prevDetalles, nuevoDetalle]);
-
       setTotal(
         (prevTotal) => prevTotal + nuevoMontoExtra * nuevoDetalle.cantidad
       );
@@ -90,10 +130,12 @@ const Venta: React.FC = () => {
     }
   };
 
+  // === 5) Cancelar venta y limpiar localStorage ===
   const cancelarVenta = () => {
     if (window.confirm('¿Está seguro de que desea cancelar la venta?')) {
       setDetalles([]);
       setMontoExtra(0);
+      localStorage.removeItem('ventaActual');
     }
   };
 
