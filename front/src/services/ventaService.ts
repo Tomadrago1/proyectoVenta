@@ -50,11 +50,27 @@ export const guardarVenta = async (
 
     for (const detalle of detallesAgrupados) {
       try {
+        // Guardar el detalle de venta
         await axios.post('/api/detalle-venta', {
           ...detalle,
           id_venta: ventaCreada.id_venta,
         });
         console.log('Detalle guardado:', detalle);
+
+        // Decrementar el stock del producto (solo si no es producto genérico)
+        if (detalle.id_producto !== 0) {
+          try {
+            console.log(`Intentando decrementar stock para producto ID: ${detalle.id_producto}, cantidad: ${detalle.cantidad}`);
+            const stockResponse = await axios.put(`/api/producto/decrement-stock/${detalle.id_producto}/${detalle.cantidad}`);
+            console.log(`Stock decrementado exitosamente para producto ${detalle.id_producto}:`, stockResponse.data);
+          } catch (stockError: any) {
+            console.error(`Error al decrementar stock del producto ${detalle.id_producto}:`, stockError);
+            console.error('Error details:', stockError.response?.data);
+            // Notificar el error pero no interrumpir el proceso de venta
+            const errorMsg = stockError.response?.data?.errorMessage || stockError.message || 'Error desconocido';
+            alert(`Advertencia: No se pudo actualizar el stock del producto ${detalle.id_producto}. Error: ${errorMsg}`);
+          }
+        }
       } catch (error) {
         console.error('Error al guardar detalle:', detalle, error);
       }

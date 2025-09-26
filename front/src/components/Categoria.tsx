@@ -258,7 +258,9 @@ const Categorias: React.FC = () => {
             {selectedAction === 'eliminar' && (
               <button onClick={deleteCategoria}>Eliminar</button>
             )}
-            <button onClick={resetForm}>Cancelar</button>
+            <button className="cancel-button" onClick={resetForm}>
+              Cancelar
+            </button>
           </div>
         </div>
       )}

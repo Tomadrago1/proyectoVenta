@@ -72,12 +72,20 @@ class ProductoRepository {
             throw new Error('No se ha podido actualizar el stock del producto o el producto no existe');
         }
     }
-    async getProductoGenerico() {
-        const [productos] = await conn_1.pool.query('SELECT * FROM productos WHERE nombre_producto = "Generico"');
-        if (productos.length === 0) {
-            return undefined;
+    async decrementStock(item) {
+        const id = Number.parseInt(item.id);
+        const cantidad = item.cantidad;
+        if (isNaN(id)) {
+            throw new Error(`ID de producto inválido: "${item.id}"`);
         }
-        return productos[0];
+        const [result] = await conn_1.pool.query('UPDATE productos SET stock = stock - ? WHERE id_producto = ?', [cantidad, id]);
+        if (result.affectedRows === 1) {
+            const [updatedProduct] = await conn_1.pool.query('SELECT * FROM productos WHERE id_producto = ?', [id]);
+            return updatedProduct[0];
+        }
+        else {
+            throw new Error('No se ha podido decrementar el stock del producto');
+        }
     }
 }
 exports.ProductoRepository = ProductoRepository;

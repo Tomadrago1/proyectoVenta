@@ -7,19 +7,19 @@ import {
   findByBarcode,
   findByName,
   updateStock,
-  getProductoGenerico,
+  decrementStock,
 } from '../controllers/producto.controller';
 import { Router } from 'express';
 
 export const routerProducto = Router();
-
-routerProducto.get('/generico', getProductoGenerico);
 
 routerProducto.put('/stock/:id/:stock', updateStock);
 
 routerProducto.get('/', findAll);
 
 routerProducto.get('/:id', findOne);
+
+routerProducto.put('/decrement-stock/:id/:cantidad', decrementStock);
 
 routerProducto.post('/', create);
 

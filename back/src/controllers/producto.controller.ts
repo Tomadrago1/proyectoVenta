@@ -118,14 +118,34 @@ async function updateStock(req: Request, res: Response) {
   }
 }
 
-async function getProductoGenerico(req: Request, res: Response) {
+async function decrementStock(req: Request, res: Response) {
   try {
-    const producto = await repository.getProductoGenerico();
-    res.json(producto);
+    const { id, cantidad } = req.params;
+
+    const productId = parseInt(id);
+    if (isNaN(productId)) {
+      return res.status(400).json({
+        message: 'ID de producto inválido',
+        errorMessage: `El ID "${id}" no es un número válido`
+      });
+    }
+
+    const cantidadNum = parseFloat(cantidad);
+    if (isNaN(cantidadNum) || cantidadNum <= 0) {
+      return res.status(400).json({
+        message: 'Cantidad inválida',
+        errorMessage: `La cantidad "${cantidad}" debe ser un número mayor a 0`
+      });
+    }
+
+    const result = await repository.decrementStock({ id: productId.toString(), cantidad: cantidadNum });
+    res.json({ message: 'Stock decrementado correctamente', result });
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
-    res.status(500).json({ message: 'Error al obtener el producto genérico', errorMessage });
+    console.error('Error en decrementStock controller:', errorMessage);
+    res.status(500).json({ message: 'Error al decrementar el stock', errorMessage });
   }
 }
 
-export { findAll, findOne, create, update, remove, findByBarcode, findByName, updateStock, getProductoGenerico };
+
+export { findAll, findOne, create, update, remove, findByBarcode, findByName, updateStock, decrementStock };

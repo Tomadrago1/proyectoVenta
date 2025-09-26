@@ -119,13 +119,28 @@ export class ProductoRepository implements Repository<Producto> {
     }
   }
 
-  public async getProductoGenerico(): Promise<Producto | undefined> {
-    const [productos] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM productos WHERE nombre_producto = "Generico"',
-    ) as RowDataPacket[];
-    if (productos.length === 0) {
-      return undefined;
+  public async decrementStock(item: { id: string, cantidad: number }): Promise<Producto | undefined> {
+    const id = Number.parseInt(item.id);
+    const cantidad = item.cantidad;
+
+    if (isNaN(id)) {
+      throw new Error(`ID de producto inválido: "${item.id}"`);
     }
-    return productos[0] as Producto;
+
+    const [result] = await pool.query<ResultSetHeader>(
+      'UPDATE productos SET stock = stock - ? WHERE id_producto = ?',
+      [cantidad, id]
+    );
+
+
+    if (result.affectedRows === 1) {
+      const [updatedProduct] = await pool.query<RowDataPacket[]>(
+        'SELECT * FROM productos WHERE id_producto = ?',
+        [id]
+      );
+      return updatedProduct[0] as Producto;
+    } else {
+      throw new Error('No se ha podido decrementar el stock del producto');
+    }
   }
 }

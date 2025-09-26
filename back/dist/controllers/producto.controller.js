@@ -8,7 +8,7 @@ exports.remove = remove;
 exports.findByBarcode = findByBarcode;
 exports.findByName = findByName;
 exports.updateStock = updateStock;
-exports.getProductoGenerico = getProductoGenerico;
+exports.decrementStock = decrementStock;
 const producto_repository_1 = require("../repositories/producto.repository");
 const producto_model_1 = require("../models/producto.model");
 const repository = new producto_repository_1.ProductoRepository();
@@ -110,13 +110,29 @@ async function updateStock(req, res) {
         res.status(500).json({ message: 'Error al actualizar el stock', errorMessage });
     }
 }
-async function getProductoGenerico(req, res) {
+async function decrementStock(req, res) {
     try {
-        const producto = await repository.getProductoGenerico();
-        res.json(producto);
+        const { id, cantidad } = req.params;
+        const productId = parseInt(id);
+        if (isNaN(productId)) {
+            return res.status(400).json({
+                message: 'ID de producto inválido',
+                errorMessage: `El ID "${id}" no es un número válido`
+            });
+        }
+        const cantidadNum = parseFloat(cantidad);
+        if (isNaN(cantidadNum) || cantidadNum <= 0) {
+            return res.status(400).json({
+                message: 'Cantidad inválida',
+                errorMessage: `La cantidad "${cantidad}" debe ser un número mayor a 0`
+            });
+        }
+        const result = await repository.decrementStock({ id: productId.toString(), cantidad: cantidadNum });
+        res.json({ message: 'Stock decrementado correctamente', result });
     }
     catch (error) {
         const errorMessage = error.message || 'Error desconocido';
-        res.status(500).json({ message: 'Error al obtener el producto genérico', errorMessage });
+        console.error('Error en decrementStock controller:', errorMessage);
+        res.status(500).json({ message: 'Error al decrementar el stock', errorMessage });
     }
 }
