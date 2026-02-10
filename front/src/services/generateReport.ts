@@ -54,7 +54,7 @@ const splitText = (doc: jsPDF, text: string, maxWidth: number): string[] => {
 const drawCell = (doc: jsPDF, x: number, y: number, width: number, height: number, text: string, align: 'left' | 'center' | 'right' = 'left') => {
   // Dibujar borde de la celda
   doc.rect(x, y, width, height);
-  
+
   // Calcular posición del texto según alineación
   let textX = x + 2; // padding izquierdo por defecto
   if (align === 'center') {
@@ -62,7 +62,7 @@ const drawCell = (doc: jsPDF, x: number, y: number, width: number, height: numbe
   } else if (align === 'right') {
     textX = x + width - 2; // padding derecho
   }
-  
+
   // Dibujar texto
   doc.text(text, textX, y + height / 2 + 2, { align });
 };
@@ -99,29 +99,29 @@ export const generateReport = async (ventas: Venta[]) => {
   doc.setFont("helvetica", "bold");
   doc.setTextColor(33, 37, 41); // Color gris oscuro
   doc.text('REPORTE DE VENTAS', pageWidth / 2, currentY + 10, { align: 'center' });
-  
+
   // Línea decorativa
   doc.setDrawColor(0, 123, 255); // Color azul
   doc.setLineWidth(1);
   doc.line(margin, currentY + 15, pageWidth - margin, currentY + 15);
-  
+
   currentY += 25;
 
   // Información del reporte
-  const date = new Date().toLocaleString('es-ES', { 
-    year: 'numeric', 
-    month: 'long', 
+  const date = new Date().toLocaleString('es-ES', {
+    year: 'numeric',
+    month: 'long',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
   });
-  
+
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(108, 117, 125); // Color gris
   doc.text(`Fecha de generación: ${date}`, margin, currentY);
   doc.text(`Total de ventas: ${ventas.length}`, pageWidth - margin, currentY, { align: 'right' });
-  
+
   currentY += 15;
 
   // Obtener datos necesarios
@@ -151,28 +151,28 @@ export const generateReport = async (ventas: Venta[]) => {
     // Fondo para el encabezado de la venta
     doc.setFillColor(248, 249, 250); // Gris muy claro
     doc.rect(margin, currentY, usableWidth, 25, 'F');
-    
+
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(33, 37, 41);
     doc.text(`Venta #${venta.id_venta}`, margin + 5, currentY + 8);
-    
+
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(108, 117, 125);
-    const fechaVenta = new Date(venta.fecha_venta).toLocaleString('es-ES', { 
+    const fechaVenta = new Date(venta.fecha_venta).toLocaleString('es-ES', {
       day: '2-digit',
-      month: '2-digit', 
+      month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     });
     doc.text(`Fecha: ${fechaVenta}`, margin + 5, currentY + 16);
-    
+
     if (usuario) {
       doc.text(`Vendedor: ${usuario.nombre} ${usuario.apellido}`, margin + 5, currentY + 22);
     }
-    
+
     currentY += 30;
 
     // === TABLA DE PRODUCTOS ===
@@ -180,36 +180,36 @@ export const generateReport = async (ventas: Venta[]) => {
       // Dibujar fondo completo de los encabezados
       doc.setFillColor(0, 123, 255); // Azul
       doc.rect(tableConfig.startX, currentY, usableWidth, tableConfig.headerHeight, 'F');
-      
+
       // Configurar texto de encabezados
       doc.setTextColor(255, 255, 255); // Blanco
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
-      
+
       // Dibujar bordes y texto de cada columna
       let currentX = tableConfig.startX;
-      
+
       // Columna Producto
       doc.setDrawColor(255, 255, 255); // Borde blanco para separar columnas
       doc.setLineWidth(0.5);
       doc.rect(currentX, currentY, tableConfig.columns[0].width, tableConfig.headerHeight);
       doc.text('Producto', currentX + (tableConfig.columns[0].width / 2), currentY + 8, { align: 'center' });
       currentX += tableConfig.columns[0].width;
-      
+
       // Columna Cantidad
       doc.rect(currentX, currentY, tableConfig.columns[1].width, tableConfig.headerHeight);
       doc.text('Cantidad', currentX + (tableConfig.columns[1].width / 2), currentY + 8, { align: 'center' });
       currentX += tableConfig.columns[1].width;
-      
+
       // Columna Precio Unitario
       doc.rect(currentX, currentY, tableConfig.columns[2].width, tableConfig.headerHeight);
       doc.text('Precio Unit.', currentX + (tableConfig.columns[2].width / 2), currentY + 8, { align: 'center' });
       currentX += tableConfig.columns[2].width;
-      
+
       // Columna Subtotal
       doc.rect(currentX, currentY, tableConfig.columns[3].width, tableConfig.headerHeight);
       doc.text('Subtotal', currentX + (tableConfig.columns[3].width / 2), currentY + 8, { align: 'center' });
-      
+
       currentY += tableConfig.headerHeight;
 
       // Filas de datos
@@ -218,73 +218,73 @@ export const generateReport = async (ventas: Venta[]) => {
       doc.setFontSize(9);
       doc.setDrawColor(200, 200, 200); // Gris claro para los bordes
       doc.setLineWidth(0.1);
-      
+
       detallesDeVenta.forEach((detalle, index) => {
         // Alternar color de fondo
         if (index % 2 === 0) {
           doc.setFillColor(248, 249, 250);
           doc.rect(tableConfig.startX, currentY, usableWidth, tableConfig.cellHeight, 'F');
         }
-        
+
         const nombreProducto = productos[detalle.id_producto]?.nombre_producto || 'Producto Desconocido';
         const nombreTruncado = truncateText(nombreProducto, 35);
         const cantidad = detalle.cantidad.toString();
         const precioUnitario = `$${Number(detalle.precio_unitario).toLocaleString('es-ES')}`;
         const subtotal = `$${(detalle.cantidad * detalle.precio_unitario).toLocaleString('es-ES')}`;
-        
+
         currentX = tableConfig.startX;
-        
+
         // Producto
         doc.rect(currentX, currentY, tableConfig.columns[0].width, tableConfig.cellHeight);
         doc.text(nombreTruncado, currentX + 3, currentY + (tableConfig.cellHeight / 2) + 1.5);
         currentX += tableConfig.columns[0].width;
-        
+
         // Cantidad
         doc.rect(currentX, currentY, tableConfig.columns[1].width, tableConfig.cellHeight);
         const cantidadX = currentX + (tableConfig.columns[1].width / 2);
         const cantidadY = currentY + (tableConfig.cellHeight / 2) + 1.5;
         doc.text(cantidad, cantidadX, cantidadY, { align: 'center' });
         currentX += tableConfig.columns[1].width;
-        
+
         // Precio Unitario
         doc.rect(currentX, currentY, tableConfig.columns[2].width, tableConfig.cellHeight);
         const precioX = currentX + tableConfig.columns[2].width - 3;
         const precioY = currentY + (tableConfig.cellHeight / 2) + 1.5;
         doc.text(precioUnitario, precioX, precioY, { align: 'right' });
         currentX += tableConfig.columns[2].width;
-        
+
         // Subtotal
         doc.rect(currentX, currentY, tableConfig.columns[3].width, tableConfig.cellHeight);
         const subtotalX = currentX + tableConfig.columns[3].width - 3;
         const subtotalY = currentY + (tableConfig.cellHeight / 2) + 1.5;
         doc.text(subtotal, subtotalX, subtotalY, { align: 'right' });
-        
+
         currentY += tableConfig.cellHeight;
       });
     }
 
     // === TOTALES DE LA VENTA ===
     currentY += 10;
-    
+
     // Fondo para totales
     doc.setFillColor(233, 236, 239);
     doc.rect(pageWidth - margin - 80, currentY, 80, 20, 'F');
-    
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(33, 37, 41);
-    
+
     const montoExtra = venta.monto_extra || 0;
     const totalVenta = Number(venta.total);
-    
+
     if (montoExtra > 0) {
       doc.text(`Monto Extra: $${montoExtra.toLocaleString('es-ES')}`, pageWidth - margin - 78, currentY + 7);
       totalMontoExtra += montoExtra;
     }
-    
+
     doc.setFontSize(12);
     doc.text(`Total: $${totalVenta.toLocaleString('es-ES')}`, pageWidth - margin - 78, currentY + 15);
-    
+
     totalGeneral += totalVenta;
     currentY += 35;
   }
@@ -306,7 +306,7 @@ export const generateReport = async (ventas: Venta[]) => {
     // Resumen final
     doc.setFillColor(0, 123, 255);
     doc.rect(margin, currentY, usableWidth, 25, 'F');
-    
+
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
@@ -332,14 +332,14 @@ export const generateReport = async (ventas: Venta[]) => {
   }
 
   // === GUARDAR ARCHIVO ===
-  const formattedDate = new Date().toLocaleDateString('es-ES', { 
-    day: '2-digit', 
-    month: '2-digit', 
-    year: 'numeric' 
-  }).replace(/\//g, '-') + '_' + new Date().toLocaleTimeString('es-ES', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  const formattedDate = new Date().toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).replace(/\//g, '-') + '_' + new Date().toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit'
   }).replace(/:/g, '-');
-  
+
   doc.save(`reporte_ventas_${formattedDate}.pdf`);
 };
