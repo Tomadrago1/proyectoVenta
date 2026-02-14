@@ -60,13 +60,10 @@ export const guardarVenta = async (
         // Decrementar el stock del producto (solo si no es producto genérico)
         if (detalle.id_producto !== 0) {
           try {
-            console.log(`Intentando decrementar stock para producto ID: ${detalle.id_producto}, cantidad: ${detalle.cantidad}`);
             const stockResponse = await axios.put(`/api/producto/decrement-stock/${detalle.id_producto}/${detalle.cantidad}`);
-            console.log(`Stock decrementado exitosamente para producto ${detalle.id_producto}:`, stockResponse.data);
           } catch (stockError: any) {
             console.error(`Error al decrementar stock del producto ${detalle.id_producto}:`, stockError);
             console.error('Error details:', stockError.response?.data);
-            // Notificar el error pero no interrumpir el proceso de venta
             const errorMsg = stockError.response?.data?.errorMessage || stockError.message || 'Error desconocido';
             alert(`Advertencia: No se pudo actualizar el stock del producto ${detalle.id_producto}. Error: ${errorMsg}`);
           }

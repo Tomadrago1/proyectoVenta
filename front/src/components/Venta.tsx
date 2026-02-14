@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Producto } from '../interface/producto';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { Venta } from '../interface/venta';
 import '../styles/VentaStyle.css';

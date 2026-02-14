@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import jsPDF from 'jspdf';
 import { Venta } from '../interface/venta';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { formatFechaHora } from '../utils/fechaConverter';

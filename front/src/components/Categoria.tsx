@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Categoria } from '../interface/categoria';
 import axios from 'axios';
 import '../styles/CategoriaStyle.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const Categorias: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
