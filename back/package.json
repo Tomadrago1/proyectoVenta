@@ -1,11 +1,12 @@
 {
   "name": "back",
   "version": "1.0.0",
-  "main": "dist/main.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "npm run build && electron .  ",
+    "start": "ts-node src/server.ts",
+    "start:dev": "set NODE_ENV=development&&ts-node src/server.ts",
     "build": "tsc",
-    "server": "ts-node src/server.ts"
+    "server": "npm run start"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +18,7 @@
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
-    "electron": "^33.2.0",
+    "dotenv": "^16.4.7",
     "escpos": "^3.0.0-alpha.6",
     "express": "^4.21.1",
     "express-session": "^1.18.1",

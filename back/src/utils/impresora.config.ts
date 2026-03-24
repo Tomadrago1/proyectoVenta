@@ -1,13 +1,14 @@
 import escpos from 'escpos';
-import iconv from 'iconv-lite'; // 👈 conversión de caracteres
+import iconv from 'iconv-lite';
 const USB = require('../vendor/escpos-usb/index.js');
 
 escpos.USB = USB;
 
 import { Request, Response } from 'express';
+import { crearContenidoTicket, formatearLineaTotal } from './crearTicket';
 
 async function imprimir(req: Request, res: Response): Promise<void> {
-  const { contenido, fecha, total } = req.body;
+  const { detalles, fecha, total } = req.body;
 
   try {
     const device = new escpos.USB();
@@ -20,35 +21,27 @@ async function imprimir(req: Request, res: Response): Promise<void> {
         return;
       }
 
-      const lineaTotal = `Total:`;
-      const totalString = `$${total.toFixed(0)}`;
-      const largoTotal = 32;
-      const espacioParaTotal =
-        largoTotal - lineaTotal.length - totalString.length;
-      const lineaConTotal =
-        lineaTotal + ' '.repeat(Math.max(0, espacioParaTotal)) + totalString;
+      const contenidoProductos = crearContenidoTicket(detalles);
+      const lineaConTotal = formatearLineaTotal(total);
 
-      const rawPrinter = printer as any; // 👈 habilitamos métodos no tipados
+      const rawPrinter = printer as any;
 
-      // Seleccionamos code page CP850 (multi-lingual: ñ, á, é, í, ó, ú)
       rawPrinter.raw(Buffer.from([0x1b, 0x74, 0x02]));
 
-      // Helper: convierte a CP850 y manda texto
       const printText = (texto: string) => {
         rawPrinter.raw(iconv.encode(texto + '\n', 'CP850'));
       };
 
-      // --- Aquí armamos el ticket ---
       printText('CARNES PAMPA');
       printText('ROSARIO - GARZÓN 619 - 2399611');
       printText(`Fecha: ${fecha}`);
       printText('--------------------------------');
       printText('Producto');
       printText('Cant x Precio           Subtotal');
-      printText(contenido);
+      printText(contenidoProductos);
       printText('--------------------------------');
       printText(lineaConTotal);
-      printText('Gracias por su compra');
+      printText('Gracias por su compra\n\n');
 
       rawPrinter.cut().close((err: any) => {
         if (err) {

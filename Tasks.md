@@ -1,10 +1,15 @@
 # Tareas de Frontend y Backend
 
-1- Que se sume la cantidad de las carnes mismo codigo, o en su defecto, que se trate como otro objeto distinto
-pero en la base de datos sean uno solo con cantidades sumadas
+1- Facilidad para instalar y hacer funcionar la impresora
 
-2- Plantear estadisticas
+2- Gestion de empleado, admin negocio y superadmin
 
-3- Generar ticket resumen de venta despues de cada venta
+3- Generar cruds para el superadmin
 
-4- Agregar boton para filtrar ventas de hoy / este mes [LISTO]
+4- Generar cruds para el admin
+
+5- Generar panel para empleado
+
+6- Adaptar panel para admin negocio
+
+7- Generar estadisticas para admin negocio

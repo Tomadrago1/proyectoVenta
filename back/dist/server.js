@@ -7,14 +7,13 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const cors_1 = __importDefault(require("cors"));
 const express_session_1 = __importDefault(require("express-session"));
-// Primer servidor (en el puerto 3000)
+const conn_1 = require("./shared/conn");
 const app = (0, express_1.default)();
-const port = 3000;
-app.use(express_1.default.json()); // Middleware para manejar JSON
+const port = Number(process.env.PORT ?? 3000);
+app.use(express_1.default.json());
 app.use((0, cors_1.default)({
     origin: 'http://localhost:8080',
 }));
-// Rutas (estos imports pueden estar en sus respectivos archivos)
 const producto_routes_1 = require("./routes/producto.routes");
 const usuario_routes_1 = require("./routes/usuario.routes");
 const venta_routes_1 = require("./routes/venta.routes");
@@ -43,6 +42,48 @@ app.get('/api', (req, res) => {
 app.get('/home', (req, res) => {
     res.sendFile(path_1.default.join(__dirname, 'dist', 'index.html'));
 });
-app.listen(port, () => {
-    console.log(`Servidor Express corriendo en http://localhost:${port}`);
-});
+const setupGracefulShutdown = (server) => {
+    let isShuttingDown = false;
+    const shutdown = async (signal) => {
+        if (isShuttingDown)
+            return;
+        isShuttingDown = true;
+        console.log(`Recibida senal ${signal}. Cerrando servidor...`);
+        server.close(async () => {
+            try {
+                await conn_1.pool.end();
+                console.log('Pool de MySQL cerrado correctamente.');
+                process.exit(0);
+            }
+            catch (error) {
+                console.error('Error cerrando el pool de MySQL:', error);
+                process.exit(1);
+            }
+        });
+        setTimeout(() => {
+            console.error('Cierre forzado por timeout.');
+            process.exit(1);
+        }, 10000).unref();
+    };
+    process.on('SIGINT', () => {
+        void shutdown('SIGINT');
+    });
+    process.on('SIGTERM', () => {
+        void shutdown('SIGTERM');
+    });
+};
+const bootstrap = async () => {
+    try {
+        await conn_1.pool.query('SELECT 1');
+        console.log('Conexion a base de datos verificada.');
+        const server = app.listen(port, () => {
+            console.log(`Servidor Express corriendo en http://localhost:${port}`);
+        });
+        setupGracefulShutdown(server);
+    }
+    catch (error) {
+        console.error('No se pudo iniciar el servidor por error de base de datos:', error);
+        process.exit(1);
+    }
+};
+void bootstrap();

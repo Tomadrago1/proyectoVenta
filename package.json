@@ -4,7 +4,9 @@
   },
   "scripts": {
     "start": "concurrently \"npm run serve-front\" \"npm run serve-back\"",
+    "start:dev": "concurrently \"npm run serve-front\" \"npm run serve-back:dev\"",
     "serve-back": "cd back && npm start",
+    "serve-back:dev": "cd back && npm run start:dev",
     "serve-front": "cd front && npm start"
   }
 }
