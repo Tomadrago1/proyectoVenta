@@ -7,7 +7,6 @@ exports.pool = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const promise_1 = __importDefault(require("mysql2/promise"));
 const nodeEnv = process.env.NODE_ENV ?? 'production';
-// Carga .env por defecto y luego sobreescribe con .env.{entorno} si existe.
 dotenv_1.default.config();
 dotenv_1.default.config({ path: `.env.${nodeEnv}`, override: true });
 const getRequiredEnv = (name) => {
