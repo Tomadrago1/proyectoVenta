@@ -1,10 +1,11 @@
 import React from 'react';
 import axios from 'axios';
+import { API_URL } from '../config/api';
 
 const Ayuda: React.FC = () => {
 
     const handleTestImpresion = () => {
-        axios.post('http://localhost:3000/api/impresora/test-imprimir', {
+        axios.post(`${API_URL}/impresora/test-imprimir`, {
         })
             .then(response => {
                 alert(response.data.message);

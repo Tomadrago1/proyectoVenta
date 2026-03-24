@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Producto } from '../interface/producto';
 import { Categoria } from '../interface/categoria';
 import { productoService } from '../services/productoService';
+import { API_URL } from '../config/api';
 
 type OFFProduct = {
     product_name?: string;
@@ -37,7 +38,7 @@ export const useProductos = () => {
 
     const fetchCategorias = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/categoria');
+            const response = await axios.get(`${API_URL}/categoria`);
             setCategorias(response.data);
         } catch (error) {
             console.error('Error fetching categories:', error);

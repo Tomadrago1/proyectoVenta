@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Categoria } from '../interface/categoria';
 import axios from 'axios';
+import { API_URL } from '../config/api';
 import '../styles/CategoriaStyle.css';
 
 const Categorias: React.FC = () => {
+
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [selectedAction, setSelectedAction] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -16,7 +18,7 @@ const Categorias: React.FC = () => {
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/categoria');
+      const response = await axios.get(`${API_URL}/categoria`);
       setCategorias(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -26,9 +28,7 @@ const Categorias: React.FC = () => {
   const handleEditLoad = async (id: string) => {
     if (id) {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/categoria/${id}`
-        );
+        const response = await axios.get(`${API_URL}/categoria/${id}`);
         setNewCategoria(response.data);
         setSelectedAction('modificar');
         setEditId(id);
@@ -43,9 +43,7 @@ const Categorias: React.FC = () => {
   const handleDeleteLoad = async (id: string) => {
     if (id) {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/categoria/${id}`
-        );
+        const response = await axios.get(`${API_URL}/categoria/${id}`);
         setNewCategoria(response.data);
         setSelectedAction('eliminar');
         setEditId(id);
@@ -59,7 +57,7 @@ const Categorias: React.FC = () => {
 
   const createCategoria = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/api/categoria', {
+      const response = await axios.post(`${API_URL}/categoria`, {
         ...newCategoria,
       });
       setCategorias((prevCategorias) => [...prevCategorias, response.data]);
@@ -71,12 +69,9 @@ const Categorias: React.FC = () => {
 
   const updateCategoria = async () => {
     try {
-      const response = await axios.put(
-        `http://localhost:3000/api/categoria/${newCategoria.id_categoria}`,
-        {
-          ...newCategoria,
-        }
-      );
+      const response = await axios.put(`${API_URL}/categoria/${newCategoria.id_categoria}`, {
+        ...newCategoria,
+      });
       setCategorias((prevCategorias) =>
         prevCategorias.map((categoria) =>
           categoria.id_categoria === response.data.id_categoria
@@ -92,9 +87,7 @@ const Categorias: React.FC = () => {
 
   const deleteCategoria = async () => {
     try {
-      await axios.delete(
-        `http://localhost:3000/api/categoria/${newCategoria.id_categoria}`
-      );
+      await axios.delete(`${API_URL}/categoria/${newCategoria.id_categoria}`);
       setCategorias((prevCategorias) =>
         prevCategorias.filter(
           (categoria) => categoria.id_categoria !== newCategoria.id_categoria
@@ -121,9 +114,7 @@ const Categorias: React.FC = () => {
       if (search.trim() === '') {
         fetchCategorias();
       } else {
-        const response = await axios.get(
-          `http://localhost:3000/api/categoria/search/${search}`
-        );
+        const response = await axios.get(`${API_URL}/categoria/search/${search}`);
         setCategorias(response.data);
       }
     } catch (error) {
@@ -206,33 +197,33 @@ const Categorias: React.FC = () => {
             {selectedAction === 'crear'
               ? 'Crear Categoría'
               : selectedAction === 'modificar'
-              ? 'Modificar Categoría'
-              : selectedAction === 'eliminar'
-              ? 'Eliminar Categoría'
-              : ''}
+                ? 'Modificar Categoría'
+                : selectedAction === 'eliminar'
+                  ? 'Eliminar Categoría'
+                  : ''}
           </h3>
 
           {error && <p className="error-message">{error}</p>}
 
           {(selectedAction === 'modificar' ||
             selectedAction === 'eliminar') && (
-            <div className="form-group">
-              <label>ID de la Categoría</label>
-              <input
-                type="text"
-                placeholder="ID de la Categoría"
-                value={editId}
-                onChange={(e) => setEditId(e.target.value)}
-                onBlur={() => {
-                  if (selectedAction === 'modificar') {
-                    handleEditLoad(editId);
-                  } else if (selectedAction === 'eliminar') {
-                    handleDeleteLoad(editId);
-                  }
-                }}
-              />
-            </div>
-          )}
+              <div className="form-group">
+                <label>ID de la Categoría</label>
+                <input
+                  type="text"
+                  placeholder="ID de la Categoría"
+                  value={editId}
+                  onChange={(e) => setEditId(e.target.value)}
+                  onBlur={() => {
+                    if (selectedAction === 'modificar') {
+                      handleEditLoad(editId);
+                    } else if (selectedAction === 'eliminar') {
+                      handleDeleteLoad(editId);
+                    }
+                  }}
+                />
+              </div>
+            )}
           <div className="form-group">
             <label>Nombre de la Categoría</label>
             <input

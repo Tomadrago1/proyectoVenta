@@ -39,7 +39,9 @@ async function create(req: Request, res: Response) {
       rest.nombre,
       rest.apellido,
       rest.username,
-      hashedPassword
+      hashedPassword,
+      rest.id_rol,
+      rest.id_negocio
     );
     const result = await repository.save(usuario);
     res.json(result);
@@ -62,7 +64,9 @@ async function update(req: Request, res: Response) {
       req.body.nombre,
       req.body.apellido,
       req.body.username,
-      contrasena
+      contrasena,
+      req.body.id_rol,
+      req.body.id_negocio
     );
 
     const result = await repository.update({ id: id }, usuarioActualizado);
@@ -97,7 +101,7 @@ async function login(req: Request, res: Response) {
         }
 
         const token = jwt.sign(
-          { id_usuario: usuario.id_usuario, username: usuario.username },
+          { id_usuario: usuario.id_usuario, username: usuario.username, id_negocio: usuario.id_negocio, nombre_rol: usuario.nombre_rol },
           jwtSecret,
           { expiresIn: '1h' }
         );

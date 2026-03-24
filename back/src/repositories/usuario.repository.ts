@@ -78,7 +78,7 @@ export class UsuarioRepository implements Repository<Usuario> {
 
   public async findByUsername(username: string): Promise<Usuario | undefined> {
     const [usuarios] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM usuarios WHERE username = ?',
+      'SELECT usuarios.*, roles.nombre_rol FROM usuarios inner join roles on usuarios.id_rol = roles.id_rol WHERE username = ?',
       [username]
     );
     if (usuarios.length === 0) {
