@@ -58,7 +58,7 @@ CREATE TABLE categoria (
 
 CREATE TABLE productos (
   id_producto INT AUTO_INCREMENT PRIMARY KEY,
-  id_negocio INT NOT NULL,
+  id_negocio INT,
   id_categoria INT,
   nombre_producto VARCHAR(100) NOT NULL,
   precio_compra DECIMAL(10, 2) NOT NULL DEFAULT 0.00,

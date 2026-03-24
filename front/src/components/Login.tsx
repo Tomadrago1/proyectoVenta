@@ -18,9 +18,9 @@ const Login: React.FC = () => {
         password,
       });
       if (response.status === 200) {
-        const { usuario, token } = response.data;
+        const { token } = response.data;
         localStorage.setItem('token', token);
-        navigate('/venta', { state: { usuario } });
+        navigate('/venta');
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
