@@ -1,0 +1,29 @@
+.help-floating-button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 999;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: #0f766e;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(15, 118, 110, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.help-floating-button:hover {
+  background: #115e59;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(15, 118, 110, 0.35);
+}
+
+@media (max-width: 768px) {
+  .help-floating-button {
+    right: 14px;
+    bottom: 14px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+}

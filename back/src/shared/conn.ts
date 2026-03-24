@@ -3,7 +3,6 @@ import mysql from 'mysql2/promise';
 
 const nodeEnv = process.env.NODE_ENV ?? 'production';
 
-// Carga .env por defecto y luego sobreescribe con .env.{entorno} si existe.
 dotenv.config();
 dotenv.config({ path: `.env.${nodeEnv}`, override: true });
 

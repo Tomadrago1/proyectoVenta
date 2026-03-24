@@ -20,7 +20,6 @@ const Login: React.FC = () => {
       if (response.status === 200) {
         const { usuario, token } = response.data;
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(usuario));
         navigate('/venta', { state: { usuario } });
       }
     } catch (error) {
