@@ -14,12 +14,17 @@ import VentaPage from './features/venta/Venta';
 import Ventas from './features/ventas/Ventas';
 import Categorias from './features/categoria/Categoria';
 
+import AdminPanel from './features/admin/AdminPanel';
+import SuperadminPanel from './features/superadmin/SuperadminPanel';
+import Unauthorized from './shared/components/Unauthorized';
+
 const App: React.FC = () => {
   return (
     <>
       <Routes>
         {/* Ruta pública */}
         <Route path="/" element={<Login />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Rutas protegidas — requieren JWT válido */}
         <Route
@@ -73,6 +78,24 @@ const App: React.FC = () => {
             <ProtectedRoute>
               <Header />
               <Ayuda />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requiredRoles={['Administrador', 'Superadmin']}>
+              <Header />
+              <AdminPanel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin"
+          element={
+            <ProtectedRoute requiredRoles={['Superadmin']}>
+              <Header />
+              <SuperadminPanel />
             </ProtectedRoute>
           }
         />

@@ -4,10 +4,11 @@ import { useAuth } from './useAuth';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
+    requiredRoles?: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const { isAuthenticated, loading } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles }) => {
+    const { isAuthenticated, loading, user } = useAuth();
 
     if (loading) {
         return (
@@ -19,6 +20,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     if (!isAuthenticated) {
         return <Navigate to="/" replace />;
+    }
+
+    if (requiredRoles && user && !requiredRoles.includes(user.nombre_rol)) {
+        return <Navigate to="/unauthorized" replace />;
     }
 
     return <>{children}</>;

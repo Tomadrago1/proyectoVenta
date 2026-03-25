@@ -1,0 +1,117 @@
+.container_admin {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.container_admin h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.action-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.create-button { background-color: #28a745; }
+.update-button { background-color: #ffc107; color: black !important; }
+.delete-button { background-color: #dc3545; }
+
+.create-button:hover { background-color: #218838; }
+.update-button:hover { background-color: #e0a800; }
+.delete-button:hover { background-color: #c82333; }
+
+.empleados-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.empleados-table th, .empleados-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.empleados-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.modal-form {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  max-width: 500px;
+  margin: 20px auto;
+  border: 1px solid #ddd;
+}
+
+.modal-form h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}

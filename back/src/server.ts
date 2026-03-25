@@ -11,6 +11,8 @@ import { routerVenta } from './routes/venta.routes';
 import { routerDetalleVenta } from './routes/detalleVenta.routes';
 import { routerCategoria } from './routes/categoria.routes';
 import { routerImpresora } from './routes/impresora.routes';
+import { routerNegocio } from './routes/negocio.routes';
+import { routerRol } from './routes/rol.routes';
 
 const app = express();
 const port = Number(process.env.PORT ?? 3000);
@@ -49,6 +51,8 @@ app.use('/api/venta', routerVenta);
 app.use('/api/detalle-venta', routerDetalleVenta);
 app.use('/api/categoria', routerCategoria);
 app.use('/api/impresora', routerImpresora);
+app.use('/api/negocio', routerNegocio);
+app.use('/api/rol', routerRol);
 
 app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));

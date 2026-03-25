@@ -76,5 +76,5 @@ export const useAuth = () => {
         };
     }, [validateToken, logout]);
 
-    return authState;
+    return { ...authState, logout };
 };
