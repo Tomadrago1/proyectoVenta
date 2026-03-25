@@ -1,31 +1,25 @@
 import React from 'react';
-import ProductCrud from './components/productos/Producto';
 import { Route, Routes } from 'react-router-dom';
 
-import Header from './components/Header';
-import HelpButton from './components/HelpButton';
-import Login from './components/Login';
-import Venta from './components/Venta';
-import Ventas from './components/Ventas';
-import Producto from './components/productos/Producto';
-import Categoria from './components/Categoria';
-import Estadistica from './components/Estadistica';
-import Ayuda from './components/Ayuda';
-import ProtectedRoute from './components/ProtectedRoute';
+import Header from './shared/components/Header';
+import HelpButton from './shared/components/HelpButton';
+import Ayuda from './shared/components/Ayuda';
+import Estadistica from './shared/components/Estadistica';
+
+import Login from './features/auth/Login';
+import ProtectedRoute from './features/auth/ProtectedRoute';
+
+import Producto from './features/productos/Producto';
+import VentaPage from './features/venta/Venta';
+import Ventas from './features/ventas/Ventas';
+import Categorias from './features/categoria/Categoria';
 
 const App: React.FC = () => {
   return (
     <>
       <Routes>
         {/* Ruta pública */}
-        <Route
-          path="/"
-          element={
-            <div>
-              <Login />
-            </div>
-          }
-        />
+        <Route path="/" element={<Login />} />
 
         {/* Rutas protegidas — requieren JWT válido */}
         <Route
@@ -42,7 +36,7 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <Header />
-              <Venta />
+              <VentaPage />
             </ProtectedRoute>
           }
         />
@@ -60,7 +54,7 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <Header />
-              <Categoria />
+              <Categorias />
             </ProtectedRoute>
           }
         />
