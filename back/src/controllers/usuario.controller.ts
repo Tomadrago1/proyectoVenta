@@ -86,21 +86,29 @@ async function login(req: Request, res: Response) {
   try {
     const { username, password } = req.body;
     const usuario = await repository.findByUsername(username);
+
     if (usuario) {
       const isMatch = await bcrypt.compare(password, usuario.contrasena);
+
       if (isMatch) {
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+          throw new Error('JWT_SECRET no está definido en las variables de entorno');
+        }
+
         const token = jwt.sign(
           { id_usuario: usuario.id_usuario, username: usuario.username },
-          'secreto_del_token',
+          jwtSecret,
           { expiresIn: '1h' }
         );
 
-        res.json({ usuario, token });
+        res.json({
+          token
+        });
       } else {
         res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
       }
-    }
-    else {
+    } else {
       res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
     }
   } catch (error: any) {

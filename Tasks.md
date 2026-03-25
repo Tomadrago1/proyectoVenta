@@ -1,8 +1,8 @@
 # Tareas de Frontend y Backend
 
-1- Facilidad para instalar y hacer funcionar la impresora
+1- Facilidad para instalar y hacer funcionar la impresora - Mitad
 
-2- Gestion de empleado, admin negocio y superadmin
+2- Gestion de empleado, admin negocio y superadmin 
 
 3- Generar cruds para el superadmin
 
