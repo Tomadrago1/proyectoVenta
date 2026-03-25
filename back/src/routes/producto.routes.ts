@@ -10,8 +10,11 @@ import {
   decrementStock,
 } from '../controllers/producto.controller';
 import { Router } from 'express';
+import { validateJWT } from '../utils/validateJwt';
 
 export const routerProducto = Router();
+
+routerProducto.use(validateJWT);
 
 routerProducto.put('/stock/:id/:stock', updateStock);
 

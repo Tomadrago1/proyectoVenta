@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../config/api';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { Venta } from '../interface/venta';
 import { Producto } from '../interface/producto';
@@ -44,14 +44,14 @@ export const guardarVenta = async (
   mapDetalles.forEach((detalle) => detallesAgrupados.push(detalle));
 
   try {
-    const response = await axios.post('/api/venta', nuevaVenta);
+    const response = await api.post('/venta', nuevaVenta);
     const ventaCreada = response.data;
     setVenta(ventaCreada);
 
     for (const detalle of detallesAgrupados) {
       try {
         // Guardar el detalle de venta
-        await axios.post('/api/detalle-venta', {
+        await api.post('/detalle-venta', {
           ...detalle,
           id_venta: ventaCreada.id_venta,
         });
@@ -60,7 +60,7 @@ export const guardarVenta = async (
         // Decrementar el stock del producto (solo si no es producto genérico)
         if (detalle.id_producto !== 0) {
           try {
-            const stockResponse = await axios.put(`/api/producto/decrement-stock/${detalle.id_producto}/${detalle.cantidad}`);
+            const stockResponse = await api.put(`/producto/decrement-stock/${detalle.id_producto}/${detalle.cantidad}`);
           } catch (stockError: any) {
             console.error(`Error al decrementar stock del producto ${detalle.id_producto}:`, stockError);
             console.error('Error details:', stockError.response?.data);
@@ -89,11 +89,11 @@ export const guardarVenta = async (
 
 const prepararDetallesParaTicket = async (detalles: DetalleVenta[]) => {
   // Obtener todos los productos en paralelo
-  const productosPromises = detalles.map(detalle => 
+  const productosPromises = detalles.map(detalle =>
     obtenerProductoPorId(detalle.id_producto)
   );
   const productos = await Promise.all(productosPromises);
-  
+
   // Crear array de detalles con información completa del producto
   return detalles.map((detalle, index) => ({
     nombre_producto: productos[index].nombre_producto,
@@ -104,7 +104,7 @@ const prepararDetallesParaTicket = async (detalles: DetalleVenta[]) => {
 
 const obtenerProductoPorId = async (id_producto: number): Promise<Producto> => {
   try {
-    const response = await axios.get(`/api/producto/${id_producto}`);
+    const response = await api.get(`/producto/${id_producto}`);
     return response.data;
   } catch (error) {
     console.error("Error al obtener el producto:", error);
@@ -122,7 +122,7 @@ const obtenerProductoPorId = async (id_producto: number): Promise<Producto> => {
 
 const imprimirTicketBackend = async (detalles: any[], total: number, fecha: string) => {
   try {
-    await axios.post('/api/impresora/imprimir', { detalles, fecha, total });
+    await api.post('/impresora/imprimir', { detalles, fecha, total });
     console.log("Ticket enviado para impresión.");
   } catch (error) {
     console.error("Error al enviar el ticket para impresión:", error);

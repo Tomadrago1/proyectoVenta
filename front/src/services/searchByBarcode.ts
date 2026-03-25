@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../config/api';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { Producto } from '../interface/producto';
 import { Venta } from '../interface/venta';
@@ -39,8 +39,8 @@ export const buscarProductoPorCodigo = async (
     importeStr = importeStr.replace(/^0+/, '');
 
     try {
-      const responseRecortado = await axios.get(
-        `/api/producto/barcode/${codigoRecortado}`
+      const responseRecortado = await api.get(
+        `/producto/barcode/${codigoRecortado}`
       );
       const productoRecortado: Producto = responseRecortado.data;
 
@@ -75,7 +75,7 @@ export const buscarProductoPorCodigo = async (
       );
     }
 
-    const response = await axios.get(`/api/producto/barcode/${codigo}`);
+    const response = await api.get(`/producto/barcode/${codigo}`);
     const producto: Producto = response.data;
 
     if (!producto) {

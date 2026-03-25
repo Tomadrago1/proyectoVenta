@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import { ProductoRepository } from '../repositories/producto.repository';
 import { Producto } from '../models/producto.model';
+import { resolveBusinessIdFromRequest } from '../shared/tenant';
 
 const repository = new ProductoRepository();
 
 async function findAll(req: Request, res: Response) {
   try {
-    const productos = await repository.findAll();
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const productos = await repository.findAll(idNegocio);
     res.json(productos);
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
@@ -17,7 +19,8 @@ async function findAll(req: Request, res: Response) {
 async function findOne(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const producto = await repository.findOne({ id });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const producto = await repository.findOne({ id, id_negocio: idNegocio.toString() });
     if (producto) {
       res.json(producto);
     } else {
@@ -31,8 +34,10 @@ async function findOne(req: Request, res: Response) {
 
 async function create(req: Request, res: Response) {
   try {
+    const idNegocio = resolveBusinessIdFromRequest(req);
     const producto = new Producto(
       req.body.id,
+      idNegocio,
       req.body.id_categoria,
       req.body.nombre_producto,
       req.body.precio_compra,
@@ -51,8 +56,10 @@ async function create(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const { id } = req.params;
+    const idNegocio = resolveBusinessIdFromRequest(req);
     const producto = new Producto(
       parseInt(id),
+      idNegocio,
       req.body.id_categoria,
       req.body.nombre_producto,
       req.body.precio_compra,
@@ -61,7 +68,7 @@ async function update(req: Request, res: Response) {
       req.body.codigo_barras,
     );
 
-    const result = await repository.update({ id }, producto);
+    const result = await repository.update({ id, id_negocio: idNegocio.toString() }, producto);
     res.json(result);
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
@@ -73,7 +80,8 @@ async function update(req: Request, res: Response) {
 async function remove(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    await repository.remove({ id });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    await repository.remove({ id, id_negocio: idNegocio.toString() });
     res.json({ message: 'Producto eliminado' });
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
@@ -84,7 +92,8 @@ async function remove(req: Request, res: Response) {
 async function findByBarcode(req: Request, res: Response) {
   try {
     const { barcode } = req.params;
-    const producto = await repository.findByBarcode({ barcode });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const producto = await repository.findByBarcode({ barcode, id_negocio: idNegocio.toString() });
     if (producto) {
       res.json(producto);
     } else {
@@ -99,7 +108,8 @@ async function findByBarcode(req: Request, res: Response) {
 async function findByName(req: Request, res: Response) {
   try {
     const { name } = req.params;
-    const productos = await repository.findByName({ name });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const productos = await repository.findByName({ name, id_negocio: idNegocio.toString() });
     res.json(productos);
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
@@ -110,7 +120,8 @@ async function findByName(req: Request, res: Response) {
 async function updateStock(req: Request, res: Response) {
   try {
     const { id, stock } = req.params;
-    const result = await repository.updateStock({ id, stock });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const result = await repository.updateStock({ id, stock, id_negocio: idNegocio.toString() });
     res.json(result);
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
@@ -121,6 +132,7 @@ async function updateStock(req: Request, res: Response) {
 async function decrementStock(req: Request, res: Response) {
   try {
     const { id, cantidad } = req.params;
+    const idNegocio = resolveBusinessIdFromRequest(req);
 
     const productId = parseInt(id);
     if (isNaN(productId)) {
@@ -138,7 +150,11 @@ async function decrementStock(req: Request, res: Response) {
       });
     }
 
-    const result = await repository.decrementStock({ id: productId.toString(), cantidad: cantidadNum });
+    const result = await repository.decrementStock({
+      id: productId.toString(),
+      cantidad: cantidadNum,
+      id_negocio: idNegocio.toString(),
+    });
     res.json({ message: 'Stock decrementado correctamente', result });
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';

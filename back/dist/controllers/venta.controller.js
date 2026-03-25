@@ -8,10 +8,12 @@ exports.remove = remove;
 exports.filterByDateRange = filterByDateRange;
 const venta_repository_1 = require("../repositories/venta.repository");
 const venta_model_1 = require("../models/venta.model");
+const tenant_1 = require("../shared/tenant");
 const repository = new venta_repository_1.VentaRepository();
 async function findAll(req, res) {
     try {
-        const ventas = await repository.findAll();
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const ventas = await repository.findAll(idNegocio);
         res.json(ventas);
     }
     catch (error) {
@@ -21,7 +23,8 @@ async function findAll(req, res) {
 async function findOne(req, res) {
     try {
         const { id } = req.params;
-        const venta = await repository.findOne({ id });
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const venta = await repository.findOne({ id, id_negocio: idNegocio.toString() });
         if (venta) {
             res.json(venta);
         }
@@ -35,7 +38,8 @@ async function findOne(req, res) {
 }
 async function create(req, res) {
     try {
-        const venta = new venta_model_1.Venta(req.body.id_usuario, null, req.body.total, new Date(req.body.fecha_venta), req.body.monto_extra);
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const venta = new venta_model_1.Venta(idNegocio, req.body.id_usuario, null, req.body.total, new Date(req.body.fecha_venta), req.body.monto_extra);
         const result = await repository.save(venta);
         res.json(result);
     }
@@ -46,8 +50,9 @@ async function create(req, res) {
 async function update(req, res) {
     try {
         const { id } = req.params;
-        const venta = new venta_model_1.Venta(req.body.id_usuario, parseInt(id), req.body.total, new Date(req.body.fecha_venta), req.body.monto_extra);
-        const result = await repository.update({ id }, venta);
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const venta = new venta_model_1.Venta(idNegocio, req.body.id_usuario, parseInt(id), req.body.total, new Date(req.body.fecha_venta), req.body.monto_extra);
+        const result = await repository.update({ id, id_negocio: idNegocio.toString() }, venta);
         res.json(result);
     }
     catch (error) {
@@ -57,7 +62,8 @@ async function update(req, res) {
 async function remove(req, res) {
     try {
         const { id } = req.params;
-        await repository.remove({ id });
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        await repository.remove({ id, id_negocio: idNegocio.toString() });
         res.json({ message: 'Venta eliminada' });
     }
     catch (error) {
@@ -67,11 +73,12 @@ async function remove(req, res) {
 async function filterByDateRange(req, res) {
     try {
         const { startDate, endDate } = req.query;
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
         if (!startDate || !endDate) {
             res.status(400).json({ message: 'Debe proporcionar startDate y endDate' });
             return;
         }
-        const ventas = await repository.filterByDateRange(new Date(startDate), new Date(endDate));
+        const ventas = await repository.filterByDateRange(new Date(startDate), new Date(endDate), idNegocio);
         res.status(200).json(ventas);
     }
     catch (error) {

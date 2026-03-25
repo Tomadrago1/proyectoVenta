@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Categoria } from '../interface/categoria';
-import axios from 'axios';
+import api from '../config/api';
 import { API_URL } from '../config/api';
 import '../styles/CategoriaStyle.css';
 
@@ -18,7 +18,7 @@ const Categorias: React.FC = () => {
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get(`${API_URL}/categoria`);
+      const response = await api.get(`${API_URL}/categoria`);
       setCategorias(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -28,7 +28,7 @@ const Categorias: React.FC = () => {
   const handleEditLoad = async (id: string) => {
     if (id) {
       try {
-        const response = await axios.get(`${API_URL}/categoria/${id}`);
+        const response = await api.get(`${API_URL}/categoria/${id}`);
         setNewCategoria(response.data);
         setSelectedAction('modificar');
         setEditId(id);
@@ -43,7 +43,7 @@ const Categorias: React.FC = () => {
   const handleDeleteLoad = async (id: string) => {
     if (id) {
       try {
-        const response = await axios.get(`${API_URL}/categoria/${id}`);
+        const response = await api.get(`${API_URL}/categoria/${id}`);
         setNewCategoria(response.data);
         setSelectedAction('eliminar');
         setEditId(id);
@@ -57,7 +57,7 @@ const Categorias: React.FC = () => {
 
   const createCategoria = async () => {
     try {
-      const response = await axios.post(`${API_URL}/categoria`, {
+      const response = await api.post(`${API_URL}/categoria`, {
         ...newCategoria,
       });
       setCategorias((prevCategorias) => [...prevCategorias, response.data]);
@@ -69,7 +69,7 @@ const Categorias: React.FC = () => {
 
   const updateCategoria = async () => {
     try {
-      const response = await axios.put(`${API_URL}/categoria/${newCategoria.id_categoria}`, {
+      const response = await api.put(`${API_URL}/categoria/${newCategoria.id_categoria}`, {
         ...newCategoria,
       });
       setCategorias((prevCategorias) =>
@@ -87,7 +87,7 @@ const Categorias: React.FC = () => {
 
   const deleteCategoria = async () => {
     try {
-      await axios.delete(`${API_URL}/categoria/${newCategoria.id_categoria}`);
+      await api.delete(`${API_URL}/categoria/${newCategoria.id_categoria}`);
       setCategorias((prevCategorias) =>
         prevCategorias.filter(
           (categoria) => categoria.id_categoria !== newCategoria.id_categoria
@@ -114,7 +114,7 @@ const Categorias: React.FC = () => {
       if (search.trim() === '') {
         fetchCategorias();
       } else {
-        const response = await axios.get(`${API_URL}/categoria/search/${search}`);
+        const response = await api.get(`${API_URL}/categoria/search/${search}`);
         setCategorias(response.data);
       }
     } catch (error) {

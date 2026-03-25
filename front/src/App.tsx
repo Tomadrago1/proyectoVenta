@@ -11,11 +11,13 @@ import Producto from './components/productos/Producto';
 import Categoria from './components/Categoria';
 import Estadistica from './components/Estadistica';
 import Ayuda from './components/Ayuda';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App: React.FC = () => {
   return (
     <>
       <Routes>
+        {/* Ruta pública */}
         <Route
           path="/"
           element={
@@ -24,58 +26,60 @@ const App: React.FC = () => {
             </div>
           }
         />
+
+        {/* Rutas protegidas — requieren JWT válido */}
         <Route
           path="/productos"
           element={
-            <div>
+            <ProtectedRoute>
               <Header />
               <Producto />
-            </div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/venta"
           element={
-            <div>
+            <ProtectedRoute>
               <Header />
               <Venta />
-            </div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/ventas"
           element={
-            <div>
+            <ProtectedRoute>
               <Header />
               <Ventas />
-            </div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/categorias"
           element={
-            <div>
+            <ProtectedRoute>
               <Header />
               <Categoria />
-            </div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/estadisticas"
           element={
-            <div>
+            <ProtectedRoute>
               <Header />
               <Estadistica />
-            </div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/ayuda"
           element={
-            <div>
+            <ProtectedRoute>
               <Header />
               <Ayuda />
-            </div>
+            </ProtectedRoute>
           }
         />
       </Routes>

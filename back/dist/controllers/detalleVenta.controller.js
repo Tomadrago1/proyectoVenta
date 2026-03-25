@@ -8,10 +8,12 @@ exports.remove = remove;
 exports.findByVenta = findByVenta;
 const detalleVenta_repository_1 = require("../repositories/detalleVenta.repository");
 const detalleVenta_model_1 = require("../models/detalleVenta.model");
+const tenant_1 = require("../shared/tenant");
 const repository = new detalleVenta_repository_1.DetalleVentaRepository();
 async function findAll(req, res) {
     try {
-        const detalles = await repository.findAll();
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const detalles = await repository.findAll(idNegocio);
         res.json(detalles);
     }
     catch (error) {
@@ -22,7 +24,12 @@ async function findAll(req, res) {
 async function findOne(req, res) {
     try {
         const { id_venta, id_producto } = req.params; // Cambiar id a id_venta y id_producto
-        const detalle = await repository.findOne({ id_venta, id_producto });
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const detalle = await repository.findOne({
+            id_venta,
+            id_producto,
+            id_negocio: idNegocio.toString(),
+        });
         if (detalle) {
             res.json(detalle);
         }
@@ -37,7 +44,8 @@ async function findOne(req, res) {
 }
 async function create(req, res) {
     try {
-        const detalle = new detalleVenta_model_1.DetalleVenta(req.body.id_producto, req.body.id_venta, req.body.cantidad, req.body.precio_unitario);
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const detalle = new detalleVenta_model_1.DetalleVenta(idNegocio, req.body.id_producto, req.body.id_venta, req.body.cantidad, req.body.precio_unitario);
         const result = await repository.save(detalle);
         res.json(result);
     }
@@ -49,8 +57,9 @@ async function create(req, res) {
 async function update(req, res) {
     try {
         const { id_venta, id_producto } = req.params; // Cambiar id a id_venta y id_producto
-        const detalle = new detalleVenta_model_1.DetalleVenta(parseInt(id_producto), parseInt(id_venta), req.body.cantidad, req.body.precio_unitario);
-        const result = await repository.update({ id_venta, id_producto }, detalle); // Cambiar id a id_venta y id_producto
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const detalle = new detalleVenta_model_1.DetalleVenta(idNegocio, parseInt(id_producto), parseInt(id_venta), req.body.cantidad, req.body.precio_unitario);
+        const result = await repository.update({ id_venta, id_producto, id_negocio: idNegocio.toString() }, detalle);
         res.json(result);
     }
     catch (error) {
@@ -61,7 +70,8 @@ async function update(req, res) {
 async function remove(req, res) {
     try {
         const { id_venta, id_producto } = req.params; // Cambiar id a id_venta y id_producto
-        await repository.remove({ id_venta, id_producto });
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        await repository.remove({ id_venta, id_producto, id_negocio: idNegocio.toString() });
         res.json({ message: 'Detalle de venta eliminado' });
     }
     catch (error) {
@@ -72,7 +82,8 @@ async function remove(req, res) {
 async function findByVenta(req, res) {
     try {
         const { id_venta } = req.params;
-        const detalles = await repository.findByVenta(id_venta);
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const detalles = await repository.findByVenta(id_venta, idNegocio.toString());
         res.json(detalles);
     }
     catch (error) {

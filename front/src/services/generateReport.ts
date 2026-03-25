@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../config/api';
 import jsPDF from 'jspdf';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { Venta } from '../interface/venta';
@@ -7,7 +7,7 @@ import { Usuario } from '../interface/usuario';
 
 export const getDetallesDeVenta = async (idVenta: number): Promise<DetalleVenta[]> => {
   try {
-    const response = await axios.get(`/api/detalle-venta/${idVenta}`);
+    const response = await api.get(`/detalle-venta/${idVenta}`);
     return response.data;
   } catch (error) {
     console.error('Error al obtener los detalles de la venta:', error);
@@ -17,7 +17,7 @@ export const getDetallesDeVenta = async (idVenta: number): Promise<DetalleVenta[
 
 export const getProductos = async (): Promise<{ [key: string]: Producto }> => {
   try {
-    const response = await axios.get('/api/producto');
+    const response = await api.get('/producto');
     const productos = response.data.reduce((acc: { [key: string]: Producto }, producto: Producto) => {
       acc[producto.id_producto] = producto;
       return acc;
@@ -31,7 +31,7 @@ export const getProductos = async (): Promise<{ [key: string]: Producto }> => {
 
 export const getUsuario = async (idUsuario: number): Promise<Usuario | null> => {
   try {
-    const response = await axios.get(`/api/usuario/${idUsuario}`);
+    const response = await api.get(`/usuario/${idUsuario}`);
     return response.data;
   } catch (error) {
     console.error('Error al obtener el usuario:', error);

@@ -7,8 +7,11 @@ import {
   findByName,
 } from '../controllers/categoria.controller';
 import { Router } from 'express';
+import { validateJWT } from '../utils/validateJwt';
 
 export const routerCategoria = Router();
+
+routerCategoria.use(validateJWT);
 
 routerCategoria.get('/', findAll);
 

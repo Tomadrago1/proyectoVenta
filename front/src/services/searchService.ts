@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../config/api';
 import { API_URL } from '../config/api';
 
 export const handleLinkClick = async (
@@ -10,7 +10,7 @@ export const handleLinkClick = async (
   event.preventDefault();
 
   try {
-    const response = await axios.get(`${API_URL}/${endpoint}`);
+    const response = await api.get(`${API_URL}/${endpoint}`);
     navigate(`/${route}`, { state: { [route]: response.data } });
   } catch (error) {
     console.error(`Error al obtener ${endpoint}:`, error);

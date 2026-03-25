@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/api';
 import { Venta } from '../interface/venta';
 import { DetalleVenta } from '../interface/detalleVenta';
 import { formatFechaHora } from '../utils/fechaConverter';
@@ -24,7 +24,7 @@ const Ventas: React.FC = () => {
 
   const fetchVentas = async () => {
     try {
-      const response = await axios.get('/api/venta');
+      const response = await api.get('/venta');
       const ventasData = response.data;
 
       const usuariosIds = [
@@ -32,7 +32,7 @@ const Ventas: React.FC = () => {
       ];
 
       const usuariosResponse = await Promise.all(
-        usuariosIds.map((id) => axios.get(`/api/usuario/${id}`))
+        usuariosIds.map((id) => api.get(`/usuario/${id}`))
       );
 
       const usuariosMap = usuariosResponse.reduce(
@@ -55,7 +55,7 @@ const Ventas: React.FC = () => {
 
   const fetchDetalleVenta = async (idVenta: number) => {
     try {
-      const response = await axios.get(`/api/detalle-venta/${idVenta}`);
+      const response = await api.get(`/detalle-venta/${idVenta}`);
       const detalleVentaData = response.data;
 
       const productosIds = [
@@ -65,7 +65,7 @@ const Ventas: React.FC = () => {
       ];
 
       const productosResponse = await Promise.all(
-        productosIds.map((id) => axios.get(`/api/producto/${id}`))
+        productosIds.map((id) => api.get(`/producto/${id}`))
       );
 
       const productosMap = productosResponse.reduce(
@@ -95,7 +95,7 @@ const Ventas: React.FC = () => {
 
     try {
       if (!startDate && !endDate) {
-        const response = await axios.get(`/api/venta`);
+        const response = await api.get(`/venta`);
         setSelectedVenta(null);
         setPagina(1);
         setVentas(response.data);
@@ -107,7 +107,7 @@ const Ventas: React.FC = () => {
         return;
       }
 
-      const response = await axios.get(`/api/venta/filtro/fechas`, {
+      const response = await api.get(`/venta/filtro/fechas`, {
         params: { startDate, endDate },
       });
       setSelectedVenta(null);
@@ -211,9 +211,8 @@ const Ventas: React.FC = () => {
             <tr key={venta.id_venta}>
               <td>{venta.id_venta}</td>
               <td>
-                {`${usuarios[venta.id_usuario]?.nombre || ''} ${
-                  usuarios[venta.id_usuario]?.apellido || ''
-                }`}
+                {`${usuarios[venta.id_usuario]?.nombre || ''} ${usuarios[venta.id_usuario]?.apellido || ''
+                  }`}
               </td>
               <td>{formatFechaHora(venta.fecha_venta)}</td>
               <td>${Number(venta.total).toFixed(0)}</td>
@@ -255,17 +254,15 @@ const Ventas: React.FC = () => {
           <div className="ventas-detalle-info">
             <p>
               <strong>Vendedor:</strong>{' '}
-              {`${
-                usuarios[
-                  ventas.find((venta) => venta.id_venta === selectedVenta)
-                    ?.id_usuario || 0
-                ]?.nombre || ''
-              } ${
-                usuarios[
+              {`${usuarios[
+                ventas.find((venta) => venta.id_venta === selectedVenta)
+                  ?.id_usuario || 0
+              ]?.nombre || ''
+                } ${usuarios[
                   ventas.find((venta) => venta.id_venta === selectedVenta)
                     ?.id_usuario ?? 0
                 ]?.apellido || ''
-              }`}
+                }`}
             </p>
             <p>
               <strong>Fecha:</strong>{' '}

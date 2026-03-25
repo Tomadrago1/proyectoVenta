@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/api';
 import { Producto } from '../interface/producto';
 import { Categoria } from '../interface/categoria';
 import { productoService } from '../services/productoService';
@@ -38,7 +38,7 @@ export const useProductos = () => {
 
     const fetchCategorias = async () => {
         try {
-            const response = await axios.get(`${API_URL}/categoria`);
+            const response = await api.get(`${API_URL}/categoria`);
             setCategorias(response.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -68,11 +68,11 @@ export const useProductos = () => {
 
         try {
             const url = `https://world.openfoodfacts.net/api/v2/product/${codigo}`;
-            const { data } = await axios.get<OFFResponse>(url, {
-                params: {
-                    fields: 'status,product_name,product_name_es,brands,product_quantity,product_quantity_unit',
-                },
+            const params = new URLSearchParams({
+                fields: 'status,product_name,product_name_es,brands,product_quantity,product_quantity_unit',
             });
+            const response = await fetch(`${url}?${params.toString()}`);
+            const data: OFFResponse = await response.json();
 
             if (data.status === 1 && data.product) {
                 const p = data.product;

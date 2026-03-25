@@ -5,16 +5,17 @@ import { RowDataPacket } from "mysql2";
 
 export class UsuarioRepository implements Repository<Usuario> {
 
-  public async findAll(): Promise<Usuario[] | undefined> {
-    const [usuarios] = await pool.query('SELECT * FROM usuarios');
+  public async findAll(idNegocio: number = 1): Promise<Usuario[] | undefined> {
+    const [usuarios] = await pool.query('SELECT * FROM usuarios WHERE id_negocio = ?', [idNegocio]);
     return usuarios as Usuario[];
   }
 
-  public async findOne(item: { id: string }): Promise<Usuario | undefined> {
+  public async findOne(item: { id: string; id_negocio?: string }): Promise<Usuario | undefined> {
     const id_usuario = Number.parseInt(item.id);
+    const idNegocio = Number.parseInt(item.id_negocio ?? '1');
     const [usuarios] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM usuarios WHERE id_usuario = ?',
-      [id_usuario]
+      'SELECT * FROM usuarios WHERE id_usuario = ? AND id_negocio = ?',
+      [id_usuario, idNegocio]
     );
     if (usuarios.length === 0) {
       return undefined;
@@ -25,8 +26,10 @@ export class UsuarioRepository implements Repository<Usuario> {
 
   public async save(item: Usuario): Promise<Usuario> {
     const [result] = (await pool.query(
-      'INSERT INTO usuarios (nombre, apellido, username, contrasena) VALUES (?, ?, ?, ?)',
+      'INSERT INTO usuarios (id_negocio, id_rol, nombre, apellido, username, contrasena) VALUES (?, ?, ?, ?, ?, ?)',
       [
+        item.id_negocio,
+        item.id_rol,
         item.nombre,
         item.apellido,
         item.username,
@@ -42,18 +45,21 @@ export class UsuarioRepository implements Repository<Usuario> {
   }
 
   public async update(
-    item: { id: string },
+    item: { id: string; id_negocio?: string },
     usuario: Usuario
   ): Promise<Usuario | undefined> {
     const id_usuario = Number.parseInt(item.id);
+    const idNegocio = Number.parseInt(item.id_negocio ?? '1');
     const [result] = (await pool.query(
-      'UPDATE usuarios SET nombre = ?, apellido = ?, username = ?, contrasena = ? WHERE id_usuario = ?',
+      'UPDATE usuarios SET id_rol = ?, nombre = ?, apellido = ?, username = ?, contrasena = ? WHERE id_usuario = ? AND id_negocio = ?',
       [
+        usuario.id_rol,
         usuario.nombre,
         usuario.apellido,
         usuario.username,
         usuario.contrasena,
-        id_usuario
+        id_usuario,
+        idNegocio,
       ]
     )) as RowDataPacket[];
     const affectedRows = (result as any).affectedRows;
@@ -64,11 +70,12 @@ export class UsuarioRepository implements Repository<Usuario> {
     }
   }
 
-  public async remove(item: { id: string }): Promise<void> {
+  public async remove(item: { id: string; id_negocio?: string }): Promise<void> {
     const id_usuario = Number.parseInt(item.id);
+    const idNegocio = Number.parseInt(item.id_negocio ?? '1');
     const [result] = (await pool.query(
-      'DELETE FROM usuarios WHERE id_usuario = ?',
-      [id_usuario]
+      'DELETE FROM usuarios WHERE id_usuario = ? AND id_negocio = ?',
+      [id_usuario, idNegocio]
     )) as RowDataPacket[];
     const affectedRows = (result as any).affectedRows;
     if (affectedRows === 0) {

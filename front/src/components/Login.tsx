@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
@@ -13,7 +13,7 @@ const Login: React.FC = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('/api/usuario/login', {
+      const response = await api.post('/usuario/login', {
         username,
         password,
       });
@@ -22,25 +22,20 @@ const Login: React.FC = () => {
         localStorage.setItem('token', token);
         navigate('/venta');
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          if (error.response.status === 401) {
-            setError('Usuario o contraseña incorrectos.');
-          } else {
-            setError('Error en el servidor, intente nuevamente.');
-          }
+    } catch (error: any) {
+      if (error?.response) {
+        if (error.response.status === 401) {
+          setError('Usuario o contraseña incorrectos.');
         } else {
-          setError('Error al conectar al servidor, intente nuevamente.');
+          setError('Error en el servidor, intente nuevamente.');
         }
-        console.error(
-          'Error en login:',
-          error.response ? error.response.data : error.message
-        );
+      } else if (error?.request) {
+        setError('Error al conectar al servidor, intente nuevamente.');
       } else {
-        console.error('Error en login:', error);
         setError('Error desconocido, intente nuevamente.');
       }
+
+      console.error('Error en login:', error?.response ? error.response.data : error?.message || error);
     }
   }
 

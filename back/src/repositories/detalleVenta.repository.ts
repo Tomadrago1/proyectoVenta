@@ -5,18 +5,19 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export class DetalleVentaRepository implements Repository<DetalleVenta> {
 
-  public async findAll(): Promise<DetalleVenta[] | undefined> {
-    const [detalles] = await pool.query('SELECT * FROM detalle_venta');
+  public async findAll(idNegocio: number = 1): Promise<DetalleVenta[] | undefined> {
+    const [detalles] = await pool.query('SELECT * FROM detalle_venta WHERE id_negocio = ?', [idNegocio]);
     return detalles as DetalleVenta[];
   }
 
-  public async findOne(item: { id_venta: string, id_producto: string }): Promise<DetalleVenta | undefined> {
+  public async findOne(item: { id_venta: string; id_producto: string; id_negocio?: string }): Promise<DetalleVenta | undefined> {
     const idVenta = Number.parseInt(item.id_venta);
     const idProducto = Number.parseInt(item.id_producto);
+    const idNegocio = Number.parseInt(item.id_negocio ?? '1');
 
     const [detalles] = (await pool.query<RowDataPacket[]>(
-      'SELECT * FROM detalle_venta WHERE id_venta = ? AND id_producto = ?',
-      [idVenta, idProducto]
+      'SELECT * FROM detalle_venta WHERE id_negocio = ? AND id_venta = ? AND id_producto = ?',
+      [idNegocio, idVenta, idProducto]
     )) as RowDataPacket[];
 
     if (detalles.length === 0) {
@@ -28,13 +29,13 @@ export class DetalleVentaRepository implements Repository<DetalleVenta> {
 
   public async save(item: DetalleVenta): Promise<DetalleVenta> {
     const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)',
-      [item.id_venta, item.id_producto, item.cantidad, item.precio_unitario]
+      'INSERT INTO detalle_venta (id_negocio, id_venta, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?, ?)',
+      [item.id_negocio, item.id_venta, item.id_producto, item.cantidad, item.precio_unitario]
     );
     if (result.affectedRows === 1) {
       const [newDetalle] = await pool.query<RowDataPacket[]>(
-        'SELECT * FROM detalle_venta WHERE id_venta = ? AND id_producto = ?',
-        [item.id_venta, item.id_producto]
+        'SELECT * FROM detalle_venta WHERE id_negocio = ? AND id_venta = ? AND id_producto = ?',
+        [item.id_negocio, item.id_venta, item.id_producto]
       );
       return newDetalle[0] as DetalleVenta;
     } else {
@@ -44,19 +45,23 @@ export class DetalleVentaRepository implements Repository<DetalleVenta> {
 
 
   // Actualizar un detalle de venta existente
-  public async update(item: { id_venta: string, id_producto: string }, detalle: DetalleVenta): Promise<DetalleVenta | undefined> {
+  public async update(
+    item: { id_venta: string; id_producto: string; id_negocio?: string },
+    detalle: DetalleVenta
+  ): Promise<DetalleVenta | undefined> {
     const idVenta = Number.parseInt(item.id_venta);
     const idProducto = Number.parseInt(item.id_producto);
+    const idNegocio = Number.parseInt(item.id_negocio ?? '1');
 
     const [result] = await pool.query<ResultSetHeader>(
-      'UPDATE detalle_venta SET cantidad = ?, precio_unitario = ? WHERE id_venta = ? AND id_producto = ?',
-      [detalle.cantidad, detalle.precio_unitario, idVenta, idProducto]
+      'UPDATE detalle_venta SET cantidad = ?, precio_unitario = ? WHERE id_negocio = ? AND id_venta = ? AND id_producto = ?',
+      [detalle.cantidad, detalle.precio_unitario, idNegocio, idVenta, idProducto]
     );
 
     if (result.affectedRows === 1) {
       const [updatedDetalle] = await pool.query<RowDataPacket[]>(
-        'SELECT * FROM detalle_venta WHERE id_venta = ? AND id_producto = ?',
-        [idVenta, idProducto]
+        'SELECT * FROM detalle_venta WHERE id_negocio = ? AND id_venta = ? AND id_producto = ?',
+        [idNegocio, idVenta, idProducto]
       );
       return updatedDetalle[0] as DetalleVenta;
     } else {
@@ -65,13 +70,14 @@ export class DetalleVentaRepository implements Repository<DetalleVenta> {
   }
 
   // Eliminar un detalle de venta
-  public async remove(item: { id_venta: string, id_producto: string }): Promise<void> {
+  public async remove(item: { id_venta: string; id_producto: string; id_negocio?: string }): Promise<void> {
     const idVenta = Number.parseInt(item.id_venta);
     const idProducto = Number.parseInt(item.id_producto);
+    const idNegocio = Number.parseInt(item.id_negocio ?? '1');
 
     const [result] = await pool.query<ResultSetHeader>(
-      'DELETE FROM detalle_venta WHERE id_venta = ? AND id_producto = ?',
-      [idVenta, idProducto]
+      'DELETE FROM detalle_venta WHERE id_negocio = ? AND id_venta = ? AND id_producto = ?',
+      [idNegocio, idVenta, idProducto]
     );
 
     if (result.affectedRows === 0) {
@@ -79,9 +85,13 @@ export class DetalleVentaRepository implements Repository<DetalleVenta> {
     }
   }
 
-  public async findByVenta(idVenta: string): Promise<DetalleVenta[] | undefined> {
+  public async findByVenta(idVenta: string, idNegocio: string = '1'): Promise<DetalleVenta[] | undefined> {
     const id = Number.parseInt(idVenta);
-    const [detalles] = await pool.query('SELECT * FROM detalle_venta WHERE id_venta = ?', [id]);
+    const idNegocioNum = Number.parseInt(idNegocio);
+    const [detalles] = await pool.query(
+      'SELECT * FROM detalle_venta WHERE id_negocio = ? AND id_venta = ?',
+      [idNegocioNum, id]
+    );
     return detalles as DetalleVenta[];
   }
 }

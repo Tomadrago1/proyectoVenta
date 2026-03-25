@@ -7,8 +7,11 @@ import {
   filterByDateRange,
 } from '../controllers/venta.controller';
 import { Router } from 'express';
+import { validateJWT } from '../utils/validateJwt';
 
 export const routerVenta = Router();
+
+routerVenta.use(validateJWT);
 
 routerVenta.get('/filtro/fechas', filterByDateRange);
 
