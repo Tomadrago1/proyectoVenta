@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPlus, faPen, faTrash,
-  faUsers, faBoxOpen, faTag, faChartLine,
+  faUsers, faBoxOpen, faTag, faChartLine, faReceipt
 } from '@fortawesome/free-solid-svg-icons';
 import { useEmpleados } from './useEmpleados';
 import EmpleadoCreateForm from './EmpleadoCreateForm';
@@ -10,15 +10,17 @@ import EmpleadoEditForm from './EmpleadoEditForm';
 import EmpleadoDeleteForm from './EmpleadoDeleteForm';
 import Producto from '../productos/Producto';
 import Categorias from '../categoria/Categoria';
+import Ventas from '../ventas/Ventas';
 import Estadistica from '../../shared/components/Estadistica';
 import './AdminPanel.css';
 
-type Tab = 'empleados' | 'productos' | 'categorias' | 'estadisticas';
+type Tab = 'empleados' | 'productos' | 'categorias' | 'estadisticas' | 'ventas';
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: 'empleados',    label: 'Empleados',    icon: faUsers      },
   { id: 'productos',    label: 'Productos',    icon: faBoxOpen    },
   { id: 'categorias',   label: 'Categorías',   icon: faTag        },
+  { id: 'ventas',       label: 'Ventas',       icon: faReceipt    },
   { id: 'estadisticas', label: 'Estadísticas', icon: faChartLine  },
 ];
 
@@ -189,6 +191,19 @@ const AdminPanel: React.FC = () => {
               </div>
             </div>
             <Categorias />
+          </div>
+        )}
+
+        {/* TAB: VENTAS */}
+        {activeTab === 'ventas' && (
+          <div className="admin-content-section">
+            <div className="admin-section-header">
+              <div>
+                <h1>Gestión de Ventas</h1>
+                <p className="admin-section-subtitle">Historial de ventas realizadas</p>
+              </div>
+            </div>
+            <Ventas />
           </div>
         )}
 

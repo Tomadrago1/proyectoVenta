@@ -1,18 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
 .header {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--pos-font-family);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 32px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: var(--pos-bg-surface);
+  border-bottom: 1px solid var(--pos-border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 a {
-  color: #1f2937 !important;
+  color: var(--pos-text-primary) !important;
   text-decoration: none !important;
 }
 
@@ -27,7 +28,7 @@ a {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  gap: 32px;
+  gap: 40px;
 }
 
 .nav ul li {
@@ -36,38 +37,41 @@ a {
 
 .nav ul li a {
   text-decoration: none;
-  color: #4b5563;
-  font-weight: 500;
+  color: var(--pos-text-secondary) !important;
+  font-weight: 600;
   font-size: 15px;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
   padding: 8px 0;
   border-bottom: 2px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .nav ul li a:hover {
-  color: #1f2937;
-  border-bottom-color: #1f2937;
+  color: var(--pos-primary-color) !important;
+  border-bottom-color: var(--pos-primary-color);
 }
 
 .user {
   display: flex;
   align-items: center;
   margin-left: auto;
-  padding-left: 15px;
-  font-weight: 500;
-  color: #4b5563;
+  padding-left: 16px;
+  font-weight: 600;
+  color: var(--pos-text-primary);
 }
 
 .user-icon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: 12px;
   object-fit: cover;
+  border: 2px solid var(--pos-border-color);
 }
 
 .user a:hover {
-  color: #1f2937 !important;
+  color: var(--pos-primary-hover) !important;
   cursor: pointer;
 }
 
@@ -78,19 +82,5 @@ a {
 @media (max-width: 992px) {
   .nav {
     display: none;
-  }
-
-  .navbar-toggler {
-    display: inline-block;
-  }
-
-  .offcanvas .navbar-nav .nav-link {
-    font-weight: 500;
-    color: #4b5563;
-    transition: color 0.2s;
-  }
-
-  .offcanvas .navbar-nav .nav-link:hover {
-    color: #1f2937;
   }
 }

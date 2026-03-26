@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colors */
+  --pos-bg-main: #f0f2f5;         /* Lightest gray for body */
+  --pos-bg-surface: #ffffff;      /* White for cards and panels */
+  
+  --pos-text-primary: #1e293b;    /* Slate 800 - dark, high contrast */
+  --pos-text-secondary: #475569;  /* Slate 600 - subtle text */
+  --pos-text-muted: #94a3b8;      /* Slate 400 - placeholders/disabled */
+  
+  --pos-primary-color: #2563eb;   /* Blue 600 - Main action color */
+  --pos-primary-hover: #1d4ed8;   /* Blue 700 - Hover state */
+  --pos-primary-light: #dbeafe;   /* Blue 100 - Selection/highlight */
+  
+  --pos-success-color: #10b981;   /* Emerald 500 - Sales, Money */
+  --pos-success-hover: #059669;   /* Emerald 600 */
+  
+  --pos-danger-color: #ef4444;    /* Red 500 - Delete/Error */
+  --pos-danger-hover: #dc2626;    /* Red 600 */
+  
+  --pos-warning-color: #f59e0b;   /* Amber 500 - Warning/Alerts */
+  
+  /* Borders & Shadows */
+  --pos-border-color: #e2e8f0;    /* Slate 200 */
+  --pos-border-focus: #cbd5e1;    /* Slate 300 */
+  
+  --pos-border-radius-sm: 4px;
+  --pos-border-radius-md: 6px;
+  --pos-border-radius-lg: 8px;
+  
+  --pos-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --pos-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --pos-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Typography */
+  --pos-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  font-family: var(--pos-font-family);
+  background-color: var(--pos-bg-main);
+  color: var(--pos-text-primary);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Common POS specific utilities */
+.pos-card {
+  background-color: var(--pos-bg-surface);
+  border: 1px solid var(--pos-border-color);
+  border-radius: var(--pos-border-radius-lg);
+  box-shadow: var(--pos-shadow-sm);
+}
+
+.pos-title {
+  color: var(--pos-text-primary);
+  font-weight: 600;
+  font-size: 1.25rem; /* 20px */
+}
+
+/* Scrollbar styling for a cleaner look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--pos-bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--pos-text-muted);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pos-text-secondary);
+}

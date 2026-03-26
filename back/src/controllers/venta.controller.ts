@@ -41,6 +41,7 @@ async function create(req: Request, res: Response) {
       new Date(req.body.fecha_venta),
       req.body.monto_extra
     );
+    console.log(venta)
     const result = await repository.save(venta);
     res.json(result);
   } catch (error: any) {

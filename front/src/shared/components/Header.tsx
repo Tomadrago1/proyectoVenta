@@ -31,7 +31,6 @@ const Header = () => {
           {isAdmin && (
             <>
               <li><Link to="/venta">Venta</Link></li>
-              <li><Link to="/ventas">Ventas</Link></li>
               <li><Link to="/admin">Panel Admin</Link></li>
             </>
           )}

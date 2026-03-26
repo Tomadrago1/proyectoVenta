@@ -111,7 +111,6 @@ async function login(req: Request, res: Response) {
           jwtSecret,
           { expiresIn: '1h' }
         );
-
         res.json({
           id_rol: usuario.id_rol,
           token
