@@ -14,41 +14,46 @@ const Header = () => {
 
   const isSuperadmin = user?.nombre_rol === 'Superadmin';
   const isAdmin = user?.nombre_rol === 'Administrador';
+  const isEmpleado = user?.nombre_rol === 'Empleado';
 
   return (
     <header className="header">
       <nav className="nav d-none d-lg-flex justify-content-center align-items-center">
         <ul>
-          {isSuperadmin ? (
+          {/* Superadmin: solo Panel Global */}
+          {isSuperadmin && (
             <li>
-              <Link to="/superadmin">Panel Superadmin</Link>
+              <Link to="/superadmin">Panel Global</Link>
             </li>
-          ) : (
+          )}
+
+          {/* Administrador: Venta, Ventas y Panel Admin (contiene productos/categorías/estadísticas) */}
+          {isAdmin && (
             <>
-              <li>
-                <Link to="/venta">Venta</Link>
-              </li>
-              <li>
-                <Link to="/productos">Productos</Link>
-              </li>
-              <li>
-                <Link to="/categorias">Categorias</Link>
-              </li>
-              <li>
-                <Link to="/ventas">Ventas</Link>
-              </li>
-              <li>
-                <Link to="/estadisticas">Estadisticas</Link>
-              </li>
-              {isAdmin && (
-                <li>
-                  <Link to="/admin">Panel Admin</Link>
-                </li>
-              )}
+              <li><Link to="/venta">Venta</Link></li>
+              <li><Link to="/ventas">Ventas</Link></li>
+              <li><Link to="/admin">Panel Admin</Link></li>
             </>
           )}
+
+          {/* Empleado: Venta, Ventas, Productos, Categorías — sin estadísticas */}
+          {isEmpleado && (
+            <>
+              <li><Link to="/venta">Venta</Link></li>
+              <li><Link to="/productos">Productos</Link></li>
+              <li><Link to="/categorias">Categorias</Link></li>
+              <li><Link to="/ventas">Ventas</Link></li>
+            </>
+          )}
+
           <li>
-            <button className="logout-button" onClick={handleLogout} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>Salir</button>
+            <button
+              className="logout-button"
+              onClick={handleLogout}
+              style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              Salir
+            </button>
           </li>
         </ul>
       </nav>

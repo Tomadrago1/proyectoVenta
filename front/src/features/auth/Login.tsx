@@ -20,7 +20,18 @@ const Login: React.FC = () => {
       if (response.status === 200) {
         const { token } = response.data;
         localStorage.setItem('token', token);
-        navigate('/venta');
+        console.log(response.data)
+        switch (response.data.id_rol) {
+          case 1:
+            navigate('/admin');
+            break;
+          case 2:
+            navigate('/venta');
+            break;
+          case 3:
+            navigate('/superadmin');
+            break;
+        }
       }
     } catch (error: any) {
       if (error?.response) {

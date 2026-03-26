@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Usuario } from '../auth/usuario.interface';
 import { empleadoService } from './empleadoService';
+import { getRol } from '../../shared/utils/rol';
 
 export const useEmpleados = () => {
     const [empleados, setEmpleados] = useState<Usuario[]>([]);
@@ -11,7 +12,11 @@ export const useEmpleados = () => {
         try {
             setLoading(true);
             const data = await empleadoService.getAll();
-            setEmpleados(data);
+            const dataWithRol = data.map((empleado: Usuario) => ({
+                ...empleado,
+                nombre_rol: getRol(empleado.id_rol)
+            }));
+            setEmpleados(dataWithRol);
             setError(null);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Error al obtener los empleados');

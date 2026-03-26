@@ -113,6 +113,7 @@ async function login(req: Request, res: Response) {
         );
 
         res.json({
+          id_rol: usuario.id_rol,
           token
         });
       } else {
