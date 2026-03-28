@@ -1,81 +1,98 @@
 import React from 'react';
-import ProductCrud from './components/productos/Producto';
 import { Route, Routes } from 'react-router-dom';
 
-import Header from './components/Header';
-import HelpButton from './components/HelpButton';
-import Login from './components/Login';
-import Venta from './components/Venta';
-import Ventas from './components/Ventas';
-import Producto from './components/productos/Producto';
-import Categoria from './components/Categoria';
-import Estadistica from './components/Estadistica';
-import Ayuda from './components/Ayuda';
+import Header from './shared/components/Header';
+import HelpButton from './shared/components/HelpButton';
+import Ayuda from './shared/components/Ayuda';
+
+import Login from './features/auth/Login';
+import ProtectedRoute from './features/auth/ProtectedRoute';
+
+import Producto from './features/productos/Producto';
+import VentaPage from './features/venta/Venta';
+import Ventas from './features/ventas/Ventas';
+import Categorias from './features/categoria/Categoria';
+
+import AdminPanel from './features/admin/AdminPanel';
+import SuperadminPanel from './features/superadmin/SuperadminPanel';
+import Unauthorized from './shared/components/Unauthorized';
+
+const EMPLEADO_ROLES = ['Administrador', 'Empleado'];
 
 const App: React.FC = () => {
   return (
     <>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              <Login />
-            </div>
-          }
-        />
+        {/* Ruta pública */}
+        <Route path="/" element={<Login />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
+        {/* Rutas de empleado y administrador — Superadmin no accede */}
         <Route
           path="/productos"
           element={
-            <div>
+            <ProtectedRoute requiredRoles={EMPLEADO_ROLES}>
               <Header />
               <Producto />
-            </div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/venta"
           element={
-            <div>
+            <ProtectedRoute requiredRoles={EMPLEADO_ROLES}>
               <Header />
-              <Venta />
-            </div>
+              <VentaPage />
+            </ProtectedRoute>
           }
         />
         <Route
           path="/ventas"
           element={
-            <div>
+            <ProtectedRoute requiredRoles={EMPLEADO_ROLES}>
               <Header />
               <Ventas />
-            </div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/categorias"
           element={
-            <div>
+            <ProtectedRoute requiredRoles={EMPLEADO_ROLES}>
               <Header />
-              <Categoria />
-            </div>
-          }
-        />
-        <Route
-          path="/estadisticas"
-          element={
-            <div>
-              <Header />
-              <Estadistica />
-            </div>
+              <Categorias />
+            </ProtectedRoute>
           }
         />
         <Route
           path="/ayuda"
           element={
-            <div>
+            <ProtectedRoute requiredRoles={EMPLEADO_ROLES}>
               <Header />
               <Ayuda />
-            </div>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Panel Admin — solo Administrador (incluye productos, categorías y estadísticas) */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requiredRoles={['Administrador']}>
+              <Header />
+              <AdminPanel />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Panel Superadmin — solo Superadmin */}
+        <Route
+          path="/superadmin"
+          element={
+            <ProtectedRoute requiredRoles={['Superadmin']}>
+              <Header />
+              <SuperadminPanel />
+            </ProtectedRoute>
           }
         />
       </Routes>

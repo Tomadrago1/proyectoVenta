@@ -8,10 +8,12 @@ exports.remove = remove;
 exports.findByName = findByName;
 const categoria_repository_1 = require("../repositories/categoria.repository");
 const categoria_model_1 = require("../models/categoria.model");
+const tenant_1 = require("../shared/tenant");
 const repository = new categoria_repository_1.CategoriaRepository();
 async function findAll(req, res) {
     try {
-        const categorias = await repository.findAll();
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const categorias = await repository.findAll(idNegocio);
         res.json(categorias);
     }
     catch (error) {
@@ -22,7 +24,8 @@ async function findAll(req, res) {
 async function findOne(req, res) {
     try {
         const { id } = req.params;
-        const categoria = await repository.findOne({ id });
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const categoria = await repository.findOne({ id, id_negocio: idNegocio.toString() });
         if (categoria) {
             res.json(categoria);
         }
@@ -37,9 +40,8 @@ async function findOne(req, res) {
 }
 async function create(req, res) {
     try {
-        console.log(req.body);
-        const categoria = new categoria_model_1.Categoria(req.body.id, req.body.nombre);
-        console.log(categoria);
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const categoria = new categoria_model_1.Categoria(req.body.id, idNegocio, req.body.nombre);
         const result = await repository.save(categoria);
         res.json(result);
     }
@@ -51,8 +53,9 @@ async function create(req, res) {
 async function update(req, res) {
     try {
         const { id } = req.params;
-        const categoria = new categoria_model_1.Categoria(parseInt(id), req.body.nombre);
-        const result = await repository.update({ id }, categoria);
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const categoria = new categoria_model_1.Categoria(parseInt(id), idNegocio, req.body.nombre);
+        const result = await repository.update({ id, id_negocio: idNegocio.toString() }, categoria);
         res.json(result);
     }
     catch (error) {
@@ -63,7 +66,8 @@ async function update(req, res) {
 async function remove(req, res) {
     try {
         const { id } = req.params;
-        await repository.remove({ id });
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        await repository.remove({ id, id_negocio: idNegocio.toString() });
         res.json({ message: 'Categoria eliminada' });
     }
     catch (error) {
@@ -74,7 +78,8 @@ async function remove(req, res) {
 async function findByName(req, res) {
     try {
         const { name } = req.params;
-        const categorias = await repository.findByName({ name });
+        const idNegocio = (0, tenant_1.resolveBusinessIdFromRequest)(req);
+        const categorias = await repository.findByName({ name, id_negocio: idNegocio.toString() });
         res.json(categorias);
     }
     catch (error) {

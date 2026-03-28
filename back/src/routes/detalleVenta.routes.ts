@@ -7,8 +7,11 @@ import {
   remove,
 } from '../controllers/detalleVenta.controller';
 import { Router } from 'express';
+import { validateJWT } from '../utils/validateJwt';
 
 export const routerDetalleVenta = Router();
+
+routerDetalleVenta.use(validateJWT);
 
 routerDetalleVenta.get('/', findAll);
 

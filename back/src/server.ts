@@ -1,18 +1,9 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { Server } from 'http';
 import path from 'path';
 import cors from 'cors';
 import session from 'express-session';
 import { pool } from './shared/conn';
-
-const app = express();
-const port = Number(process.env.PORT ?? 3000);
-
-app.use(express.json());
-
-app.use(cors({
-  origin: 'http://localhost:8080',
-}));
 
 import { routerProducto } from './routes/producto.routes';
 import { routerUsuario } from './routes/usuario.routes';
@@ -20,15 +11,40 @@ import { routerVenta } from './routes/venta.routes';
 import { routerDetalleVenta } from './routes/detalleVenta.routes';
 import { routerCategoria } from './routes/categoria.routes';
 import { routerImpresora } from './routes/impresora.routes';
+import { routerNegocio } from './routes/negocio.routes';
+import { routerDetalleVentaGenerico } from './routes/detalleVentaGenerico.routes';
+import { routerRol } from './routes/rol.routes';
+
+const app = express();
+const port = Number(process.env.PORT ?? 3000);
+
+app.use(express.json());
+
+const allowedOrigins = ['http://localhost:8080', `${process.env.LOCALHOST}:8080`];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+}));
 
 app.use(
   session({
-    secret: 'juamaqbrujan',
+    secret: process.env.APP_SECRET || 'default-secret-key',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false },
   })
 );
+
+app.use(express.static(path.join(__dirname, 'dist')));
+
+app.get('/api', (req: Request, res: Response) => {
+  res.json({ message: "API funcionando correctamente." });
+});
 
 app.use('/api/producto', routerProducto);
 app.use('/api/usuario', routerUsuario);
@@ -36,19 +52,17 @@ app.use('/api/venta', routerVenta);
 app.use('/api/detalle-venta', routerDetalleVenta);
 app.use('/api/categoria', routerCategoria);
 app.use('/api/impresora', routerImpresora);
+app.use('/api/detalle-venta-generico', routerDetalleVentaGenerico);
+app.use('/api/negocio', routerNegocio);
+app.use('/api/rol', routerRol);
 
-app.use(express.static(path.join(__dirname, 'dist')));
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('¡Hola Mundo! El servidor Express está corriendo en el puerto 3000.');
-});
-
-app.get('/api', (req: Request, res: Response) => {
-  res.json({ message: "API funcionando correctamente." });
-});
-
-app.get('/home', (req: Request, res: Response) => {
+app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Algo salió mal en el servidor' });
 });
 
 const setupGracefulShutdown = (server: Server) => {
@@ -58,7 +72,7 @@ const setupGracefulShutdown = (server: Server) => {
     if (isShuttingDown) return;
     isShuttingDown = true;
 
-    console.log(`Recibida senal ${signal}. Cerrando servidor...`);
+    console.log(`Recibida señal ${signal}. Cerrando servidor...`);
 
     server.close(async () => {
       try {
@@ -77,22 +91,19 @@ const setupGracefulShutdown = (server: Server) => {
     }, 10000).unref();
   };
 
-  process.on('SIGINT', () => {
-    void shutdown('SIGINT');
-  });
-
-  process.on('SIGTERM', () => {
-    void shutdown('SIGTERM');
-  });
+  process.on('SIGINT', () => { void shutdown('SIGINT'); });
+  process.on('SIGTERM', () => { void shutdown('SIGTERM'); });
 };
 
 const bootstrap = async () => {
   try {
     await pool.query('SELECT 1');
-    console.log('Conexion a base de datos verificada.');
+    console.log('Conexión a base de datos verificada.');
 
-    const server = app.listen(port, () => {
-      console.log(`Servidor Express corriendo en http://localhost:${port}`);
+    const server = app.listen(port, '0.0.0.0', () => {
+      console.log(`Servidor Express corriendo en el puerto ${port}`);
+      console.log(`- Local: http://localhost:${port}`);
+      console.log(`- Red Local: ${process.env.LOCALHOST}:${port}`);
     });
 
     setupGracefulShutdown(server);

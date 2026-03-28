@@ -3,12 +3,14 @@ import { UsuarioRepository } from '../repositories/usuario.repository';
 import { Usuario } from '../models/usuario.model';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { resolveBusinessIdFromRequest } from '../shared/tenant';
 
 const repository = new UsuarioRepository();
 
 async function findAll(req: Request, res: Response) {
   try {
-    const usuarios = await repository.findAll();
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const usuarios = await repository.findAll(idNegocio);
     res.json(usuarios);
   } catch (error: any) {
     res.status(500).json({ message: 'Error al obtener los usuarios', errorMessage: error.message });
@@ -18,7 +20,8 @@ async function findAll(req: Request, res: Response) {
 async function findOne(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
-    const usuario = await repository.findOne({ id: id.toString() });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const usuario = await repository.findOne({ id: id.toString(), id_negocio: idNegocio.toString() });
     if (usuario) {
       res.json(usuario);
     } else {
@@ -31,6 +34,7 @@ async function findOne(req: Request, res: Response) {
 
 async function create(req: Request, res: Response) {
   try {
+    const idNegocio = resolveBusinessIdFromRequest(req);
     const { contrasena, ...rest } = req.body;
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
@@ -39,7 +43,9 @@ async function create(req: Request, res: Response) {
       rest.nombre,
       rest.apellido,
       rest.username,
-      hashedPassword
+      hashedPassword,
+      rest.id_rol,
+      idNegocio
     );
     const result = await repository.save(usuario);
     res.json(result);
@@ -51,6 +57,7 @@ async function create(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const { id } = req.params;
+    const idNegocio = resolveBusinessIdFromRequest(req);
     let { contrasena } = req.body;
 
     if (!contrasena.startsWith('$2b$')) {
@@ -62,10 +69,12 @@ async function update(req: Request, res: Response) {
       req.body.nombre,
       req.body.apellido,
       req.body.username,
-      contrasena
+      contrasena,
+      req.body.id_rol,
+      idNegocio
     );
 
-    const result = await repository.update({ id: id }, usuarioActualizado);
+    const result = await repository.update({ id: id, id_negocio: idNegocio.toString() }, usuarioActualizado);
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ message: 'Error al actualizar el usuario', errorMessage: error.message });
@@ -75,7 +84,8 @@ async function update(req: Request, res: Response) {
 async function remove(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    await repository.remove({ id: id });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    await repository.remove({ id: id, id_negocio: idNegocio.toString() });
     res.json({ message: 'Usuario eliminado' });
   } catch (error: any) {
     res.status(500).json({ message: 'Error al eliminar el usuario', errorMessage: error.message });
@@ -97,12 +107,12 @@ async function login(req: Request, res: Response) {
         }
 
         const token = jwt.sign(
-          { id_usuario: usuario.id_usuario, username: usuario.username },
+          { id_usuario: usuario.id_usuario, username: usuario.username, id_negocio: usuario.id_negocio, nombre_rol: usuario.nombre_rol },
           jwtSecret,
           { expiresIn: '1h' }
         );
-
         res.json({
+          id_rol: usuario.id_rol,
           token
         });
       } else {

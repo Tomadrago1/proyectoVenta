@@ -1,5 +1,6 @@
 export class DetalleVenta {
   constructor(
+    public id_negocio: number,
     public id_producto: number,
     public id_venta: number,
     public cantidad: number,

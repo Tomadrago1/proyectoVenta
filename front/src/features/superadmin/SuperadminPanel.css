@@ -1,0 +1,182 @@
+.container_superadmin {
+  padding: 32px;
+  max-width: 1400px;
+  margin: 32px auto;
+  background-color: var(--pos-bg-surface);
+  border: 1px solid var(--pos-border-color);
+  box-shadow: var(--pos-shadow-md);
+  border-radius: var(--pos-border-radius-lg);
+  min-height: calc(100vh - 120px);
+}
+
+.container_superadmin h1 {
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: var(--pos-text-primary);
+  font-size: 26px;
+  font-weight: 700;
+  border-bottom: 2px solid var(--pos-bg-main);
+  padding-bottom: 16px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.action-buttons button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--pos-border-radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: var(--pos-shadow-sm);
+}
+
+.create-button { background-color: var(--pos-primary-color); }
+.update-button { background-color: var(--pos-warning-color); color: #ffffff !important; }
+.delete-button { background-color: var(--pos-danger-color); }
+
+.create-button:hover { background-color: var(--pos-primary-hover); transform: translateY(-1px); }
+.update-button:hover { background-color: #d97706; transform: translateY(-1px); }
+.delete-button:hover { background-color: var(--pos-danger-hover); transform: translateY(-1px); }
+
+.negocios-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 32px;
+  background-color: var(--pos-bg-surface);
+  border: 1px solid var(--pos-border-color);
+  border-radius: var(--pos-border-radius-md);
+  box-shadow: var(--pos-shadow-sm);
+  overflow: hidden;
+}
+
+.negocios-table th, .negocios-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--pos-border-color);
+  font-size: 15px;
+  vertical-align: middle;
+}
+
+.negocios-table th {
+  background-color: var(--pos-bg-main);
+  font-weight: 600;
+  color: var(--pos-text-secondary);
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--pos-border-color);
+}
+
+.negocios-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+.negocios-table tbody tr:hover {
+  background-color: var(--pos-bg-main);
+}
+.negocios-table td {
+  color: var(--pos-text-primary);
+}
+
+.modal-form {
+  background: var(--pos-bg-main);
+  padding: 32px;
+  border-radius: var(--pos-border-radius-lg);
+  box-shadow: var(--pos-shadow-lg);
+  max-width: 500px;
+  margin: 32px auto;
+  border: 1px solid var(--pos-border-color);
+}
+
+.modal-form h2 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: var(--pos-text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  border-bottom: 2px solid var(--pos-bg-surface);
+  padding-bottom: 16px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--pos-text-secondary);
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--pos-border-color);
+  border-radius: var(--pos-border-radius-md);
+  font-size: 15px;
+  background-color: var(--pos-bg-surface);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+.form-group input:focus {
+  outline: none;
+  border-color: var(--pos-primary-color);
+  box-shadow: 0 0 0 3px var(--pos-primary-light);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.form-actions button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--pos-border-radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  box-shadow: var(--pos-shadow-sm);
+}
+.form-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background-color: var(--pos-primary-color);
+  color: white;
+}
+.btn-primary:hover {
+  background-color: var(--pos-primary-hover);
+}
+.btn-secondary {
+  background-color: var(--pos-text-secondary);
+  color: white;
+}
+.btn-secondary:hover {
+  background-color: var(--pos-text-primary);
+}
+.btn-danger {
+  background-color: var(--pos-danger-color);
+  color: white;
+}
+.btn-danger:hover {
+  background-color: var(--pos-danger-hover);
+}

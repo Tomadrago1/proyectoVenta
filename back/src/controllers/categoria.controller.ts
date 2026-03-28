@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import { CategoriaRepository } from '../repositories/categoria.repository';
 import { Categoria } from '../models/categoria.model';
+import { resolveBusinessIdFromRequest } from '../shared/tenant';
 
 const repository = new CategoriaRepository();
 
 async function findAll(req: Request, res: Response) {
   try {
-    const categorias = await repository.findAll();
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const categorias = await repository.findAll(idNegocio);
     res.json(categorias);
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
@@ -17,7 +19,8 @@ async function findAll(req: Request, res: Response) {
 async function findOne(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const categoria = await repository.findOne({ id });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const categoria = await repository.findOne({ id, id_negocio: idNegocio.toString() });
     if (categoria) {
       res.json(categoria);
     } else {
@@ -31,12 +34,12 @@ async function findOne(req: Request, res: Response) {
 
 async function create(req: Request, res: Response) {
   try {
-    console.log(req.body);
+    const idNegocio = resolveBusinessIdFromRequest(req);
     const categoria = new Categoria(
       req.body.id,
+      idNegocio,
       req.body.nombre
     );
-    console.log(categoria);
     const result = await repository.save(categoria);
     res.json(result);
   } catch (error: any) {
@@ -48,12 +51,14 @@ async function create(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const { id } = req.params;
+    const idNegocio = resolveBusinessIdFromRequest(req);
     const categoria = new Categoria(
       parseInt(id),
+      idNegocio,
       req.body.nombre
     );
 
-    const result = await repository.update({ id }, categoria);
+    const result = await repository.update({ id, id_negocio: idNegocio.toString() }, categoria);
     res.json(result);
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
@@ -64,7 +69,8 @@ async function update(req: Request, res: Response) {
 async function remove(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    await repository.remove({ id });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    await repository.remove({ id, id_negocio: idNegocio.toString() });
     res.json({ message: 'Categoria eliminada' });
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
@@ -75,7 +81,8 @@ async function remove(req: Request, res: Response) {
 async function findByName(req: Request, res: Response) {
   try {
     const { name } = req.params;
-    const categorias = await repository.findByName({ name });
+    const idNegocio = resolveBusinessIdFromRequest(req);
+    const categorias = await repository.findByName({ name, id_negocio: idNegocio.toString() });
     res.json(categorias);
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
