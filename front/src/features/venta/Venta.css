@@ -162,38 +162,69 @@
 
 /* Botones */
 .venta-botones {
-  margin-top: 24px;
+  margin-top: 32px;
   display: flex;
   justify-content: flex-end;
   gap: 16px;
+  border-top: 1px solid var(--pos-border-color);
+  padding-top: 24px;
 }
 
 .venta-botones button {
   font-family: var(--pos-font-family);
   padding: 14px 28px;
-  background-color: var(--pos-success-color);
-  color: #ffffff;
   border: none;
   border-radius: var(--pos-border-radius-md);
   cursor: pointer;
   font-size: 16px;
-  font-weight: 600;
-  transition: all 0.2s;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--pos-shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.venta-botones button:hover {
+.venta-botones button b {
+  font-size: 12px;
+  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+.btn-success {
+  background-color: var(--pos-success-color);
+  color: #ffffff;
+}
+
+.btn-success:hover {
   background-color: var(--pos-success-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: var(--pos-shadow-md);
 }
 
-.venta-botones button:first-child {
+.btn-secondary {
   background-color: var(--pos-text-secondary);
+  color: #ffffff;
 }
 
-.venta-botones button:first-child:hover {
+.btn-secondary:hover {
   background-color: var(--pos-text-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--pos-shadow-md);
+}
+
+.btn-danger {
+  background-color: var(--pos-danger-color);
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: var(--pos-danger-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--pos-shadow-md);
 }
 
 /* Modals */

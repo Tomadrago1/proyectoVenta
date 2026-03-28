@@ -10,6 +10,9 @@ async function imprimir_ticket(req: Request, res: Response): Promise<void> {
     const { id_venta, fecha, total, genericos } = req.body;
     try {
         const printer = await openDevice();
+        if (!printer) {
+            throw new Error('No se pudo encontrar la impresora USB');
+        }
         const rawPrinter = printer as any;
         const detalles = await obtenerDetallesConProductos(id_venta, idNegocio);
         

@@ -29,7 +29,8 @@ async function findOne(req: Request, res: Response) {
 
 async function create(req: Request, res: Response) {
   try {
-    const negocio = new Negocio(0, req.body.nombre_negocio);
+    const { nombre_negocio, ciudad, direccion, telefono } = req.body;
+    const negocio = new Negocio(0, nombre_negocio, ciudad, direccion, telefono);
     const result = await repository.save(negocio);
     res.status(201).json(result);
   } catch (error: any) {
@@ -40,7 +41,8 @@ async function create(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
-    const negocio = new Negocio(id, req.body.nombre_negocio);
+    const { nombre_negocio, ciudad, direccion, telefono } = req.body;
+    const negocio = new Negocio(id, nombre_negocio, ciudad, direccion, telefono);
     const result = await repository.update(id, negocio);
     res.json(result);
   } catch (error: any) {

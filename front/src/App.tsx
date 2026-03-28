@@ -17,11 +17,14 @@ import AdminPanel from './features/admin/AdminPanel';
 import SuperadminPanel from './features/superadmin/SuperadminPanel';
 import Unauthorized from './shared/components/Unauthorized';
 
+import { Toaster } from 'react-hot-toast';
+
 const EMPLEADO_ROLES = ['Administrador', 'Empleado'];
 
 const App: React.FC = () => {
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         {/* Ruta pública */}
         <Route path="/" element={<Login />} />

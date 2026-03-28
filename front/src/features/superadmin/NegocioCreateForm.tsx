@@ -8,6 +8,9 @@ interface Props {
 
 const NegocioCreateForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
     const [nombreNegocio, setNombreNegocio] = useState('');
+    const [ciudad, setCiudad] = useState('');
+    const [direccion, setDireccion] = useState('');
+    const [telefono, setTelefono] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -15,7 +18,12 @@ const NegocioCreateForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
         e.preventDefault();
         try {
             setLoading(true);
-            await negocioService.create({ nombre_negocio: nombreNegocio });
+            await negocioService.create({ 
+                nombre_negocio: nombreNegocio,
+                ciudad,
+                direccion,
+                telefono
+            });
             onSuccess();
         } catch (err: any) {
             setError(err.response?.data?.message || 'Error al registrar el negocio');
@@ -37,6 +45,36 @@ const NegocioCreateForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
                         onChange={(e) => setNombreNegocio(e.target.value)} 
                         required 
                         maxLength={100}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Ciudad:</label>
+                    <input 
+                        type="text" 
+                        value={ciudad} 
+                        onChange={(e) => setCiudad(e.target.value)} 
+                        required 
+                        maxLength={100}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Dirección:</label>
+                    <input 
+                        type="text" 
+                        value={direccion} 
+                        onChange={(e) => setDireccion(e.target.value)} 
+                        required 
+                        maxLength={100}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Teléfono:</label>
+                    <input 
+                        type="text" 
+                        value={telefono} 
+                        onChange={(e) => setTelefono(e.target.value)} 
+                        required 
+                        maxLength={20}
                     />
                 </div>
                 <div className="form-actions">

@@ -9,6 +9,9 @@ interface Props {
 
 const NegocioEditForm: React.FC<Props> = ({ negocioId, onSuccess, onCancel }) => {
     const [nombreNegocio, setNombreNegocio] = useState('');
+    const [ciudad, setCiudad] = useState('');
+    const [direccion, setDireccion] = useState('');
+    const [telefono, setTelefono] = useState('');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -19,6 +22,9 @@ const NegocioEditForm: React.FC<Props> = ({ negocioId, onSuccess, onCancel }) =>
                 setLoading(true);
                 const neg = await negocioService.getById(negocioId);
                 setNombreNegocio(neg.nombre_negocio);
+                setCiudad(neg.ciudad || '');
+                setDireccion(neg.direccion || '');
+                setTelefono(neg.telefono || '');
             } catch (err: any) {
                 setError(err.response?.data?.message || 'Error al cargar el negocio');
             } finally {
@@ -32,7 +38,12 @@ const NegocioEditForm: React.FC<Props> = ({ negocioId, onSuccess, onCancel }) =>
         e.preventDefault();
         try {
             setSaving(true);
-            await negocioService.update(negocioId, { nombre_negocio: nombreNegocio });
+            await negocioService.update(negocioId, { 
+                nombre_negocio: nombreNegocio,
+                ciudad,
+                direccion,
+                telefono
+            });
             onSuccess();
         } catch (err: any) {
             setError(err.response?.data?.message || 'Error al actualizar el negocio');
@@ -56,6 +67,36 @@ const NegocioEditForm: React.FC<Props> = ({ negocioId, onSuccess, onCancel }) =>
                         onChange={(e) => setNombreNegocio(e.target.value)} 
                         required 
                         maxLength={100}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Ciudad:</label>
+                    <input 
+                        type="text" 
+                        value={ciudad} 
+                        onChange={(e) => setCiudad(e.target.value)} 
+                        required 
+                        maxLength={100}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Dirección:</label>
+                    <input 
+                        type="text" 
+                        value={direccion} 
+                        onChange={(e) => setDireccion(e.target.value)} 
+                        required 
+                        maxLength={100}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Teléfono:</label>
+                    <input 
+                        type="text" 
+                        value={telefono} 
+                        onChange={(e) => setTelefono(e.target.value)} 
+                        required 
+                        maxLength={20}
                     />
                 </div>
                 <div className="form-actions">

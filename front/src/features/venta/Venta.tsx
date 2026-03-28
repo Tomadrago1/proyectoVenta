@@ -4,11 +4,11 @@ import { Venta } from './venta.interface';
 import './Venta.css';
 import { guardarVenta } from './ventaService';
 import { buscarProductoPorCodigo } from '../productos/searchByBarcode';
+import toast from 'react-hot-toast';
 
 const VentaPage: React.FC = () => {
   const [detalles, setDetalles] = useState<DetalleVenta[]>([]);
   const [total, setTotal] = useState<number>(0);
-  const [monto_extra, setMontoExtra] = useState<number>(0);
   const [codigoBarras, setCodigoBarras] = useState<string>('');
   const [nombresProductos, setNombresProductos] = useState<
     Record<number, string>
@@ -20,6 +20,7 @@ const VentaPage: React.FC = () => {
     total: 0
   });
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [nuevoMontoExtra, setNuevoMontoExtra] = useState<number>(0);
 
   useEffect(() => {
@@ -75,6 +76,14 @@ const VentaPage: React.FC = () => {
         );
         setCodigoBarras('');
       }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const firstInput = document.querySelector('.venta-tabla tbody tr:first-child input[type="number"]') as HTMLInputElement;
+      if (firstInput) firstInput.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const lastInput = document.querySelector('.venta-tabla tbody tr:last-child input[type="number"]') as HTMLInputElement;
+      if (lastInput) lastInput.focus();
     }
   };
 
@@ -93,7 +102,7 @@ const VentaPage: React.FC = () => {
   const handleGuardarVenta = () => {
     try {
       if (total <= 0) {
-        alert('El total de la venta debe ser mayor a 0');
+        toast.error('El total de la venta debe ser mayor a 0');
         return;
       }
       console.log(detalles);
@@ -105,7 +114,6 @@ const VentaPage: React.FC = () => {
         total: 0
       });
       setDetalles([]);
-      setMontoExtra(0);
       setTotal(0);
       setNombresProductos({});
       localStorage.removeItem('ventaActual');
@@ -139,12 +147,40 @@ const VentaPage: React.FC = () => {
   };
 
   const cancelarVenta = () => {
-    if (window.confirm('¿Está seguro de que desea cancelar la venta?')) {
-      setDetalles([]);
-      setMontoExtra(0);
-      localStorage.removeItem('ventaActual');
-    }
+    setDetalles([]);
+    localStorage.removeItem('ventaActual');
+    setShowConfirm(false);
+    toast.success('Venta cancelada correctamente');
   };
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (showModal || showConfirm) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          setShowModal(false);
+          setShowConfirm(false);
+        }
+        return;
+      }
+
+      if (e.key === 'F12') {
+        e.preventDefault();
+        handleGuardarVenta();
+      } else if (e.key === 'F4' || e.key === 'Escape') {
+        e.preventDefault();
+        if (detalles.length > 0) {
+          setShowConfirm(true);
+        }
+      } else if (e.key === 'F2') {
+        e.preventDefault();
+        addExtraAmount();
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [detalles, total, venta, showModal, handleGuardarVenta, cancelarVenta, addExtraAmount]);
 
   return (
     <div className="venta-container">
@@ -196,6 +232,13 @@ const VentaPage: React.FC = () => {
                       setDetalles(nuevosDetalles);
                     }
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const mainInput = document.querySelector('.venta-codigo input[type="text"]') as HTMLInputElement;
+                      if (mainInput) mainInput.focus();
+                    }
+                  }}
                   step={1}
                   min={0}
                 />
@@ -215,9 +258,15 @@ const VentaPage: React.FC = () => {
         <h2>Total: {total.toFixed(0)}</h2>
       </div>
       <div className="venta-botones">
-        <button onClick={handleGuardarVenta}>Guardar Venta</button>
-        <button onClick={addExtraAmount}>Agregar producto generico</button>
-        <button onClick={cancelarVenta}>Cancelar venta</button>
+        <button className="btn-success" onClick={handleGuardarVenta}>
+          Finalizar y Cobrar <b>[F12]</b>
+        </button>
+        <button className="btn-secondary" onClick={addExtraAmount}>
+          Producto genérico <b>[F2]</b>
+        </button>
+        <button className="btn-danger" onClick={() => setShowConfirm(true)}>
+          Cancelar venta <b>[Esc]</b>
+        </button>
       </div>
       {showModal && (
         <div className="modal">
@@ -229,10 +278,26 @@ const VentaPage: React.FC = () => {
               onChange={(e) => setNuevoMontoExtra(parseFloat(e.target.value))}
               min="0"
               placeholder="Monto extra (precio unitario)"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleMontoExtraSubmit();
+              }}
             />
             <div className="modal-buttons">
               <button onClick={handleMontoExtraSubmit}>Aceptar</button>
               <button onClick={() => setShowModal(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showConfirm && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>¿Cancelar Venta?</h3>
+            <p>Se borrarán todos los productos de la lista actual.</p>
+            <div className="modal-buttons">
+              <button className="btn-danger" onClick={cancelarVenta}>Confirmar Cancelación</button>
+              <button className="btn-secondary" onClick={() => setShowConfirm(false)}>Seguir Vendiendo</button>
             </div>
           </div>
         </div>
