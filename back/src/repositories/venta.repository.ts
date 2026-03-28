@@ -28,8 +28,8 @@ export class VentaRepository implements Repository<Venta> {
   public async save(item: Venta): Promise<Venta> {
     // Realiza la inserción de la venta
     const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO ventas (id_negocio, id_usuario, fecha_venta, total, monto_extra) VALUES (?, ?, ?, ?, ?)',
-      [item.id_negocio, item.id_usuario, item.fecha_venta, item.total, item.monto_extra]
+      'INSERT INTO ventas (id_negocio, id_usuario, fecha_venta, total) VALUES (?, ?, ?, ?)',
+      [item.id_negocio, item.id_usuario, item.fecha_venta, item.total]
     );
     const insertId = (result as any).insertId;
     if (insertId) {
@@ -49,8 +49,8 @@ export class VentaRepository implements Repository<Venta> {
     const idNegocio = Number.parseInt(item.id_negocio ?? '1');
 
     const [result] = await pool.query<ResultSetHeader>(
-      'UPDATE ventas SET id_usuario = ?, fecha_venta = ?, total = ?, monto_extra= ? WHERE id_negocio = ? AND id_venta = ?',
-      [venta.id_usuario, venta.fecha_venta, venta.total, venta.monto_extra, idNegocio, id]
+      'UPDATE ventas SET id_usuario = ?, fecha_venta = ?, total = ? WHERE id_negocio = ? AND id_venta = ?',
+      [venta.id_usuario, venta.fecha_venta, venta.total, idNegocio, id]
     );
 
     if (result.affectedRows === 1) {

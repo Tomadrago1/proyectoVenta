@@ -12,6 +12,7 @@ import { routerDetalleVenta } from './routes/detalleVenta.routes';
 import { routerCategoria } from './routes/categoria.routes';
 import { routerImpresora } from './routes/impresora.routes';
 import { routerNegocio } from './routes/negocio.routes';
+import { routerDetalleVentaGenerico } from './routes/detalleVentaGenerico.routes';
 import { routerRol } from './routes/rol.routes';
 
 const app = express();
@@ -51,6 +52,7 @@ app.use('/api/venta', routerVenta);
 app.use('/api/detalle-venta', routerDetalleVenta);
 app.use('/api/categoria', routerCategoria);
 app.use('/api/impresora', routerImpresora);
+app.use('/api/detalle-venta-generico', routerDetalleVentaGenerico);
 app.use('/api/negocio', routerNegocio);
 app.use('/api/rol', routerRol);
 

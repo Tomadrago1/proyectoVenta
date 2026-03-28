@@ -7,11 +7,22 @@ import { resolveBusinessIdFromRequest } from '../shared/tenant';
 
 async function imprimir_ticket(req: Request, res: Response): Promise<void> {
     const idNegocio = resolveBusinessIdFromRequest(req);
-    const { id_venta, fecha, total } = req.body;
+    const { id_venta, fecha, total, genericos } = req.body;
     try {
         const printer = await openDevice();
         const rawPrinter = printer as any;
         const detalles = await obtenerDetallesConProductos(id_venta, idNegocio);
+        
+        if (genericos && Array.isArray(genericos)) {
+            genericos.forEach((gen: any) => {
+                detalles.push({
+                    cantidad: gen.cantidad,
+                    precio_unitario: Number(gen.precio_unitario),
+                    nombre_producto: 'Producto Genérico'
+                });
+            });
+        }
+
         const negocio = await obtenerNegocio(idNegocio);
         const imprimirTicket = await ejecutarImpresion(rawPrinter, detalles, negocio, fecha, total);
         res.status(200).json({ message: 'Ticket impreso exitosamente.' });

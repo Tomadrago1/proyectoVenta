@@ -38,8 +38,7 @@ async function create(req: Request, res: Response) {
       res?.locals?.user?.id_usuario,
       null,
       req.body.total,
-      new Date(req.body.fecha_venta),
-      req.body.monto_extra
+      new Date(req.body.fecha_venta)
     );
     const result = await repository.save(venta);
     res.json(result);
@@ -57,8 +56,7 @@ async function update(req: Request, res: Response) {
       req.body.id_usuario,
       parseInt(id),
       req.body.total,
-      new Date(req.body.fecha_venta),
-      req.body.monto_extra
+      new Date(req.body.fecha_venta)
     );
 
     const result = await repository.update({ id, id_negocio: idNegocio.toString() }, venta);

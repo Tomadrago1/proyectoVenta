@@ -27,14 +27,15 @@ export function crearContenidoTicket(detalles: DetalleTicket[]): string {
     return lineas.join("\n");
 }
 
-export function formatearLineaTotal(total: number): string {
+export function formatearLineaTotal(total: any): string {
+    const numTotal = Number(total);
     const lineaTotal = `TOTAL:`;
-    const totalString = `$${total.toFixed(0)}`;
+    const totalString = `$${numTotal.toFixed(0)}`;
     const espacioParaTotal = MAX_COLUMNAS - lineaTotal.length - totalString.length;
     return lineaTotal + " ".repeat(Math.max(0, espacioParaTotal)) + totalString;
 }
 
-export const ejecutarImpresion = (printer: any, detalles: DetalleTicket[], negocio: Negocio, fecha: string, total: number): Promise<void> => {
+export const ejecutarImpresion = (printer: any, detalles: DetalleTicket[], negocio: Negocio, fecha: string, total: any): Promise<void> => {
     return new Promise((resolve, reject) => {
         const rawPrinter = printer as any;
         

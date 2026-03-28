@@ -85,9 +85,7 @@ CREATE TABLE ventas (
   id_usuario INT NOT NULL,
   fecha_venta DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   total DECIMAL(10, 2) NOT NULL,
-  monto_extra DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
   CONSTRAINT chk_ventas_total CHECK (total >= 0),
-  CONSTRAINT chk_ventas_monto_extra CHECK (monto_extra >= 0),
   UNIQUE KEY uk_ventas_negocio_idventa (id_negocio, id_venta),
   KEY idx_ventas_negocio_fecha (id_negocio, fecha_venta),
   CONSTRAINT fk_ventas_negocio FOREIGN KEY (id_negocio) REFERENCES negocios(id_negocio) ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -107,6 +105,17 @@ CREATE TABLE detalle_venta (
   CONSTRAINT fk_detalle_venta_mismo_negocio FOREIGN KEY (id_negocio, id_venta) REFERENCES ventas(id_negocio, id_venta) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT fk_detalle_producto_mismo_negocio FOREIGN KEY (id_negocio, id_producto) REFERENCES productos(id_negocio, id_producto) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE = InnoDB;
+
+CREATE TABLE detalle_venta_generico (
+  id_detalle_generico INT AUTO_INCREMENT PRIMARY KEY,
+  id_negocio INT NOT NULL,
+  id_venta INT NOT NULL,
+  cantidad DECIMAL(10,3) NOT NULL DEFAULT 1,
+  precio_unitario DECIMAL(10,2) NOT NULL,
+  descripcion VARCHAR(100) DEFAULT 'Producto Genérico', -- ¡Para futuros nombres custom!
+  CONSTRAINT fk_generico_venta FOREIGN KEY (id_negocio, id_venta) REFERENCES ventas(id_negocio, id_venta) ON DELETE CASCADE
+);
+
 
 -- 6. DATOS DE PRUEBA
 

@@ -17,8 +17,7 @@ const VentaPage: React.FC = () => {
     id_venta: 0,
     id_usuario: null,
     fecha_venta: new Date().toISOString(),
-    total: 0,
-    monto_extra: 0,
+    total: 0
   });
   const [showModal, setShowModal] = useState<boolean>(false);
   const [nuevoMontoExtra, setNuevoMontoExtra] = useState<number>(0);
@@ -34,8 +33,7 @@ const VentaPage: React.FC = () => {
           parsed.venta || {
             id_venta: 0,
             fecha_venta: new Date().toISOString(),
-            total: 0,
-            monto_extra: 0,
+            total: 0
           }
         );
         setNombresProductos(parsed.nombresProductos || {});
@@ -104,8 +102,7 @@ const VentaPage: React.FC = () => {
         id_venta: 0,
         id_usuario: null,
         fecha_venta: new Date().toISOString(),
-        total: 0,
-        monto_extra: 0,
+        total: 0
       });
       setDetalles([]);
       setMontoExtra(0);

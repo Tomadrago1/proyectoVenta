@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../../shared/api/api';
 import { Venta } from '../venta/venta.interface';
 import { DetalleVenta } from '../venta/detalleVenta.interface';
@@ -7,6 +7,9 @@ import './Ventas.css';
 import { generateReport } from './generateReport';
 
 const Ventas: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const detalleRef = useRef<HTMLDivElement>(null);
+
   const [ventas, setVentas] = useState<Venta[]>([]);
   const [detalleVenta, setDetalleVenta] = useState<DetalleVenta[] | null>(null);
   const [startDate, setStartDate] = useState<string>('');
@@ -55,11 +58,27 @@ const Ventas: React.FC = () => {
   const fetchDetalleVenta = async (idVenta: number) => {
     try {
       const response = await api.get(`/detalle-venta/${idVenta}`);
-      const detalleVentaData = response.data;
+      let detalleVentaData = response.data;
+
+      try {
+        const resGen = await api.get(`/detalle-venta-generico/${idVenta}`);
+        if (resGen.data && resGen.data.length > 0) {
+          const genericosAdaptados = resGen.data.map((g: any) => ({
+            id_producto: `gen-${g.id_detalle_generico}`,
+            cantidad: g.cantidad,
+            precio_unitario: g.precio_unitario,
+            is_generico: true,
+            descripcion: g.descripcion
+          }));
+          detalleVentaData = [...detalleVentaData, ...genericosAdaptados];
+        }
+      } catch (err) {
+        console.error('No se pudieron cargar los detalles genéricos', err);
+      }
 
       const productosIds = [
         ...new Set(
-          detalleVentaData.map((detalle: DetalleVenta) => detalle.id_producto)
+          detalleVentaData.filter((d: any) => !d.is_generico).map((detalle: any) => detalle.id_producto)
         ),
       ];
 
@@ -119,23 +138,85 @@ const Ventas: React.FC = () => {
 
   const handleSelectVenta = async (idVenta: number) => {
     setSelectedVenta(idVenta);
-    fetchDetalleVenta(idVenta);
+    await fetchDetalleVenta(idVenta);
+    setTimeout(() => {
+      detalleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
-  const handleFilterToday = () => {
+  const handleCloseDetalle = () => {
+    containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      setSelectedVenta(null);
+      setDetalleVenta(null);
+    }, 300);
+  };
+
+  const handleFilterToday = async () => {
     const today = new Date().toISOString().split('T')[0];
     setStartDate(today);
     setEndDate(today);
+    try {
+      const response = await api.get(`/venta/filtro/fechas`, {
+        params: { startDate: today, endDate: today },
+      });
+      setSelectedVenta(null);
+      setPagina(1);
+      setVentas(response.data);
+    } catch (error) {
+      console.error('Error al filtrar las ventas de hoy:', error);
+    }
   };
 
-  const handleFilterThisMonth = () => {
+  const handleFilterThisMonth = async () => {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
-      .toISOString()
-      .split('T')[0];
+      .toISOString().split('T')[0];
     const lastDay = today.toISOString().split('T')[0];
     setStartDate(firstDay);
     setEndDate(lastDay);
+    try {
+      const response = await api.get(`/venta/filtro/fechas`, {
+        params: { startDate: firstDay, endDate: lastDay },
+      });
+      setSelectedVenta(null);
+      setPagina(1);
+      setVentas(response.data);
+    } catch (error) {
+      console.error('Error al filtrar las ventas del mes:', error);
+    }
+  };
+
+  const handleReimprimirTicket = async () => {
+    if (!selectedVenta || !detalleVenta) return;
+
+    try {
+      const ventaActual = ventas.find((v) => v.id_venta === selectedVenta);
+      if (!ventaActual) return;
+
+      const genericos = detalleVenta
+        .filter((d: any) => d.is_generico)
+        .map((d: any) => ({
+          id_producto: 0,
+          cantidad: d.cantidad,
+          precio_unitario: d.precio_unitario,
+          descripcion: d.descripcion,
+        }));
+
+      const fechaFormateada = new Date(ventaActual.fecha_venta).toLocaleString('es-ES', { hour12: false });
+
+      await api.post('/impresora/imprimir-ticket', {
+        id_venta: selectedVenta,
+        total: ventaActual.total,
+        fecha: fechaFormateada,
+        genericos: genericos,
+      });
+
+      alert('Ticket enviado a la impresora correctamente.');
+    } catch (error) {
+      console.error('Error al reimprimir el ticket:', error);
+      alert('Hubo un error al intentar reimprimir el ticket.');
+    }
   };
 
   const handleGenerarReporte = () => {
@@ -157,7 +238,7 @@ const Ventas: React.FC = () => {
   };
 
   return (
-    <div className="ventas-container">
+    <div className="ventas-container" ref={containerRef}>
       <div className="ventas-header-container">
         <h1 className="ventas-header">Historial de Ventas</h1>
 
@@ -184,15 +265,15 @@ const Ventas: React.FC = () => {
         </form>
         <div className="ventas-btn-group">
           <button onClick={handleFilterToday} className="btn-filtro-hoy">
-            Filtrar Ventas Hoy
+            Ventas del Día
           </button>
           <button onClick={handleFilterThisMonth} className="btn-filtro-mes">
-            Filtrar Ventas Este Mes
+            Ventas del Mes
+          </button>
+          <button onClick={handleGenerarReporte} className="btn-filtro-reporte">
+            Generar Reporte (Filtro Actual)
           </button>
         </div>
-        <button onClick={handleGenerarReporte}>
-          Generar reporte de ventas
-        </button>
       </div>
 
       <table className="ventas-tabla">
@@ -248,8 +329,29 @@ const Ventas: React.FC = () => {
       </div>
 
       {detalleVenta && selectedVenta && (
-        <div className="ventas-detalle">
-          <h2>Detalle de la Venta {selectedVenta}</h2>
+        <div className="ventas-detalle" ref={detalleRef}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '2px solid var(--pos-bg-surface)', paddingBottom: '16px' }}>
+            <h2 style={{ margin: 0, border: 'none', padding: 0 }}>Detalle de la Venta {selectedVenta}</h2>
+            <button
+              onClick={handleCloseDetalle}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                fontSize: '28px',
+                cursor: 'pointer',
+                color: 'var(--pos-text-secondary)',
+                padding: '0 8px',
+                lineHeight: '1',
+                fontWeight: 'bold',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--pos-danger-color)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--pos-text-secondary)')}
+              title="Cerrar detalle"
+            >
+              ×
+            </button>
+          </div>
           <div className="ventas-detalle-info">
             <p>
               <strong>Vendedor:</strong>{' '}
@@ -282,9 +384,9 @@ const Ventas: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {detalleVenta.map((detalle) => (
+              {detalleVenta.map((detalle: any) => (
                 <tr key={detalle.id_producto}>
-                  <td>{productos[detalle.id_producto]}</td>
+                  <td>{detalle.is_generico ? detalle.descripcion : productos[detalle.id_producto]}</td>
                   <td>{detalle.cantidad}</td>
                   <td>${Number(detalle.precio_unitario).toFixed(0)}</td>
                   <td>
@@ -296,16 +398,28 @@ const Ventas: React.FC = () => {
           </table>
           <h2>
             <span>
-              Monto extra: ${' '}
-              {ventas.find((v) => v.id_venta === selectedVenta)?.monto_extra}
-            </span>
-          </h2>
-          <h2>
-            <span>
               Monto Total: $
               {ventas.find((v) => v.id_venta === selectedVenta)?.total}
             </span>
           </h2>
+
+          <div style={{ marginTop: '20px', textAlign: 'right' }}>
+            <button
+              onClick={handleReimprimirTicket}
+              style={{
+                backgroundColor: '#10b981', // Verde suave para imprimir
+                color: 'white',
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            >
+              Reimprimir Ticket
+            </button>
+          </div>
         </div>
       )}
     </div>

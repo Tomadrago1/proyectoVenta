@@ -4,7 +4,6 @@ export class Venta {
     public id_usuario: number,
     public id_venta: number | null,
     public total: number,
-    public fecha_venta: Date,
-    public monto_extra: number,
+    public fecha_venta: Date
   ) { }
 }

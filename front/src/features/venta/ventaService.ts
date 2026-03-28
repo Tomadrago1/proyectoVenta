@@ -6,16 +6,11 @@ export const guardarVenta = async (
   detalles: DetalleVenta[],
   total: number,
 ) => {
-  const montoExtraCalculado = detalles
-    .filter((detalle) => detalle.id_producto === 0)
-    .reduce((acc, detalle) => acc + detalle.precio_unitario * detalle.cantidad, 0);
-
   const nuevaVenta: Venta = {
     id_venta: 0,
     id_usuario: null,
     fecha_venta: new Date().toISOString(),
-    total: parseFloat(total.toFixed(0)),
-    monto_extra: montoExtraCalculado,
+    total: parseFloat(total.toFixed(0))
   };
 
 
@@ -24,21 +19,40 @@ export const guardarVenta = async (
     console.log(detalles);
     const res_venta = await api.post('/venta', nuevaVenta);
     if (res_venta.status === 200) {
-      if (detalles.length > 0) {
+      const productosNormales = detalles.filter((d) => d.id_producto !== 0);
+      if (productosNormales.length > 0) {
         const res_detalles = await api.post('/detalle-venta', {
-          detalles: detalles,
+          detalles: productosNormales,
           id_venta: res_venta.data.id_venta,
         });
-        if (res_detalles.status === 200) {
-          console.log(res_detalles);
-          alert('Venta guardada exitosamente.');
-          await api.post('/impresora/imprimir-ticket', {
-            id_venta: res_venta.data.id_venta,
-            total: total,
-            fecha: new Date().toLocaleString('es-ES', { hour12: false })
-          });
+        
+        if (res_detalles.status !== 200) {
+            console.error('Error al guardar detalles:', res_detalles);
+            alert('Venta guardada pero hubo un error con los detalles.');
+            return;
         }
       }
+      const genericos = detalles.filter((d) => d.id_producto === 0);
+      
+      if (genericos.length > 0) {
+        try {
+            await api.post('/detalle-venta-generico', {
+              genericos: genericos,
+              id_venta: res_venta.data.id_venta
+            });
+        } catch (e) {
+            console.error('Error guardando genéricos', e);
+        }
+      }
+
+      console.log('Venta guardada exitosamente.');
+      alert('Venta guardada exitosamente.');
+      await api.post('/impresora/imprimir-ticket', {
+        id_venta: res_venta.data.id_venta,
+        total: total,
+        fecha: new Date().toLocaleString('es-ES', { hour12: false }),
+        genericos: genericos
+      });
     }
   } catch (error) {
     console.error('Error al guardar la venta:', error);
