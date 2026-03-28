@@ -47,7 +47,6 @@ async function create(req: Request, res: Response) {
         detalle.cantidad,
         detalle.precio_unitario
       );
-      console.log(detalleCrear);
       const result = await repository.save(detalleCrear);
     }
     res.json({ message: 'Detalle de venta creado exitosamente' });

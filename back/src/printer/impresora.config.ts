@@ -1,5 +1,4 @@
 import escpos from 'escpos';
-import iconv from 'iconv-lite';
 const USB = require('../vendor/escpos-usb/index.js');
 
 escpos.USB = USB;

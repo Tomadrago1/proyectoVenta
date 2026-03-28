@@ -12,6 +12,9 @@ FLUSH PRIVILEGES;
 CREATE TABLE negocios (
   id_negocio INT AUTO_INCREMENT PRIMARY KEY,
   nombre_negocio VARCHAR(100) NOT NULL,
+  ciudad VARCHAR(100) NOT NULL,
+  direccion VARCHAR(100) NOT NULL,
+  telefono VARCHAR(20) NOT NULL,
   fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uk_negocios_nombre (nombre_negocio)
 ) ENGINE = InnoDB;
@@ -117,12 +120,12 @@ INSERT INTO usuarios (
 );
 
 -- B. Creamos el primer negocio
-INSERT INTO negocios (id_negocio, nombre_negocio)
-VALUES (1, 'Mi Primer Kiosco');
+INSERT INTO negocios (id_negocio, nombre_negocio, ciudad, direccion, telefono)
+VALUES (1, 'Mi Primer Kiosco', 'Posadas', 'Av. Siempre Viva 742', '3764123456');
 
 -- C. Creamos el usuario Administrador para ese negocio
 INSERT INTO usuarios (
     id_usuario, id_negocio, id_rol, nombre, apellido, username, contrasena, estado
 ) VALUES (
-    2, 1, 1, 'Tomas', 'Admin', 'admin_kiosco', '$2b$10$EQX/UvNEf34aP.cPci9i6uYHDMbFV.AmocH5vl/kwIjft1phT24sS', 1
+    2, 1, 1, 'Tomas', 'Admin', 'admin', '$2b$10$EQX/UvNEf34aP.cPci9i6uYHDMbFV.AmocH5vl/kwIjft1phT24sS', 1
 );

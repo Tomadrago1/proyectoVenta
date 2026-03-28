@@ -20,9 +20,11 @@ export const guardarVenta = async (
 
 
   try {
+    console.log(nuevaVenta);
+    console.log(detalles);
     const res_venta = await api.post('/venta', nuevaVenta);
     if (res_venta.status === 200) {
-      try {
+      if (detalles.length > 0) {
         const res_detalles = await api.post('/detalle-venta', {
           detalles: detalles,
           id_venta: res_venta.data.id_venta,
@@ -36,9 +38,6 @@ export const guardarVenta = async (
             fecha: new Date().toLocaleString('es-ES', { hour12: false })
           });
         }
-      } catch (error) {
-        console.error('Error al guardar los detalles de la venta:', error);
-        alert('Error al guardar los detalles de la venta.');
       }
     }
   } catch (error) {
