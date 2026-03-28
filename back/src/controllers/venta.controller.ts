@@ -35,13 +35,12 @@ async function create(req: Request, res: Response) {
     const idNegocio = resolveBusinessIdFromRequest(req);
     const venta = new Venta(
       idNegocio,
-      req.body.id_usuario,
+      res?.locals?.user?.id_usuario,
       null,
       req.body.total,
       new Date(req.body.fecha_venta),
       req.body.monto_extra
     );
-    console.log(venta)
     const result = await repository.save(venta);
     res.json(result);
   } catch (error: any) {

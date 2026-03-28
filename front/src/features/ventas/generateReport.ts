@@ -137,7 +137,7 @@ export const generateReport = async (ventas: Venta[]) => {
 
     if (venta.id_venta !== null) {
       detallesDeVenta = await getDetallesDeVenta(venta.id_venta);
-      usuario = await getUsuario(venta.id_usuario);
+      usuario = await getUsuario(venta.id_usuario!);
     }
 
     // Verificar si necesitamos una nueva página

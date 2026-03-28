@@ -15,7 +15,7 @@ const VentaPage: React.FC = () => {
   >({});
   const [venta, setVenta] = useState<Venta>({
     id_venta: 0,
-    id_usuario: 1,
+    id_usuario: null,
     fecha_venta: new Date().toISOString(),
     total: 0,
     monto_extra: 0,
@@ -33,7 +33,6 @@ const VentaPage: React.FC = () => {
         setVenta(
           parsed.venta || {
             id_venta: 0,
-            id_usuario: 1,
             fecha_venta: new Date().toISOString(),
             total: 0,
             monto_extra: 0,
@@ -94,8 +93,28 @@ const VentaPage: React.FC = () => {
   };
 
   const handleGuardarVenta = () => {
-    guardarVenta(detalles, total, setVenta, setDetalles, setMontoExtra);
-    localStorage.removeItem('ventaActual');
+    try {
+      if (total <= 0) {
+        alert('El total de la venta debe ser mayor a 0');
+        return;
+      }
+      console.log(detalles);
+      guardarVenta(detalles, total);
+      setVenta({
+        id_venta: 0,
+        id_usuario: null,
+        fecha_venta: new Date().toISOString(),
+        total: 0,
+        monto_extra: 0,
+      });
+      setDetalles([]);
+      setMontoExtra(0);
+      setTotal(0);
+      setNombresProductos({});
+      localStorage.removeItem('ventaActual');
+    } catch (error) {
+      console.error('Error al guardar la venta:', error);
+    }
   };
 
   const addExtraAmount = () => {

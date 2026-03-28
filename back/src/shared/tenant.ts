@@ -13,7 +13,6 @@ export function resolveBusinessId(value: unknown): number {
 export function resolveBusinessIdFromRequest(req: Request): number {
   const jwtBusinessId = req.res?.locals?.user?.id_negocio;
 
-  // En rutas protegidas, el middleware validateJWT fija este valor.
   if (jwtBusinessId !== undefined && jwtBusinessId !== null) {
     return resolveBusinessId(jwtBusinessId);
   }

@@ -39,15 +39,18 @@ async function findOne(req: Request, res: Response) {
 async function create(req: Request, res: Response) {
   try {
     const idNegocio = resolveBusinessIdFromRequest(req);
-    const detalle = new DetalleVenta(
-      idNegocio,
-      req.body.id_producto,
-      req.body.id_venta,
-      req.body.cantidad,
-      req.body.precio_unitario
-    );
-    const result = await repository.save(detalle);
-    res.json(result);
+    for (const detalle of req.body.detalles) {
+      const detalleCrear = new DetalleVenta(
+        idNegocio,
+        detalle.id_producto,
+        req.body.id_venta,
+        detalle.cantidad,
+        detalle.precio_unitario
+      );
+      console.log(detalleCrear);
+      const result = await repository.save(detalleCrear);
+    }
+    res.json({ message: 'Detalle de venta creado exitosamente' });
   } catch (error: any) {
     const errorMessage = error.message || 'Error desconocido';
     res.status(500).json({ message: 'Error al crear el detalle de venta', errorMessage });

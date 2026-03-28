@@ -210,7 +210,7 @@ const Ventas: React.FC = () => {
             <tr key={venta.id_venta}>
               <td>{venta.id_venta}</td>
               <td>
-                {`${usuarios[venta.id_usuario]?.nombre || ''} ${usuarios[venta.id_usuario]?.apellido || ''
+                {`${usuarios[venta.id_usuario!]?.nombre || ''} ${usuarios[venta.id_usuario!]?.apellido || ''
                   }`}
               </td>
               <td>{formatFechaHora(venta.fecha_venta)}</td>
