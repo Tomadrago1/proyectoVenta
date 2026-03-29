@@ -26,11 +26,8 @@ const App: React.FC = () => {
     <>
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
-        {/* Ruta pública */}
         <Route path="/" element={<Login />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
-
-        {/* Rutas de empleado y administrador — Superadmin no accede */}
         <Route
           path="/productos"
           element={
@@ -76,8 +73,6 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
-        {/* Panel Admin — solo Administrador (incluye productos, categorías y estadísticas) */}
         <Route
           path="/admin"
           element={
@@ -87,8 +82,6 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
-        {/* Panel Superadmin — solo Superadmin */}
         <Route
           path="/superadmin"
           element={
