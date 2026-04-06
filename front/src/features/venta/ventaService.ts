@@ -45,8 +45,6 @@ export const guardarVenta = async (
           console.error('Error guardando genéricos', e);
         }
       }
-
-      console.log('Venta guardada exitosamente.');
       toast.success('Venta guardada exitosamente.');
       await api.post('/impresora/imprimir-ticket', {
         id_venta: res_venta.data.id_venta,
@@ -55,8 +53,8 @@ export const guardarVenta = async (
         genericos: genericos
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error al guardar la venta:', error);
-    toast.error('Error al guardar la venta.');
+    toast.error(error.response.data.error || 'Error al guardar la venta.');
   }
 }

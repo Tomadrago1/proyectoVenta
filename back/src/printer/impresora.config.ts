@@ -11,13 +11,15 @@ const openDevice = (): Promise<any> => {
 
       (device as any).open((err: any) => {
         if (err) {
-          console.error('Error al conectar con la impresora:', err);
-          return reject(err);
+          err.message = 'Error al conectar con la impresora';
+          console.log(err.message, "Este es el primer error")
+          reject(err);
         }
         resolve(printer);
       });
     } catch (error) {
-      console.error('No se pudo encontrar la impresora USB:', error);
+      (error as any).message = 'No se pudo encontrar la impresora USB';
+      console.log((error as any).message, "este es el segundo error")
       reject(error);
     }
   });

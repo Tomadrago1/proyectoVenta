@@ -1,6 +1,7 @@
 import React from 'react';
 import api from '../api/api';
 import { API_URL } from '../api/api';
+import toast from 'react-hot-toast';
 
 const Ayuda: React.FC = () => {
 
@@ -8,11 +9,11 @@ const Ayuda: React.FC = () => {
         api.post(`${API_URL}/impresora/test-imprimir`, {
         })
             .then(response => {
-                alert(response.data.message);
+                toast.success(response.data.message);
             })
             .catch(error => {
+                toast.error(error.response.data.error)
                 console.error('Error al realizar la prueba de impresión:', error);
-                alert(`Error al realizar la prueba de impresión. ${error.response?.data?.error}`);
             });
     };
 
