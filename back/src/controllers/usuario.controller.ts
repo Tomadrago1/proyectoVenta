@@ -9,11 +9,15 @@ const repository = new UsuarioRepository();
 
 async function findAll(req: Request, res: Response) {
   try {
-    const idNegocio = resolveBusinessIdFromRequest(req);
+    let idNegocio = resolveBusinessIdFromRequest(req);
+    if (res.locals.user?.nombre_rol === 'Superadmin' && req.query.id_negocio) {
+      idNegocio = Number(req.query.id_negocio);
+    }
     const usuarios = await repository.findAll(idNegocio);
     res.json(usuarios);
   } catch (error: any) {
-    res.status(500).json({ message: 'Error al obtener los usuarios', errorMessage: error.message });
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ message: 'Error interno del servidor al procesar la solicitud' });
   }
 }
 
@@ -28,13 +32,17 @@ async function findOne(req: Request, res: Response) {
       res.status(404).json({ message: 'Usuario no encontrado' });
     }
   } catch (error: any) {
-    res.status(500).json({ message: 'Error al obtener el usuario', errorMessage: error.message });
+    console.error('Error al obtener usuario:', error);
+    res.status(500).json({ message: 'Error interno del servidor al procesar la solicitud' });
   }
 }
 
 async function create(req: Request, res: Response) {
   try {
-    const idNegocio = resolveBusinessIdFromRequest(req);
+    let idNegocio = resolveBusinessIdFromRequest(req);
+    if (res.locals.user?.nombre_rol === 'Superadmin' && req.body.id_negocio) {
+      idNegocio = Number(req.body.id_negocio);
+    }
     const { contrasena, ...rest } = req.body;
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
@@ -50,14 +58,18 @@ async function create(req: Request, res: Response) {
     const result = await repository.save(usuario);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ message: 'Error al crear el usuario', errorMessage: error.message });
+    console.error('Error al crear usuario:', error);
+    res.status(500).json({ message: 'Error interno del servidor al procesar la solicitud' });
   }
 }
 
 async function update(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const idNegocio = resolveBusinessIdFromRequest(req);
+    let idNegocio = resolveBusinessIdFromRequest(req);
+    if (res.locals.user?.nombre_rol === 'Superadmin' && req.body.id_negocio) {
+      idNegocio = Number(req.body.id_negocio);
+    }
     let { contrasena } = req.body;
 
     if (!contrasena.startsWith('$2b$')) {
@@ -77,18 +89,23 @@ async function update(req: Request, res: Response) {
     const result = await repository.update({ id: id, id_negocio: idNegocio.toString() }, usuarioActualizado);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ message: 'Error al actualizar el usuario', errorMessage: error.message });
+    console.error('Error al actualizar usuario:', error);
+    res.status(500).json({ message: 'Error interno del servidor al procesar la solicitud' });
   }
 }
 
 async function remove(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const idNegocio = resolveBusinessIdFromRequest(req);
+    let idNegocio = resolveBusinessIdFromRequest(req);
+    if (res.locals.user?.nombre_rol === 'Superadmin' && req.query.id_negocio) {
+      idNegocio = Number(req.query.id_negocio);
+    }
     await repository.remove({ id: id, id_negocio: idNegocio.toString() });
     res.json({ message: 'Usuario eliminado' });
   } catch (error: any) {
-    res.status(500).json({ message: 'Error al eliminar el usuario', errorMessage: error.message });
+    console.error('Error al eliminar usuario:', error);
+    res.status(500).json({ message: 'Error interno del servidor al procesar la solicitud' });
   }
 }
 
@@ -122,7 +139,8 @@ async function login(req: Request, res: Response) {
       res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
     }
   } catch (error: any) {
-    res.status(500).json({ message: 'Error al iniciar sesión', errorMessage: error.message });
+    console.error('Error en login:', error);
+    res.status(500).json({ message: 'Error interno del servidor al procesar el inicio de sesión' });
   }
 }
 

@@ -11,8 +11,8 @@ async function findAll(req: Request, res: Response) {
     const productos = await repository.findAll(idNegocio);
     res.json(productos);
   } catch (error: any) {
-    const errorMessage = error.message || 'Error desconocido';
-    res.status(500).json({ message: 'Error al obtener los productos', errorMessage });
+    console.error('Error al obtener productos:', error);
+    res.status(500).json({ message: 'Error interno del servidor al obtener productos' });
   }
 }
 
@@ -27,8 +27,8 @@ async function findOne(req: Request, res: Response) {
       res.status(404).json({ message: 'Producto no encontrado' });
     }
   } catch (error: any) {
-    const errorMessage = error.message || 'Error desconocido';
-    res.status(500).json({ message: 'Error al obtener el producto', errorMessage });
+    console.error('Error al obtener producto:', error);
+    res.status(500).json({ message: 'Error interno del servidor al obtener el producto' });
   }
 }
 
@@ -48,8 +48,8 @@ async function create(req: Request, res: Response) {
     const result = await repository.save(producto);
     res.json(result);
   } catch (error: any) {
-    const errorMessage = error.message || 'Error desconocido';
-    res.status(500).json({ message: 'Error al crear el producto', errorMessage });
+    console.error('Error al crear producto:', error);
+    res.status(500).json({ message: 'Error interno del servidor al crear producto' });
   }
 }
 
@@ -84,8 +84,8 @@ async function remove(req: Request, res: Response) {
     await repository.remove({ id, id_negocio: idNegocio.toString() });
     res.json({ message: 'Producto eliminado' });
   } catch (error: any) {
-    const errorMessage = error.message || 'Error desconocido';
-    res.status(500).json({ message: 'Error al eliminar el producto', errorMessage });
+    console.error('Error al eliminar producto:', error);
+    res.status(500).json({ message: 'Error interno del servidor al eliminar el producto' });
   }
 }
 

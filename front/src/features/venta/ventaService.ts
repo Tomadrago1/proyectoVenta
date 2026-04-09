@@ -1,6 +1,7 @@
 import api from '../../shared/api/api';
 import { DetalleVenta } from './detalleVenta.interface';
 import { Venta } from './venta.interface';
+import toast from 'react-hot-toast';
 
 export const guardarVenta = async (
   detalles: DetalleVenta[],
@@ -25,37 +26,35 @@ export const guardarVenta = async (
           detalles: productosNormales,
           id_venta: res_venta.data.id_venta,
         });
-        
+
         if (res_detalles.status !== 200) {
-            console.error('Error al guardar detalles:', res_detalles);
-            alert('Venta guardada pero hubo un error con los detalles.');
-            return;
+          console.error('Error al guardar detalles:', res_detalles);
+          toast.error('Venta guardada pero hubo un error con los detalles.');
+          return;
         }
       }
       const genericos = detalles.filter((d) => d.id_producto === 0);
-      
+
       if (genericos.length > 0) {
         try {
-            await api.post('/detalle-venta-generico', {
-              genericos: genericos,
-              id_venta: res_venta.data.id_venta
-            });
+          await api.post('/detalle-venta-generico', {
+            genericos: genericos,
+            id_venta: res_venta.data.id_venta
+          });
         } catch (e) {
-            console.error('Error guardando genéricos', e);
+          console.error('Error guardando genéricos', e);
         }
       }
-
-      console.log('Venta guardada exitosamente.');
-      alert('Venta guardada exitosamente.');
+      toast.success('Venta guardada exitosamente.');
       await api.post('/impresora/imprimir-ticket', {
         id_venta: res_venta.data.id_venta,
         total: total,
-        fecha: new Date().toLocaleString('es-ES', { hour12: false }),
+        fecha: new Date(res_venta.data.fecha_venta).toLocaleString('es-ES', { hour12: false }),
         genericos: genericos
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error al guardar la venta:', error);
-    alert('Error al guardar la venta.');
+    toast.error(error.response.data.error || 'Error al guardar la venta.');
   }
 }

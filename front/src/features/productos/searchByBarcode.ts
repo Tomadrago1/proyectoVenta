@@ -2,6 +2,7 @@ import api from '../../shared/api/api';
 import { DetalleVenta } from '../venta/detalleVenta.interface';
 import { Producto } from './producto.interface';
 import { Venta } from '../venta/venta.interface';
+import toast from 'react-hot-toast';
 
 export const buscarProductoPorCodigo = async (
   codigo: string,
@@ -13,12 +14,13 @@ export const buscarProductoPorCodigo = async (
   >
 ) => {
   try {
+    console.log(codigo);
     const codigoUnitario = codigo.substring(2, 7);
     if (codigoUnitario === '99998') {
       const importe = parseFloat(codigo.substring(7, 12));
       const cantidad = parseFloat(codigo.substring(1, 2));
       if (isNaN(importe) || importe <= 0) {
-        alert('El importe en el código de barras no es válido.');
+        toast.error('El importe en el código de barras no es válido.');
         return;
       }
 
@@ -48,7 +50,7 @@ export const buscarProductoPorCodigo = async (
         const importe = parseFloat(importeStr);
 
         if (isNaN(importe) || importe <= 0) {
-          alert('El importe en el código de barras no es válido.');
+          toast.error('El importe en el código de barras no es válido.');
           return;
         }
 
@@ -76,10 +78,11 @@ export const buscarProductoPorCodigo = async (
     }
 
     const response = await api.get(`/producto/barcode/${codigo}`);
+    console.log(response.data);
     const producto: Producto = response.data;
 
     if (!producto) {
-      alert('Producto no encontrado');
+      toast.error('Producto no encontrado');
       return;
     }
 
@@ -110,6 +113,10 @@ export const buscarProductoPorCodigo = async (
       [producto.id_producto]: producto.nombre_producto,
     }));
   } catch (error) {
+    if ((error as any).response && (error as any).response.status === 404) {
+      toast.error('Producto no encontrado');
+      return;
+    }
     console.error('Error al buscar el producto por código de barras', error);
   }
 };

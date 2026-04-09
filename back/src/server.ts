@@ -3,6 +3,8 @@ import { Server } from 'http';
 import path from 'path';
 import cors from 'cors';
 import session from 'express-session';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { pool } from './shared/conn';
 
 import { routerProducto } from './routes/producto.routes';
@@ -18,7 +20,19 @@ import { routerRol } from './routes/rol.routes';
 const app = express();
 const port = Number(process.env.PORT ?? 3000);
 
+// Helmet para cabeceras de seguridad
+app.use(helmet());
+
 app.use(express.json());
+
+// Rate limit para el login
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 10, // Máximo 10 intentos
+  message: { message: 'Demasiados intentos de inicio de sesión, intente nuevamente más tarde.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const allowedOrigins = ['http://localhost:8080', `${process.env.LOCALHOST}:8080`];
 app.use(cors({
@@ -47,6 +61,7 @@ app.get('/api', (req: Request, res: Response) => {
 });
 
 app.use('/api/producto', routerProducto);
+app.use('/api/usuario/login', loginLimiter); // Aplicar limite al login
 app.use('/api/usuario', routerUsuario);
 app.use('/api/venta', routerVenta);
 app.use('/api/detalle-venta', routerDetalleVenta);

@@ -3,6 +3,9 @@ import api, { API_URL } from '../../shared/api/api';
 export interface Negocio {
     id_negocio: number;
     nombre_negocio: string;
+    ciudad: string;
+    direccion: string;
+    telefono: string;
     fecha_registro?: string;
 }
 

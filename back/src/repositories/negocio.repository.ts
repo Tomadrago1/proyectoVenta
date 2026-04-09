@@ -22,8 +22,8 @@ export class NegocioRepository {
 
   public async save(negocio: Negocio): Promise<Negocio> {
     const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO negocios (nombre_negocio) VALUES (?)',
-      [negocio.nombre_negocio]
+      'INSERT INTO negocios (nombre_negocio, ciudad, direccion, telefono) VALUES (?, ?, ?, ?)',
+      [negocio.nombre_negocio, negocio.ciudad, negocio.direccion, negocio.telefono]
     );
     negocio.id_negocio = result.insertId;
     return negocio;
@@ -31,8 +31,8 @@ export class NegocioRepository {
 
   public async update(id: number, negocio: Negocio): Promise<Negocio | undefined> {
     const [result] = await pool.query<ResultSetHeader>(
-      'UPDATE negocios SET nombre_negocio = ? WHERE id_negocio = ?',
-      [negocio.nombre_negocio, id]
+      'UPDATE negocios SET nombre_negocio = ?, ciudad = ?, direccion = ?, telefono = ? WHERE id_negocio = ?',
+      [negocio.nombre_negocio, negocio.ciudad, negocio.direccion, negocio.telefono, id]
     );
     if (result.affectedRows === 0) throw new Error('No se pudo actualizar el negocio');
     return negocio;
