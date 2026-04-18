@@ -16,6 +16,8 @@ import { routerImpresora } from './routes/impresora.routes';
 import { routerNegocio } from './routes/negocio.routes';
 import { routerDetalleVentaGenerico } from './routes/detalleVentaGenerico.routes';
 import { routerRol } from './routes/rol.routes';
+import { routerBarcode } from './routes/barcode.routes';
+import { routerPrinterConfig } from './routes/printerConfig.routes';
 
 const app = express();
 const port = Number(process.env.PORT ?? 3000);
@@ -34,10 +36,14 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-const allowedOrigins = ['http://localhost:8080', `${process.env.LOCALHOST}:8080`];
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Sin origin = misma máquina o herramienta (Postman, curl, proxy)
+    if (!origin) return callback(null, true);
+
+    // Permitir localhost y IPs privadas (192.168.x.x, 10.x.x.x) con http o https
+    const allowed = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/;
+    if (allowed.test(origin)) {
       callback(null, true);
     } else {
       callback(new Error('No permitido por CORS'));
@@ -70,6 +76,8 @@ app.use('/api/impresora', routerImpresora);
 app.use('/api/detalle-venta-generico', routerDetalleVentaGenerico);
 app.use('/api/negocio', routerNegocio);
 app.use('/api/rol', routerRol);
+app.use('/api/barcode', routerBarcode);
+app.use('/api/printer-config', routerPrinterConfig);
 
 app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));

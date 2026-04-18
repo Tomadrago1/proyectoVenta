@@ -1,16 +1,12 @@
 import axios from 'axios';
 
-const isLocalhost = window.location.hostname === 'localhost';
-const networkHost = typeof __API_HOST__ === 'string' && __API_HOST__.trim()
-    ? __API_HOST__
-    : '192.168.100.5';
-
-export const API_URL = isLocalhost
-    ? 'http://localhost:3000/api'
-    : `http://${networkHost}:3000/api`;
+// baseURL '/api' se combina con todas las rutas automáticamente.
+// API_URL se exporta vacío por compatibilidad con los servicios existentes
+// que hacen api.get(`${API_URL}/ruta`) — así queda api.get('/ruta') → '/api/ruta'.
+export const API_URL = '';
 
 const api = axios.create({
-    baseURL: API_URL,
+    baseURL: '/api',
     timeout: 10000,
 });
 

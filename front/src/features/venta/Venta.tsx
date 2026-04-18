@@ -4,6 +4,11 @@ import { Venta } from './venta.interface';
 import './Venta.css';
 import { guardarVenta } from './ventaService';
 import { buscarProductoPorCodigo } from '../productos/searchByBarcode';
+import { useBarcodeConfigs } from '../barcode/useBarcodeConfigs';
+import { useBarcodeInterceptor } from '../barcode/useBarcodeInterceptor';
+import { useWebUSBPrinter } from '../printer/useWebUSBPrinter';
+import { printerConfigService } from '../printer/printerConfigService';
+import { encodeTicket } from '../printer/ticketEncoder';
 import toast from 'react-hot-toast';
 
 const VentaPage: React.FC = () => {
@@ -22,6 +27,18 @@ const VentaPage: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [nuevoMontoExtra, setNuevoMontoExtra] = useState<number>(0);
+
+  // ── Barcode interceptor (carga configs una vez, parsea local) ────
+  const { configs: barcodeConfigs } = useBarcodeConfigs();
+  const { interceptBarcode } = useBarcodeInterceptor(barcodeConfigs);
+
+  // ── WebUSB Printer ──────────────────────────────────────────────
+  const printer = useWebUSBPrinter();
+
+  // Auto-reconectar impresora al montar
+  useEffect(() => {
+    printer.reconnect();
+  }, []);
 
   useEffect(() => {
     const guardada = localStorage.getItem('ventaActual');
@@ -67,12 +84,14 @@ const VentaPage: React.FC = () => {
     if (e.key === 'Enter') {
       const codigo = (e.target as HTMLInputElement).value.trim();
       if (codigo) {
+        const parseResult = interceptBarcode(codigo);
         buscarProductoPorCodigo(
           codigo,
           venta,
           detalles,
           setDetalles,
-          setNombresProductos
+          setNombresProductos,
+          parseResult
         );
         setCodigoBarras('');
       }
@@ -99,14 +118,14 @@ const VentaPage: React.FC = () => {
     });
   };
 
-  const handleGuardarVenta = () => {
+  const handleGuardarVenta = async () => {
     try {
       if (total <= 0) {
         toast.error('El total de la venta debe ser mayor a 0');
         return;
       }
       console.log(detalles);
-      guardarVenta(detalles, total);
+      const ventaResult = await guardarVenta(detalles, total);
       setVenta({
         id_venta: 0,
         id_usuario: null,
@@ -117,6 +136,26 @@ const VentaPage: React.FC = () => {
       setTotal(0);
       setNombresProductos({});
       localStorage.removeItem('ventaActual');
+
+      // Imprimir ticket localmente vía WebUSB
+      if (ventaResult && printer.status === 'connected') {
+        try {
+          const ticketData = await printerConfigService.getTicketData(ventaResult.id_venta);
+          const addedGenericos = (ventaResult.genericos || []).map((gen: any) => ({
+            cantidad: gen.cantidad,
+            precio_unitario: Number(gen.precio_unitario),
+            nombre_producto: 'Producto Genérico',
+          }));
+          const allDetalles = [...ticketData.detalles, ...addedGenericos];
+          const cols = ticketData.printerConfig?.columns_count ?? 48;
+          const fecha = new Date(ventaResult.fecha_venta).toLocaleString('es-ES', { hour12: false });
+          const bytes = encodeTicket(allDetalles, ticketData.negocio, fecha, ventaResult.total, cols);
+          await printer.print(bytes);
+        } catch (printErr) {
+          console.error('Error al imprimir ticket:', printErr);
+          toast.error('Venta guardada, pero hubo un error al imprimir el ticket.');
+        }
+      }
     } catch (error) {
       console.error('Error al guardar la venta:', error);
     }

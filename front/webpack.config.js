@@ -42,6 +42,8 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'public'), // Carpeta de archivos estáticos
     },
+    server: 'https', // HTTPS para WebUSB y acceso desde red local
+    host: '0.0.0.0', // Permitir acceso desde cualquier dispositivo en la red
     port: 8080,
     proxy: [
       {

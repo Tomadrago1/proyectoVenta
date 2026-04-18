@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPlus, faPen, faTrash,
-  faUsers, faBoxOpen, faTag, faChartLine, faReceipt
+  faUsers, faBoxOpen, faTag, faChartLine, faReceipt, faBarcode, faPrint
 } from '@fortawesome/free-solid-svg-icons';
 import { useEmpleados } from './useEmpleados';
 import EmpleadoCreateForm from './EmpleadoCreateForm';
@@ -12,9 +12,11 @@ import Producto from '../productos/Producto';
 import Categorias from '../categoria/Categoria';
 import Ventas from '../ventas/Ventas';
 import Estadistica from '../../shared/components/Estadistica';
+import BarcodeConfigPanel from '../barcode/BarcodeConfigPanel';
+import PrinterConfigPanel from '../printer/PrinterConfigPanel';
 import './AdminPanel.css';
 
-type Tab = 'empleados' | 'productos' | 'categorias' | 'estadisticas' | 'ventas';
+type Tab = 'empleados' | 'productos' | 'categorias' | 'estadisticas' | 'ventas' | 'balanza' | 'impresora';
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: 'empleados',    label: 'Empleados',    icon: faUsers      },
@@ -22,6 +24,8 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: 'categorias',   label: 'Categorías',   icon: faTag        },
   { id: 'ventas',       label: 'Ventas',       icon: faReceipt    },
   { id: 'estadisticas', label: 'Estadísticas', icon: faChartLine  },
+  { id: 'balanza',      label: 'Balanza',      icon: faBarcode    },
+  { id: 'impresora',    label: 'Impresora',    icon: faPrint      },
 ];
 
 const AdminPanel: React.FC = () => {
@@ -217,6 +221,20 @@ const AdminPanel: React.FC = () => {
               </div>
             </div>
             <Estadistica />
+          </div>
+        )}
+
+        {/* TAB: BALANZA */}
+        {activeTab === 'balanza' && (
+          <div className="admin-content-section">
+            <BarcodeConfigPanel />
+          </div>
+        )}
+
+        {/* TAB: IMPRESORA */}
+        {activeTab === 'impresora' && (
+          <div className="admin-content-section">
+            <PrinterConfigPanel />
           </div>
         )}
       </main>
