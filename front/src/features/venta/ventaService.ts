@@ -3,10 +3,17 @@ import { DetalleVenta } from './detalleVenta.interface';
 import { Venta } from './venta.interface';
 import toast from 'react-hot-toast';
 
+export interface VentaGuardada {
+  id_venta: number;
+  fecha_venta: string;
+  total: number;
+  genericos: DetalleVenta[];
+}
+
 export const guardarVenta = async (
   detalles: DetalleVenta[],
   total: number,
-) => {
+): Promise<VentaGuardada | null> => {
   const nuevaVenta: Venta = {
     id_venta: 0,
     id_usuario: null,
@@ -30,7 +37,7 @@ export const guardarVenta = async (
         if (res_detalles.status !== 200) {
           console.error('Error al guardar detalles:', res_detalles);
           toast.error('Venta guardada pero hubo un error con los detalles.');
-          return;
+          return null;
         }
       }
       const genericos = detalles.filter((d) => d.id_producto === 0);
@@ -46,15 +53,18 @@ export const guardarVenta = async (
         }
       }
       toast.success('Venta guardada exitosamente.');
-      await api.post('/impresora/imprimir-ticket', {
+
+      // Retornar datos de la venta para que el componente maneje la impresión localmente
+      return {
         id_venta: res_venta.data.id_venta,
+        fecha_venta: res_venta.data.fecha_venta,
         total: total,
-        fecha: new Date(res_venta.data.fecha_venta).toLocaleString('es-ES', { hour12: false }),
-        genericos: genericos
-      });
+        genericos: genericos,
+      };
     }
   } catch (error: any) {
     console.error('Error al guardar la venta:', error);
     toast.error(error.response.data.error || 'Error al guardar la venta.');
   }
-}
+  return null;
+}

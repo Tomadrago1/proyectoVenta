@@ -2,8 +2,17 @@ import api from '../../shared/api/api';
 import { DetalleVenta } from '../venta/detalleVenta.interface';
 import { Producto } from './producto.interface';
 import { Venta } from '../venta/venta.interface';
+import { BarcodeParseResult } from '../barcode/barcode.interface';
 import toast from 'react-hot-toast';
 
+/**
+ * Busca un producto por código de barras usando el resultado del interceptor.
+ *
+ * Flujo:
+ *  1. Recibe el resultado del interceptor (STANDARD_BARCODE o WEIGHTED_BARCODE)
+ *  2. WEIGHTED_BARCODE → busca producto por PLU, usa el precio de la balanza
+ *  3. STANDARD_BARCODE → busca producto por código completo (flujo normal)
+ */
 export const buscarProductoPorCodigo = async (
   codigo: string,
   venta: Venta,
@@ -11,74 +20,50 @@ export const buscarProductoPorCodigo = async (
   setDetalles: React.Dispatch<React.SetStateAction<DetalleVenta[]>>,
   setNombresProductos: React.Dispatch<
     React.SetStateAction<{ [id_producto: number]: string }>
-  >
+  >,
+  parseResult?: BarcodeParseResult
 ) => {
   try {
-    console.log(codigo);
-    const codigoUnitario = codigo.substring(2, 7);
-    if (codigoUnitario === '99998') {
-      const importe = parseFloat(codigo.substring(7, 12));
-      const cantidad = parseFloat(codigo.substring(1, 2));
-      if (isNaN(importe) || importe <= 0) {
-        toast.error('El importe en el código de barras no es válido.');
-        return;
-      }
+    // ── Código de balanza (circulación restringida) ────────────────
+    if (parseResult && parseResult.type === 'WEIGHTED_BARCODE') {
+      const { plu, value, valueType } = parseResult;
 
-      const nuevoDetalle: DetalleVenta = {
-        id_temp: Date.now(),
-        id_producto: 0,
-        id_venta: venta.id_venta,
-        cantidad,
-        precio_unitario: importe,
-      };
+      try {
+        const response = await api.get(`/producto/barcode/${plu}`);
+        const producto: Producto = response.data;
 
-      setDetalles([...detalles, nuevoDetalle]);
-      return;
-    }
+        if (producto) {
+          // Si es peso (WEIGHT), el valor extraído es directamente la cantidad.
+          // Ej. 1.250 (1250g con 3 decimales configurados) -> 1.250 kg.
+          // Si es precio (PRICE), el valor extraído es el precio total,
+          // calculamos la cantidad dividiendo por el precio unitario.
+          const cantidad = valueType === 'WEIGHT'
+            ? value
+            : (producto.precio_venta > 0 ? value / producto.precio_venta : 1);
 
-    const codigoRecortado = codigo.substring(1, 6);
-    let importeStr = codigo.substring(6, 12);
-    importeStr = importeStr.replace(/^0+/, '');
+          const nuevoDetalle: DetalleVenta = {
+            id_temp: Date.now(),
+            id_producto: Number(producto.id_producto),
+            id_venta: venta.id_venta,
+            cantidad: parseFloat(cantidad.toFixed(3)),
+            precio_unitario: producto.precio_venta,
+          };
 
-    try {
-      const responseRecortado = await api.get(
-        `/producto/barcode/${codigoRecortado}`
-      );
-      const productoRecortado: Producto = responseRecortado.data;
-
-      if (productoRecortado) {
-        const importe = parseFloat(importeStr);
-
-        if (isNaN(importe) || importe <= 0) {
-          toast.error('El importe en el código de barras no es válido.');
+          setDetalles([...detalles, nuevoDetalle]);
+          setNombresProductos((prev) => ({
+            ...prev,
+            [producto.id_producto]: producto.nombre_producto,
+          }));
           return;
         }
-
-        const cantidad = importe / productoRecortado.precio_venta;
-
-        const nuevoDetalle: DetalleVenta = {
-          id_temp: Date.now(),
-          id_producto: Number(productoRecortado.id_producto),
-          id_venta: venta.id_venta,
-          cantidad: parseFloat(cantidad.toFixed(3)),
-          precio_unitario: productoRecortado.precio_venta,
-        };
-
-        setDetalles([...detalles, nuevoDetalle]);
-        setNombresProductos((prevState) => ({
-          ...prevState,
-          [productoRecortado.id_producto]: productoRecortado.nombre_producto,
-        }));
+      } catch {
+        toast.error(`Producto con PLU "${plu}" no encontrado`);
         return;
       }
-    } catch {
-      console.log(
-        'No se encontró el producto con el código recortado, intentando con el código completo...'
-      );
     }
 
+    // ── Código estándar (búsqueda por código completo) ─────────────
     const response = await api.get(`/producto/barcode/${codigo}`);
-    console.log(response.data);
     const producto: Producto = response.data;
 
     if (!producto) {
@@ -86,6 +71,7 @@ export const buscarProductoPorCodigo = async (
       return;
     }
 
+    // Si el producto ya existe en la lista, incrementar cantidad
     const productoExistente = detalles.find(
       (d) => d.id_producto === Number(producto.id_producto)
     );
@@ -108,8 +94,8 @@ export const buscarProductoPorCodigo = async (
     };
 
     setDetalles([...detalles, nuevoDetalle]);
-    setNombresProductos((prevState) => ({
-      ...prevState,
+    setNombresProductos((prev) => ({
+      ...prev,
       [producto.id_producto]: producto.nombre_producto,
     }));
   } catch (error) {

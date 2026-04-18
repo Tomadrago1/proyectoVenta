@@ -5,6 +5,10 @@ import { DetalleVenta } from '../venta/detalleVenta.interface';
 import { formatFechaHora } from '../../shared/utils/fechaConverter';
 import './Ventas.css';
 import { generateReport } from './generateReport';
+import { useWebUSBPrinter } from '../printer/useWebUSBPrinter';
+import { printerConfigService } from '../printer/printerConfigService';
+import { encodeTicket } from '../printer/ticketEncoder';
+import toast from 'react-hot-toast';
 
 const Ventas: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -15,6 +19,13 @@ const Ventas: React.FC = () => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [selectedVenta, setSelectedVenta] = useState<number | null>(null);
+
+  // ── WebUSB Printer ──────────────────────────────────────────────
+  const printer = useWebUSBPrinter();
+
+  useEffect(() => {
+    printer.reconnect();
+  }, []);
 
   const [usuarios, setUsuarios] = useState<
     Record<number, { nombre: string; apellido: string }>
@@ -190,32 +201,40 @@ const Ventas: React.FC = () => {
   const handleReimprimirTicket = async () => {
     if (!selectedVenta || !detalleVenta) return;
 
-    try {
-      const ventaActual = ventas.find((v) => v.id_venta === selectedVenta);
-      if (!ventaActual) return;
+    const ventaActual = ventas.find((v) => v.id_venta === selectedVenta);
+    if (!ventaActual) return;
 
+    if (printer.status !== 'connected') {
+      toast.error('Impresora no conectada. Configurala desde el panel de administración.');
+      return;
+    }
+
+    try {
+      const ticketData = await printerConfigService.getTicketData(selectedVenta);
+
+      // Agregar genéricos del detalle actual
       const genericos = detalleVenta
         .filter((d: any) => d.is_generico)
         .map((d: any) => ({
-          id_producto: 0,
           cantidad: d.cantidad,
-          precio_unitario: d.precio_unitario,
-          descripcion: d.descripcion,
+          precio_unitario: Number(d.precio_unitario),
+          nombre_producto: d.descripcion || 'Producto Genérico',
         }));
 
-      const fechaFormateada = new Date(ventaActual.fecha_venta).toLocaleString('es-ES', { hour12: false });
+      const allDetalles = [...ticketData.detalles, ...genericos];
+      const cols = ticketData.printerConfig?.columns_count ?? 48;
+      const fecha = new Date(ventaActual.fecha_venta).toLocaleString('es-ES', { hour12: false });
+      const bytes = encodeTicket(allDetalles, ticketData.negocio, fecha, Number(ventaActual.total), cols);
+      const success = await printer.print(bytes);
 
-      await api.post('/impresora/imprimir-ticket', {
-        id_venta: selectedVenta,
-        total: ventaActual.total,
-        fecha: fechaFormateada,
-        genericos: genericos,
-      });
-
-      alert('Ticket enviado a la impresora correctamente.');
+      if (success) {
+        toast.success('Ticket enviado a la impresora correctamente.');
+      } else {
+        toast.error('Error al enviar el ticket a la impresora.');
+      }
     } catch (error) {
       console.error('Error al reimprimir el ticket:', error);
-      alert('Hubo un error al intentar reimprimir el ticket.');
+      toast.error('Hubo un error al intentar reimprimir el ticket.');
     }
   };
 

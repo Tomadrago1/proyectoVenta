@@ -117,7 +117,41 @@ CREATE TABLE detalle_venta_generico (
 );
 
 
--- 6. DATOS DE PRUEBA
+-- 6. TABLA DE CONFIGURACION DE CODIGOS DE BARRAS (Balanzas)
+CREATE TABLE barcode_configs (
+  id_config INT AUTO_INCREMENT PRIMARY KEY,
+  id_negocio INT NOT NULL,
+  prefix VARCHAR(5) NOT NULL,
+  plu_length TINYINT UNSIGNED NOT NULL,
+  value_length TINYINT UNSIGNED NOT NULL,
+  value_type ENUM('PRICE', 'WEIGHT') NOT NULL DEFAULT 'PRICE',
+  decimal_places TINYINT UNSIGNED NOT NULL DEFAULT 2,
+  descripcion VARCHAR(100) DEFAULT NULL,
+  activo TINYINT(1) NOT NULL DEFAULT 1,
+  CONSTRAINT chk_barcode_configs_activo CHECK (activo IN (0, 1)),
+  CONSTRAINT chk_barcode_configs_lengths CHECK (plu_length + value_length + CHAR_LENGTH(prefix) = 12),
+  UNIQUE KEY uk_barcode_configs_negocio_prefix (id_negocio, prefix),
+  CONSTRAINT fk_barcode_configs_negocio FOREIGN KEY (id_negocio)
+    REFERENCES negocios(id_negocio) ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE = InnoDB;
+
+-- 7. TABLA DE CONFIGURACION DE IMPRESORA
+CREATE TABLE printer_config (
+  id_config INT AUTO_INCREMENT PRIMARY KEY,
+  id_negocio INT NOT NULL,
+  paper_width ENUM('58mm', '80mm') NOT NULL DEFAULT '58mm',
+  vendor_id INT NULL,
+  product_id INT NULL,
+  printer_name VARCHAR(100) DEFAULT NULL,
+  columns_count INT NOT NULL DEFAULT 32,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_printer_config_negocio (id_negocio),
+  CONSTRAINT fk_printer_config_negocio FOREIGN KEY (id_negocio)
+    REFERENCES negocios(id_negocio) ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE = InnoDB;
+
+-- 8. DATOS DE PRUEBA
 
 -- A. Creamos el Superadmin de la plataforma (id_negocio es NULL)
 INSERT INTO usuarios (
@@ -138,3 +172,7 @@ INSERT INTO usuarios (
 ) VALUES (
     2, 1, 1, 'Tomas', 'Admin', 'admin', '$2b$10$EQX/UvNEf34aP.cPci9i6uYHDMbFV.AmocH5vl/kwIjft1phT24sS', 1
 );
+
+-- D. Configuración de balanza para el primer negocio (prefix '20', PLU 5 dígitos, precio 5 dígitos)
+INSERT INTO barcode_configs (id_negocio, prefix, plu_length, value_length, value_type, decimal_places, descripcion)
+VALUES (1, '20', 5, 5, 'PRICE', 2, 'Balanza principal - Precio');

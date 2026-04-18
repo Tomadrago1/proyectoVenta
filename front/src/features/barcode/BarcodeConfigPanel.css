@@ -1,0 +1,466 @@
+/* ===========================
+   BARCODE CONFIG PANEL
+=========================== */
+
+/* ── Tabla de configuraciones ─── */
+.barcode-table-wrapper {
+  background: var(--pos-bg-surface);
+  border-radius: var(--pos-border-radius-lg);
+  border: 1px solid var(--pos-border-color);
+  overflow: hidden;
+  box-shadow: var(--pos-shadow-sm);
+  margin-bottom: 32px;
+}
+
+.barcode-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.barcode-table thead tr {
+  background: var(--pos-bg-main);
+  border-bottom: 2px solid var(--pos-border-color);
+}
+
+.barcode-table th {
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--pos-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.barcode-table tbody tr {
+  border-bottom: 1px solid var(--pos-border-color);
+  transition: background 0.15s ease;
+}
+
+.barcode-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.barcode-table tbody tr:hover {
+  background: var(--pos-bg-main);
+}
+
+.barcode-table td {
+  padding: 14px 18px;
+  font-size: 0.93rem;
+  color: var(--pos-text-primary);
+  vertical-align: middle;
+}
+
+.barcode-prefix-chip {
+  display: inline-block;
+  background: var(--pos-primary-light);
+  color: var(--pos-primary-hover);
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.barcode-type-chip {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.barcode-type-chip.price {
+  background: #d1fae5;
+  color: #059669;
+  border: 1px solid #10b981;
+}
+
+.barcode-type-chip.weight {
+  background: #fef3c7;
+  color: #d97706;
+  border: 1px solid #f59e0b;
+}
+
+.barcode-status-chip {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.barcode-status-chip.active {
+  background: #d1fae5;
+  color: #059669;
+  border: 1px solid #10b981;
+}
+
+.barcode-status-chip.inactive {
+  background: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+
+.barcode-actions-cell {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.barcode-empty-row {
+  text-align: center;
+  color: var(--pos-text-secondary);
+  padding: 48px 20px;
+  font-style: italic;
+}
+
+/* ── Formulario ──────────────── */
+.barcode-form-panel {
+  background: var(--pos-bg-surface);
+  border: 1px solid var(--pos-border-color);
+  border-radius: var(--pos-border-radius-lg);
+  box-shadow: var(--pos-shadow-md);
+  padding: 32px;
+  max-width: 580px;
+  margin: 0 auto 32px;
+}
+
+.barcode-form-panel h2 {
+  color: var(--pos-text-primary);
+  border-bottom: 2px solid var(--pos-bg-main);
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  font-size: 1.25rem;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.barcode-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.barcode-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.barcode-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.barcode-form-group label {
+  color: var(--pos-text-secondary);
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+}
+
+.barcode-form-group input,
+.barcode-form-group select {
+  background: var(--pos-bg-main);
+  border: 1px solid var(--pos-border-color);
+  color: var(--pos-text-primary);
+  border-radius: var(--pos-border-radius-md);
+  padding: 11px 14px;
+  font-size: 0.93rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--pos-font-family);
+}
+
+.barcode-form-group input:focus,
+.barcode-form-group select:focus {
+  outline: none;
+  border-color: var(--pos-primary-color);
+  box-shadow: 0 0 0 3px var(--pos-primary-light);
+  background: var(--pos-bg-surface);
+}
+
+.barcode-form-hint {
+  font-size: 0.78rem;
+  color: var(--pos-text-muted);
+  margin-top: 4px;
+}
+
+.barcode-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 28px;
+  grid-column: 1 / -1;
+}
+
+.barcode-form-actions .btn-primary {
+  background-color: var(--pos-primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--pos-border-radius-md);
+  padding: 11px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.93rem;
+  transition: all 0.2s ease;
+}
+
+.barcode-form-actions .btn-primary:hover {
+  background-color: var(--pos-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--pos-shadow-md);
+}
+
+.barcode-form-actions .btn-secondary {
+  background-color: var(--pos-text-secondary);
+  color: white;
+  border: none;
+  border-radius: var(--pos-border-radius-md);
+  padding: 11px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.93rem;
+  transition: all 0.2s ease;
+}
+
+.barcode-form-actions .btn-secondary:hover {
+  background-color: var(--pos-text-primary);
+  transform: translateY(-1px);
+}
+
+/* ── Validación visual (lengths) ── */
+.barcode-length-indicator {
+  grid-column: 1 / -1;
+  background: var(--pos-bg-main);
+  border: 1px solid var(--pos-border-color);
+  border-radius: var(--pos-border-radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.88rem;
+}
+
+.barcode-length-indicator .length-sum {
+  font-weight: 700;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.barcode-length-indicator .length-ok {
+  color: #059669;
+}
+
+.barcode-length-indicator .length-error {
+  color: var(--pos-danger-color);
+}
+
+/* ═══════════════════════════════
+   LIVE PREVIEW / SIMULADOR
+═══════════════════════════════ */
+.barcode-preview {
+  background: var(--pos-bg-surface);
+  border: 1px solid var(--pos-border-color);
+  border-radius: var(--pos-border-radius-lg);
+  box-shadow: var(--pos-shadow-md);
+  padding: 28px 32px;
+  max-width: 580px;
+  margin: 0 auto 32px;
+}
+
+.barcode-preview h3 {
+  margin: 0 0 20px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--pos-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barcode-preview h3 .preview-icon {
+  font-size: 1.1rem;
+}
+
+.barcode-preview-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  letter-spacing: 0.15em;
+  text-align: center;
+  border: 2px dashed var(--pos-border-color);
+  border-radius: var(--pos-border-radius-md);
+  background: var(--pos-bg-main);
+  color: var(--pos-text-primary);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.barcode-preview-input:focus {
+  outline: none;
+  border-color: var(--pos-primary-color);
+  border-style: solid;
+  box-shadow: 0 0 0 3px var(--pos-primary-light);
+  background: var(--pos-bg-surface);
+}
+
+.barcode-preview-input::placeholder {
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  color: var(--pos-text-muted);
+}
+
+/* ── Segmentos de colores ────── */
+.barcode-segments {
+  display: flex;
+  margin-top: 20px;
+  border-radius: var(--pos-border-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--pos-border-color);
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.barcode-segment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 0;
+  transition: all 0.25s ease;
+}
+
+.barcode-segment-digits {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+
+.barcode-segment-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+/* Prefix segment */
+.barcode-segment.prefix {
+  background: #dbeafe;
+  color: #1d4ed8;
+  flex: 0 0 auto;
+}
+
+/* PLU segment */
+.barcode-segment.plu {
+  background: #fef3c7;
+  color: #92400e;
+  flex: 1;
+}
+
+/* Value segment */
+.barcode-segment.value {
+  background: #d1fae5;
+  color: #065f46;
+  flex: 1;
+}
+
+/* Check digit segment */
+.barcode-segment.check {
+  background: var(--pos-bg-main);
+  color: var(--pos-text-muted);
+  flex: 0 0 auto;
+  min-width: 36px;
+}
+
+/* ── Resultado decodificado ──── */
+.barcode-decoded-result {
+  margin-top: 16px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.barcode-decoded-card {
+  flex: 1;
+  min-width: 140px;
+  background: var(--pos-bg-main);
+  border: 1px solid var(--pos-border-color);
+  border-radius: var(--pos-border-radius-md);
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.barcode-decoded-card .decoded-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pos-text-muted);
+  margin-bottom: 6px;
+}
+
+.barcode-decoded-card .decoded-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.barcode-decoded-card .decoded-value.plu-value {
+  color: #92400e;
+}
+
+.barcode-decoded-card .decoded-value.price-value {
+  color: #059669;
+}
+
+/* ── Estado: sin match ───────── */
+.barcode-preview-standard {
+  margin-top: 16px;
+  text-align: center;
+  padding: 16px;
+  background: var(--pos-bg-main);
+  border-radius: var(--pos-border-radius-md);
+  border: 1px solid var(--pos-border-color);
+  color: var(--pos-text-secondary);
+  font-size: 0.9rem;
+}
+
+.barcode-preview-standard .standard-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* ── Estado: esperando input ─── */
+.barcode-preview-placeholder {
+  margin-top: 20px;
+  text-align: center;
+  padding: 24px;
+  color: var(--pos-text-muted);
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+/* ── Responsive ──────────────── */
+@media (max-width: 600px) {
+  .barcode-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .barcode-form-panel,
+  .barcode-preview {
+    padding: 20px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .barcode-decoded-result {
+    flex-direction: column;
+  }
+}

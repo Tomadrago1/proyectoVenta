@@ -62,7 +62,8 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--pos-text-secondary);
-  margin-bottom: 8px;
+  gap: 4px;
+  margin-bottom: 0;
 }
 
 .ventas-form input[type="date"] {
@@ -79,6 +80,11 @@
   outline: none;
   border-color: var(--pos-primary-color);
   box-shadow: 0 0 0 3px var(--pos-primary-light);
+}
+
+.ventas-form .btn-filtro {
+  padding: 12px 24px;
+  font-size: 15px;
 }
 
 .ventas-btn-group {
