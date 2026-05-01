@@ -1,4 +1,3 @@
-
 services:
   # --- SERVICIO DE BASE DE DATOS ---
   db:
@@ -34,6 +33,13 @@ services:
     depends_on:
       - db
 
+  frontend:
+    build: ./front
+    restart: always
+    ports:
+      - "80:80" # Ahora entramos por el puerto estándar web
+    depends_on:
+      - backend
 volumes:
   db_data:
 
