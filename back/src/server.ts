@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import { Server } from 'http';
 import path from 'path';
 import cors from 'cors';
-import session from 'express-session';
+
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { pool } from './shared/conn';
@@ -50,14 +50,7 @@ app.use(cors({
   },
 }));
 
-app.use(
-  session({
-    secret: process.env.APP_SECRET || 'default-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false },
-  })
-);
+
 
 app.use(express.static(path.join(__dirname, 'dist')));
 

@@ -5,17 +5,14 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      # Docker exige una clave root, aunque no la usemos en la app
-      MYSQL_ROOT_PASSWORD: clave_root_secreta
-      # Acá le decimos a Docker que cree tu base y tu usuario automáticamente:
-      MYSQL_DATABASE: negocio
-      MYSQL_USER: negocio
-      MYSQL_PASSWORD: negocio
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-negocio}
+      MYSQL_USER: ${MYSQL_USER:-negocio}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-negocio}
     ports:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
-      # Acá inyecta tus tablas automáticamente usando tu script
       - ./back/src/database/bd.sql:/docker-entrypoint-initdb.d/init.sql
 
   # --- SERVICIO DE BACKEND (Node) ---
@@ -25,18 +22,18 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Todo lo que pongas acá SOBREESCRIBE tu archivo .env local
       - PORT=3000
-      - DB_HOST=db # ¡El cambio clave! Ahora apunta al contenedor de arriba
+      - DB_HOST=db
       - DB_PORT=3306
-      - DB_USER=negocio
-      - DB_PASSWORD=negocio
-      - DB_NAME=negocio
-      - JWT_SECRET=jwt-secret-key
+      - DB_USER=${MYSQL_USER:-negocio}
+      - DB_PASSWORD=${MYSQL_PASSWORD:-negocio}
+      - DB_NAME=${MYSQL_DATABASE:-negocio}
+      - JWT_SECRET=${JWT_SECRET}
       - LOCALHOST=http://192.168.100.5
-      - APP_SECRET=your-app-secret-key
+      - APP_SECRET=${APP_SECRET}
     depends_on:
       - db
 
 volumes:
   db_data:
+
