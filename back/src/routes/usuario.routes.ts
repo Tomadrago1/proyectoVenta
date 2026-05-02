@@ -5,6 +5,8 @@ import {
   update,
   remove,
   login,
+  me,
+  logout
 } from '../controllers/usuario.controller';
 import { Router } from 'express';
 import { validateJWT } from '../utils/validateJwt';
@@ -14,9 +16,12 @@ export const routerUsuario = Router();
 
 // Login queda público
 routerUsuario.post('/login', login);
+routerUsuario.post('/logout', logout);
 
 // Todas las rutas debajo requieren JWT válido
 routerUsuario.use(validateJWT);
+
+routerUsuario.get('/me', me);
 
 // Ruta para obtener todos los usuarios
 routerUsuario.get('/', findAll);

@@ -72,7 +72,10 @@ async function update(req: Request, res: Response) {
     }
     let { contrasena } = req.body;
 
-    if (!contrasena.startsWith('$2b$')) {
+    // Solo hasheamos si se envía una contraseña y no parece ser un hash bcrypt existente válido
+    // Para evitar que alguien mande un string que empiece con $2b$ y evite el hasheo, 
+    // verificamos si la longitud coincide con un hash bcrypt (60 caracteres).
+    if (contrasena && !(contrasena.startsWith('$2b$') && contrasena.length === 60)) {
       contrasena = await bcrypt.hash(contrasena, 10);
     }
 
@@ -128,9 +131,15 @@ async function login(req: Request, res: Response) {
           jwtSecret,
           { expiresIn: '1h' }
         );
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 3600000 // 1 hora
+        });
+        
         res.json({
           id_rol: usuario.id_rol,
-          token
         });
       } else {
         res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
@@ -144,4 +153,22 @@ async function login(req: Request, res: Response) {
   }
 }
 
-export { findAll, findOne, create, update, remove, login };
+async function me(req: Request, res: Response) {
+  try {
+    const user = res.locals.user;
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(401).json({ message: 'No autenticado' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+}
+
+async function logout(req: Request, res: Response) {
+  res.clearCookie('token');
+  res.json({ message: 'Sesión cerrada correctamente' });
+}
+
+export { findAll, findOne, create, update, remove, login, me, logout };

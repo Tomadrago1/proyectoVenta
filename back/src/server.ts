@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import { Server } from 'http';
 import path from 'path';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -46,7 +47,10 @@ app.use(cors({
       callback(new Error('No permitido por CORS'));
     }
   },
+  credentials: true
 }));
+
+app.use(cookieParser());
 
 
 

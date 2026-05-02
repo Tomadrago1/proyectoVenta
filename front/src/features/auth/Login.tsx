@@ -18,9 +18,6 @@ const Login: React.FC = () => {
         password,
       });
       if (response.status === 200) {
-        const { token } = response.data;
-        localStorage.setItem('token', token);
-        console.log(response.data)
         switch (response.data.id_rol) {
           case 1:
             navigate('/admin');

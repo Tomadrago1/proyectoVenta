@@ -11,13 +11,12 @@ export function validateJWT(req: Request, res: Response, next: NextFunction): vo
         return;
     }
 
-    const authHeader = req.header('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        res.status(401).json({ mensaje: 'Acceso denegado. Token no proporcionado o formato inválido.' });
+    const token = req.cookies.token || (req.header('Authorization')?.split(' ')[1]);
+
+    if (!token) {
+        res.status(401).json({ mensaje: 'Acceso denegado. Token no proporcionado.' });
         return;
     }
-
-    const token = authHeader.split(' ')[1];
 
     try {
         const decodedPayload = jwt.verify(token, JWT_SECRET) as UserPayload;

@@ -13,6 +13,11 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./back/src/database/bd.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # --- SERVICIO DE BACKEND (Node) ---
   backend:
@@ -28,10 +33,11 @@ services:
       - DB_PASSWORD=${MYSQL_PASSWORD:-negocio}
       - DB_NAME=${MYSQL_DATABASE:-negocio}
       - JWT_SECRET=${JWT_SECRET}
-      - LOCALHOST=http://192.168.100.5
+      - LOCALHOST=${LOCALHOST:-http://192.168.100.5}
       - APP_SECRET=${APP_SECRET}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     build: ./front
@@ -40,6 +46,23 @@ services:
       - "80:80" # Ahora entramos por el puerto estándar web
     depends_on:
       - backend
+
+  # --- SERVICIO DE BACKUP ---
+  db-backup:
+    image: databack/mysql-backup
+    restart: always
+    environment:
+      DB_SERVER: db
+      DB_USER: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DB_NAMES: ${MYSQL_DATABASE:-negocio}
+      DB_DUMP_CRON: "0 2 * * *" # Todos los días a las 2 AM
+    volumes:
+      - db_backups:/db
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   db_data:
-
+  db_backups:
