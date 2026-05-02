@@ -40,7 +40,7 @@ app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
-    const allowed = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|34\.151\.237\.162)(:\d+)?$/;
+    const allowed = /^https?:\/\/(localhost|127\.0\.0\.1|.*\.upscale\.com\.ar|upscale\.com\.ar)(:\d+)?$/;
     if (allowed.test(origin)) {
       callback(null, true);
     } else {
@@ -119,7 +119,6 @@ const bootstrap = async () => {
     const server = app.listen(port, '0.0.0.0', () => {
       console.log(`Servidor Express corriendo en el puerto ${port}`);
       console.log(`- Local: http://localhost:${port}`);
-      console.log(`- Red Local: ${process.env.LOCALHOST}:${port}`);
     });
 
     setupGracefulShutdown(server);

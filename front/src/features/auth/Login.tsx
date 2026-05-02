@@ -17,17 +17,20 @@ const Login: React.FC = () => {
         username,
         password,
       });
+
       if (response.status === 200) {
-        switch (response.data.id_rol) {
-          case 1:
-            navigate('/admin');
-            break;
-          case 2:
-            navigate('/venta');
-            break;
-          case 3:
-            navigate('/superadmin');
-            break;
+        const rolNombre = response.data.nombre_rol;
+        const rolId = Number(response.data.id_rol);
+        
+        if (rolNombre === 'Administrador' || rolId === 1) {
+          navigate('/admin');
+        } else if (rolNombre === 'Empleado' || rolId === 2) {
+          navigate('/venta');
+        } else if (rolNombre === 'Superadmin' || rolId === 3) {
+          navigate('/superadmin');
+        } else {
+          setError('Rol de usuario no válido');
+          console.error('Rol no válido', response.data);
         }
       }
     } catch (error: any) {

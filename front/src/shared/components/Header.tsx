@@ -49,9 +49,9 @@ const Header = () => {
             <button
               className="logout-button"
               onClick={handleLogout}
-              style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ background: '#dc3545', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold', padding: '8px 16px', borderRadius: '4px', transition: 'background 0.2s' }}
             >
-              Salir
+              Cerrar Sesión
             </button>
           </li>
         </ul>

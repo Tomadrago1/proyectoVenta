@@ -137,9 +137,10 @@ async function login(req: Request, res: Response) {
           sameSite: 'strict',
           maxAge: 3600000 // 1 hora
         });
-        
+
         res.json({
           id_rol: usuario.id_rol,
+          nombre_rol: usuario.nombre_rol
         });
       } else {
         res.status(401).json({ message: 'Usuario o contraseña incorrectos' });

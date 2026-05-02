@@ -3,3 +3,5 @@ node_modules
 back/.env
 back/.env.development
 front/.env
+front/dist
+back/dist
