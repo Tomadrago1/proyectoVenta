@@ -37,11 +37,9 @@ const loginLimiter = rateLimit({
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Sin origin = misma máquina o herramienta (Postman, curl, proxy)
     if (!origin) return callback(null, true);
 
-    // Permitir localhost y IPs privadas (192.168.x.x, 10.x.x.x) con http o https
-    const allowed = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/;
+    const allowed = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|34\.151\.237\.162)(:\d+)?$/;
     if (allowed.test(origin)) {
       callback(null, true);
     } else {
@@ -59,7 +57,7 @@ app.get('/api', (req: Request, res: Response) => {
 });
 
 app.use('/api/producto', routerProducto);
-app.use('/api/usuario/login', loginLimiter); // Aplicar limite al login
+app.use('/api/usuario/login', loginLimiter);
 app.use('/api/usuario', routerUsuario);
 app.use('/api/venta', routerVenta);
 app.use('/api/detalle-venta', routerDetalleVenta);
