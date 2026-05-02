@@ -14,7 +14,7 @@ services:
       - db_data:/var/lib/mysql
       - ./back/src/database/bd.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,6 +44,10 @@ services:
     restart: always
     ports:
       - "80:80" # Ahora entramos por el puerto estándar web
+      - "443:443" # Puerto HTTPS
+    volumes:
+      - /etc/ssl/certs/cloudflare_upscale.pem:/etc/ssl/certs/cloudflare_upscale.pem:ro
+      - /etc/ssl/private/cloudflare_upscale.key:/etc/ssl/private/cloudflare_upscale.key:ro
     depends_on:
       - backend
 
